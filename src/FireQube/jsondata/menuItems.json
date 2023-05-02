@@ -1,0 +1,105 @@
+{
+  "data" : [
+    {
+      "name": "Framework Demo Setup",
+      "icon": "bi-gear",
+      "open": true,
+      "children": [
+        {
+          "name": "Employee List Demo",
+          "url": "/emplist",
+          "icon": "bi-menu-button-fill"
+        },
+        {
+          "name": "Access Level",
+          "url": "/accLvlList",
+          "icon": "bi-people"
+        },
+        {
+          "name": "Access Level using Component",
+          "url": "/accLvlListCx?m=8",
+          "icon": "bi-list-columns"
+        },    
+        {
+          "name": "User Roles",
+          "url": "/UserList",
+          "icon": "bi-award"
+        },
+        {
+          "name": "Checker Inbox",
+          "url": "/chkrInbox?m=16",
+          "icon": "bi-person-plus"
+        },
+        {
+          "name": "Maker Outbox",
+          "url": "/mkroutbox?m=17",
+          "icon": "bi-boombox-fill"
+        },
+        {
+          "name": "Checker Inbox Cx",
+          "url": "/chkrInboxCx?m=16",
+          "icon": "bi-person-plus"
+        },
+        {
+          "name": "Maker Outbox Cx",
+          "url": "/chkrOutboxCx?m=16",
+          "icon": "bi-person-plus"
+        }
+      ]
+    },
+    {
+      "name": "Masters",
+      "icon": "bi-window-stack",
+      "open": true,
+      "children": [
+        {
+          "name": "Account Groups",
+          "url": "/Menu",
+          "icon": "bi-building-check"
+        },
+        {
+          "name": "Account Heads",
+          "url": "/child32",
+          "icon": "bi-calendar-week"
+        },
+        {
+          "name": "Transaction Types",
+          "url": "/child32",
+          "icon": "bi-card-checklist"
+        },
+        {
+          "name": "Voucher Types",
+          "url": "/child32",
+          "icon": "bi-columns-gap"
+        }
+      ]
+    },  
+    {
+      "name": "Transactions",
+      "icon": "bi-ui-checks-grid",
+      "open": false,
+      "children": [
+        {
+          "name": "Bookings",
+          "url": "/Menu",
+          "icon": "bi-envelope-paper"
+        },
+        {
+          "name": "Invoices",
+          "url": "/child32",
+          "icon": "bi-journal"
+        },
+        {
+          "name": "Voucher Posting",
+          "url": "/child32",
+          "icon": "bi-list-columns"
+        },
+        {
+          "name": "Receipts",
+          "url": "/child32",
+          "icon": "bi-cash"
+        }
+      ]
+    }
+  ]
+}

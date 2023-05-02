@@ -1,0 +1,32 @@
+{
+  "employees": [
+    {
+      "id": 1,
+      "name": "Pankaj",
+      "salary": "10000"
+    },
+    {
+      "name": "David",
+      "salary": "5000",
+      "id": 2
+    }
+  ],
+  "appl": [
+    {
+      "id": 1,
+      "Appd": 1,
+      "AppCode": "app12",
+      "AppName": "10000",
+      "AppUrl": "10000",
+      "LicenseKey": "10000"
+    },
+    {
+      "id": 2,
+      "Appd": 2,
+      "AppCode": "app1",
+      "AppName": "10000",
+      "AppUrl": "10000",
+      "LicenseKey": "10000"
+    }
+  ]
+}

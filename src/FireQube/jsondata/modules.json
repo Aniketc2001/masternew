@@ -1,0 +1,41 @@
+{
+    "data" : [
+      {
+        "moduleid": 1,
+        "name": "Freight Forwarding System",
+        "icon": "bi-cursor-fill",
+        "desc": "Freight forwarding system including rate management & in-built accounting "
+      },
+      {
+        "moduleid": 2,
+        "name": "Application Dashboards",
+        "icon": "bi-bar-chart-fill",
+        "desc": "Access predefined data insights of the application"
+      },
+      {
+        "moduleid": 3,
+        "name": "Admin Module",
+        "icon": "bi-gear-wide-connected",
+        "desc": "Access all the various role & user management aspect of the application"
+      },
+      {
+        "moduleid": 4,
+        "name": "Notifications Setup",
+        "icon": "bi-bell-fill",
+        "desc": "Access all the notifications generated within the application"
+      },
+      {
+        "moduleid": 5,
+        "name": "Audit Module",
+        "icon": "bi-sliders",
+        "desc": "View the audit entries and transaction logs"
+      },
+      {
+        "moduleid": 6,
+        "name": "ETL Space",
+        "icon": "bi-bezier",
+        "desc": "View the file reading definitions, register & scheduled report logs"
+      }
+
+ ]
+}

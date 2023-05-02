@@ -1,0 +1,57 @@
+
+.login-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Poppins';
+    font-size: 11pt;
+    background-color: white;
+    background: linear-gradient(65deg,rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 1)), url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1NTR0takX_7T9kxeBRRdPet35kof2RwxCOA&usqp=CAU") center center;
+    background-size: cover; 
+    padding: 50px;
+}
+
+.vertical-center {
+    border-radius:15px;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: calc(50% - 440px );
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+
+.banner-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Poppins';
+    font-size: 11pt;
+    background-color: white;
+    padding: 80px;
+}  
+.banner {
+  height:400px;
+  background: linear-gradient(65deg,rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 1)), url("https://supplychainmanagement.utk.edu/wp-content/uploads/sites/2/2020/03/blog-ut-haslam-end-to-end-supply-chain-management-2.f9169736-1024x512.jpg") center center;
+  background-size: cover; 
+  }
+  
+.container-back {
+    top:0;
+    left:0;
+    position: absolute;
+    width: 100%;
+    height: 100%; /* Used to enable scrolling */
+    font-family: 'Poppins';
+    font-size: '8pt';
+    /*background: linear-gradient(55deg, #323434 0%, #182527 51%, #001f2b 85%);
+    https://img.freepik.com/free-vector/digital-landscape-with-techno-wireframe-design_1048-12304.jpg
+    https://p4.wallpaperbetter.com/wallpaper/210/304/64/dark-road-sky-landscape-asphalt-hd-wallpaper-preview.jpg */
+
+    background: linear-gradient(rgba(27, 47, 69, 0.6), rgba(27, 47, 69, 0.9)), url("https://www.turningcloud.com/blog/wp-content/uploads/2021/09/global-supply-chain.jpeg") center center;
+    background-size: cover; 
+  }
+
+  .btn-primary,.btn-secondary {
+    font-size: 9.5pt;
+  }
