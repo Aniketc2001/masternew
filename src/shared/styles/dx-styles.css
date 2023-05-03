@@ -91,3 +91,8 @@ body
     font-size: 9.5pt;
 }
 
+
+.select-box-text {
+    padding-top: 18px; /* Adjust the value as needed */
+    margin-left: 8px;
+  }

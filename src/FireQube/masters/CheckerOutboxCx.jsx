@@ -97,7 +97,7 @@ export default function CheckerOutboxCx(props) {
   const closeRecords = () => {
     var ids = getSelectedRowIDs();
     if(ids){
-      const vl = confirm('Selected records would be removed from the Maker<br/>Confirm removal from the list?','Confirmation Alert');
+      const vl = confirm('Selected records would be removed from the Maker Queue<br/>Confirm removal from the list?','Confirmation Alert');
       vl.then((dialogResult) => {
           if(dialogResult){    
             axios({

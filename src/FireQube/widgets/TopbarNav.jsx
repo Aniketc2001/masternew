@@ -122,7 +122,7 @@ const Search = styled('div')(({ theme }) => ({
       
       //User menu flag setting functions
       const hidePopover = (event) =>{
-        console.log('called hidepop...');
+        //console.log('called hidepop...');
         setpopoverFlag(false);
       }
 

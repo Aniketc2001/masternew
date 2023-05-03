@@ -229,7 +229,7 @@ export default function ListPageLayout(props) {
                 headers: {"mId": m}
               }).then((response) => {
                 getRecords();
-                setnotificationBarMessage('Records deletion successful!');
+                setnotificationBarMessage('Action on selected record(s) successful!');
                 setOpenNotificationBar(true);
               }).catch((error) => {
                 if(error.response) {
@@ -339,7 +339,7 @@ export default function ListPageLayout(props) {
     console.log(checkerInfo);
     setOpenPopover(true);
 
-    setTimeout(hidePopover,3000);
+    setTimeout(hidePopover,6000);
   }
 
   const createButtonClick = () => {
@@ -538,7 +538,7 @@ export default function ListPageLayout(props) {
             <Snackbar
                 open={openNotificationBar}
                 onClose={handleCloseNotificationBar}
-                autoHideDuration={3000}
+                autoHideDuration={6000}
                 anchorOrigin={{vertical:'bottom', horizontal:'center'}}
                 
             >

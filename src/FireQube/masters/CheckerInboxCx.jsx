@@ -238,7 +238,7 @@ export default function CheckerInboxCx(props) {
               onSelectionChanged={rowSelectionFunction}
               onCellClick={handleGridCellClick}
             >
-              <Selection mode="multiple"  />
+              <Selection mode="none"  />
               <Paging enabled={true} pageSize={displayPageSize} />
               <SearchPanel visible={true} />
               <GroupPanel visible={displayGroupPanel} />
@@ -247,7 +247,8 @@ export default function CheckerInboxCx(props) {
               <ColumnChooser enabled={true} />
 
               <Export enabled={true}   />
-              <Column caption="" cellRender={renderCheckerStatus} width={25}  />
+              <Column caption="" width={25}  />
+              <Column caption="" cellRender={renderCheckerStatus} width={50}  />
               <Column caption="" cellRender={renderEditButton}  width={30} onClick={editIconClick}  />
               <Column caption="" cellRender={renderDiffButton}  width={30} onClick={diffIconClick}  />
 

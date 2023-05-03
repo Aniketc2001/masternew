@@ -131,7 +131,7 @@ export default function AccessLevelManage(props) {
         if(item.IsParent==="Y"){
             console.log(item);
             let fps = buildTreeChildData(item.Items);
-            return({menuName: item.MenuName , items: fps, selected: (item.Access ==="Assigned"?true:false), access: item.Access, parent: 'Y', nodeType: 'Group', MenuIcon: item.MenuIcon });
+            return({menuName: item.MenuName , items: fps,  access: item.Access, parent: 'Y', nodeType: 'Group', MenuIcon: item.MenuIcon });
         }
     })
 
@@ -149,10 +149,10 @@ export default function AccessLevelManage(props) {
             let viewRights = buildRightsData(item.ViewAccess);
 
             let viewMenu = {menuName :'Page Access', items: viewRights, nodeType: 'AccessGroup'};
-            let readMenu = {menuName :'Column Access', items: readRights, nodeType: 'AccessGroup'};
-            let writeMenu = {menuName :'Write Access', items: writeRights, nodeType: 'AccessGroup'};
+            let readMenu = {menuName :'List Columns Access', items: readRights, nodeType: 'AccessGroup'};
+            let writeMenu = {menuName :'Function Points Access', items: writeRights, nodeType: 'AccessGroup'};
 
-            return({menuName: item.MenuName, items: [viewMenu, readMenu, writeMenu], selected: item.Access==="Assigned"?true:false, access: item.Access, nodeType: 'Menu', MenuIcon: item.MenuIcon})
+            return({menuName: item.MenuName, items: [viewMenu, readMenu, writeMenu], access: item.Access, nodeType: 'Menu', MenuIcon: item.MenuIcon})
         }
         catch(ex){}       
     })
@@ -222,8 +222,10 @@ export default function AccessLevelManage(props) {
 
   const buildRightsData = (nodes) => {
     const tmpData = nodes.map(item => {
-        return({menuName: item.FunctionPointName, selected: item.Access==="Assigned"?true:false, initialAccess: item.Access, type: 'FunctionPoints', FunctionPointId: item.FunctionPointId,  nodeType: 'FunctionPoints'  })       
+        return({menuName: item.FunctionPointName, selected: item.Access === "Assigned" ? true : false , initialAccess: item.Access, type: 'FunctionPoints', FunctionPointId: item.FunctionPointId,  nodeType: 'FunctionPoints'  })       
     })
+
+    console.log('tmpdata',tmpData);
     return (tmpData);
   }
 
@@ -234,6 +236,7 @@ export default function AccessLevelManage(props) {
       url: 'accesslevel/accessgrants/' + id, 
       headers: config
     }).then((response) => {
+      console.log('original',response.data);
       buildTreeData(response.data);
     }).catch((error) => {
       console.log('list err');

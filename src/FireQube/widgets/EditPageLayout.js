@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { 
   Box, Paper, FormControl, FormGroup, InputLabel, Input, Typography,  styled, TextField, MenuItem,
-  Stack, Divider, FormControlLabel, Checkbox, Alert, Grid, Snackbar, Autocomplete
+  Stack, Divider, FormControlLabel, Checkbox, Alert, Grid, Snackbar, Autocomplete, CssBaseline
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import axios from 'axios';
 
 import { alert, custom, confirm  } from 'devextreme/ui/dialog';
+import { SelectBox } from 'devextreme-react/select-box';
+
 import { getUrlToRedirectPostCheckerAction  } from '../../shared/scripts/globalfuncs';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -57,7 +59,7 @@ export default function EditPageLayout(props) {
   }, [detailGridColumns]);
 
   useEffect(() => {
-    console.log('printing m value ' + m + " clr " + clr);
+    console.log('printing m value ' + m + " clr " + clr + " id " + id);
     console.log(baseObj);
     getMetaData();
     getBaseData();
@@ -123,8 +125,20 @@ export default function EditPageLayout(props) {
 
   }
 
+  const onACValChange = (e,v,f) => {
+    console.log('Auto...',e,v,f);
+    setbaseObj({...baseObj, [f]: v[f]});
+    console.log(baseObj,f,v[f]); 
+  }
+
+  const handleValueChange = (e) => {
+    console.log('New value:', e, e.component.option("name"),e.value);
+    let valueExpr = e.component.option("name");
+    setbaseObj({...baseObj, [valueExpr]: e.value});
+  };
+
   const onValChange = (e) => {
-    //console.log(e);
+    console.log(e.target,e.target.type,e.target.name,e.target.value);
     if(e.target.type === 'checkbox'){
       console.log(e.target);
       setbaseObj({...baseObj, [e.target.name]: e.target.checked ? true : false});
@@ -308,7 +322,7 @@ export default function EditPageLayout(props) {
           valmsg = "Invalid data";
         
         fg = false;
-        errmsg = errmsg + "<b>" + item.TableFieldName + "</b><br/>" + valmsg + "<br/><br/>";    
+        errmsg = errmsg + "<b>" + item.DisplayCaption + "</b><br/>" + valmsg + "<br/><br/>";    
       }
 
     });
@@ -353,15 +367,24 @@ export default function EditPageLayout(props) {
             </FormControl>            
         )
     }
-    else if(column.ControlType==="Dropdown"){
+    else if(column.ControlType==="DropdownT"){
         if(!ancillaryData)
           return;
 
         const ancobj = column.AncillaryObject;
         const ancobjarr =  ancillaryData[ancobj]; //eval('ancillaryData.' + ancobj);
 
+        console.log('ancillary obj...',ancobjarr);
+
         let displayFieldName = column.TableFieldName.replace('Id','Code');
         let valueFieldName = column.TableFieldName;
+
+        if(displayFieldName === '')
+          displayFieldName = column.AncillaryObjectValueField;
+          
+        if(valueFieldName === '')
+          valueFieldName = column.AncillaryObjectKeyField;
+          
         //console.log('index position ...'  + valueFieldName.indexOf("Parent") + ' **  ' + column.TableFieldName); 
         if(valueFieldName.indexOf("Parent") < 0) {
           try{
@@ -377,37 +400,120 @@ export default function EditPageLayout(props) {
         displayFieldName = displayFieldName.replace('Parent','');
         valueFieldName = valueFieldName.replace('Parent','');
 
-
-        //console.log('ancillary data arr...' + 'ancillaryData.' + ancobj + " displayfield " + displayFieldName + " valuefield " + valueFieldName );
-        //console.log(ancobjarr);
-
-        //console.log(column.TableFieldName);
-
         return(
-            
-            <TextField label={column.DisplayCaption} variant="standard" title={column.HelpText}  
-              select value={baseObj[`${column.TableFieldName}`]}
-              inputProps={{  readOnly: baseObj[`${column.TableFieldName}`] === 'Y'  }} 
-              onChange={(evt) => onValChange(evt)} name={column.TableFieldName}>
-              {
-                // eslint-disable-next-line
-                ancobjarr?
-                ancobjarr.map((app) => (
-                  <MenuItem key={app[`${valueFieldName}`]}  value={app[`${valueFieldName}`]}>{app[`${displayFieldName}`]}</MenuItem>
-                ))
-                :<></>
-              }
-            </TextField>
-            
-           
+          <TextField label={column.DisplayCaption} variant="standard" title={column.HelpText}  
+          select value={baseObj[`${column.TableFieldName}`]}
+          inputProps={{  readOnly: baseObj[`${column.TableFieldName}`] === 'Y'  }} 
+          onChange={(evt) => onValChange(evt)} name={column.TableFieldName}>
+          {
+            // eslint-disable-next-line
+            ancobjarr?
+            ancobjarr.map((app) => (
+              <MenuItem key={app[`${valueFieldName}`]}  value={app[`${valueFieldName}`]}>{app[`${displayFieldName}`]}</MenuItem>
+            ))
+            :<></>
+          }
+        </TextField>
         )
     }
+    else if(column.ControlType==="DropdownAC"){
+      if(!ancillaryData)
+        return;
+
+      const ancobj = column.AncillaryObject;
+      const ancobjarr =  ancillaryData[ancobj]; //eval('ancillaryData.' + ancobj);
+
+      console.log('ancillary obj...',ancobjarr);
+
+      let displayFieldName = column.TableFieldName.replace('Id','Code');
+      let valueFieldName = column.TableFieldName;
+
+      if(displayFieldName === '')
+        displayFieldName = column.AncillaryObjectValueField;
+        
+      if(valueFieldName === '')
+        valueFieldName = column.AncillaryObjectKeyField;
+        
+      if(valueFieldName.indexOf("Parent") < 0) {
+        try{
+          if(!ancobjarr[0].hasOwnProperty(column.TableFieldName)){
+            //console.log( column.TableFieldName + ' property not found inside ancobj');  
+            displayFieldName = "LookupItemCode";
+            valueFieldName = "LookupItemId";
+          }
+        }
+        catch(ex){}
+      }
+
+      displayFieldName = displayFieldName.replace('Parent','');
+      valueFieldName = valueFieldName.replace('Parent','');
+
+      console.log('params ', displayFieldName, valueFieldName);
+
+      return(
+        <FormControl variant="standard">
+        <Autocomplete disablePortal options={ancobjarr} 
+        getOptionLabel={(option) => option[displayFieldName]} 
+        autoHighlight  
+        title={column.HelpText} 
+        name={column.TableFieldName} 
+        value={baseObj[valueFieldName]===0?null:baseObj[valueFieldName]}
+        onChange={(evt,newval) => onACValChange(evt,newval,column.TableFieldName )}
+        renderInput={(params) => <TextField {...params} label={column.DisplayCaption}  variant="standard" title={column.HelpText}  />} >
+        isOptionEqualToValue={(option, value) => option.value === value}
+        </Autocomplete>
+        </FormControl>
+      )
+  }
+  else if(column.ControlType==="Dropdown"){
+    if(!ancillaryData)
+      return;
+
+    const ancobj = column.AncillaryObject;
+    const ancobjarr =  ancillaryData[ancobj]; //eval('ancillaryData.' + ancobj);
+
+    const selectBoxStyles = {
+        height: '55px',
+        paddingTop: '18px',
+        paddingBottom: '1px' // Set the padding top to move the text down
+    };
+
+    console.log('ancillary obj...',ancobjarr);
+
+    let displayFieldName = column.AncillaryObjectValueField;
+    let valueFieldName = column.AncillaryObjectKeyField;
+  
+    return(
+      <FormControl variant="outlined"  >
+        <SelectBox dataSource={ancobjarr}
+                  name={column.TableFieldName}
+                  displayExpr={displayFieldName}
+                  valueExpr={valueFieldName}
+                  value={baseObj[`${column.TableFieldName}`] }
+                  searchEnabled={true}
+                  searchMode='contains'
+                  searchExpr={displayFieldName}
+                  searchTimeout={200}
+                  minSearchLength={0}
+                  showDataBeforeSearch={true}
+                  label={column.DisplayCaption}
+                  labelMode='floating'
+                  showSelectionControls={false}
+                  stylingMode='underlined'
+                  height='55px'
+                  className='select-box-text'
+                  onValueChanged={handleValueChange}
+                  />
+      </FormControl>
+    )
+}
+
   }
 
   const renderDeleteStatus = (cellData) => {
     return (
       <div>
-            {cellData.data.MarkedForDelete==="Y" ?<i className={'bi-flag-fill'} style={{color:'red', fontSize: '10pt', marginRight: '5px'}} title="Marked for deletion" />:<></>}
+            {cellData.data.MarkedForDelete ?<i className={'bi-flag-fill'} style={{color:'red', fontSize: '10pt', marginRight: '5px'}} title="Marked for deletion" />:<></>}
       </div>
     );
   }
@@ -432,17 +538,20 @@ export default function EditPageLayout(props) {
   const renderGridColumn = (column) => {
    // console.log('rendering columns....');
    // console.log(column);
-    if(column.lookupDataSource){
-      return(
-          <Column dataField={column.TableFieldName} caption={column.DisplayCaption} width={column.ControlWidth}>
-            <Lookup dataSource={ancillaryData[`${column.AncillaryObject}`]} displayExpr={column.AncillaryObjectValueField} valueExpr={column.AncillaryObjectKeyField} />
-          </Column>
-      );
-    }
-    else{
+   if(column.ShowField==="Y")
+   {
+      if(column.AncillaryObject){
         return(
-      <Column dataField={column.TableFieldName} caption={column.DisplayCaption} width={column.ControlWidth} />
-      );
+            <Column dataField={column.TableFieldName} caption={column.DisplayCaption} width={column.ControlWidth}>
+              <Lookup dataSource={ancillaryData[`${column.AncillaryObject}`]} displayExpr={column.AncillaryObjectValueField} valueExpr={column.AncillaryObjectKeyField} />
+            </Column>
+        );
+      }
+      else{
+          return(
+        <Column dataField={column.TableFieldName} caption={column.DisplayCaption} width={column.ControlWidth} />
+        );
+      }
     }
   }
 
@@ -514,7 +623,7 @@ export default function EditPageLayout(props) {
                 />
                 <SearchPanel visible={true} />
                 <Editing
-                  mode="cell"
+                  mode="batch"
                   newRowPosition={'last'}
                   allowUpdating={true}
                   allowAdding={true}
@@ -536,10 +645,10 @@ export default function EditPageLayout(props) {
           :<></>}
           <Grid item xs={12} spacing={1} sx={{paddingTop:10,paddingBottom:3}}>
           <FormControl>
-              { baseObj.MarkedForDelete === 'Y' ? (
+              { baseObj.MarkedForDelete ? (
               <Alert severity="error" variant="filled">
                 Entry marked for deletion. Awaiting check..
-              </Alert> ) : ''}
+              </Alert> ) : <></>}
             </FormControl>
           </Grid>
           <Grid item xs={12} spacing={2} sx={{paddingTop:4}}>
@@ -564,11 +673,14 @@ export default function EditPageLayout(props) {
                     <BxButton size="sm" style={{ textTransform: "none"}} onClick={() => saveRecord()}>
                       <i className={'bi-save'} style={{color:'white', fontSize: '9pt', marginRight: '10px'}} />
                       Save
-                    </BxButton>      
+                    </BxButton>
+                    {(id !== "0" ?
                     <BxButton size="sm" style={{ textTransform: "none" }} onClick={() => deleteRecord()} >
                       <i className={'bi-x-square-fill'} style={{color:'white', fontSize: '9pt', marginRight: '10px'}} />
-                      Delete
-                    </BxButton>                    
+                       Delete
+                    </BxButton>
+                    : <></>
+                    )}                    
                     <BxButton size="sm" style={{ textTransform: "none" }} onClick={() => cancelEntry()} >
                       <i className={'bi-card-checklist'} style={{color:'white', fontSize: '9pt', marginRight: '10px'}} />
                       Back to List
