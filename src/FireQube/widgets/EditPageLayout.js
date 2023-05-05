@@ -335,9 +335,10 @@ export default function EditPageLayout(props) {
 
   const renderControl = (column) => {
     //console.log(column);
-    if(column.ControlType==="Text Field"){
+    if(column.ControlType==="Text Field" || column.ControlType==="Numeric Field"  ){
         return(
-            <TextField onChange={(evt) => onValChange(evt)} label={column.DisplayCaption} required={column.IsMandatory=='Y'?true:false} title={column.HelpText }
+            <TextField onChange={(evt) => onValChange(evt)} label={column.DisplayCaption} required={column.IsMandatory=='Y'?true:false} 
+            title={baseObj[`${column.TableFieldName}`] }
              variant="standard" name={column.TableFieldName} value={baseObj[`${column.TableFieldName}`] } autoComplete="off" sx={{width:200}}  inputProps={{ maxLength: `${column.MaxLength}`, readOnly: baseObj[`${column.TableFieldName}`] === 'Y'  }} />
         );
     }
@@ -513,7 +514,7 @@ export default function EditPageLayout(props) {
   const renderDeleteStatus = (cellData) => {
     return (
       <div>
-            {cellData.data.MarkedForDelete ?<i className={'bi-flag-fill'} style={{color:'red', fontSize: '10pt', marginRight: '5px'}} title="Marked for deletion" />:<></>}
+            {cellData.data.MarkedForDelete==="Y" ?<i className={'bi-flag-fill'} style={{color:'red', fontSize: '10pt', marginRight: '5px'}} title="Marked for deletion" />:<></>}
       </div>
     );
   }
@@ -702,7 +703,6 @@ export default function EditPageLayout(props) {
                 onClose={handleCloseNotificationBar}
                 autoHideDuration={3000}
                 anchorOrigin={{vertical:'bottom', horizontal:'center'}}
-                
             >
                  <Alert onClose={handleCloseNotificationBar} severity="info" variant="filled" sx={{ width: '100%' }}>
                     {notificationBarMessage}

@@ -17,6 +17,7 @@ import MasterEditPageMultiLevel from './FireQube/masters/MasterEditPageMultiLeve
 
 import SystemUserList from './FireQube/masters/SystemUserList'
 import DepartmentEdit from './FireQube/masters/DepartmentEdit';
+import PartyMaster from './FFS/masters/PartyMaster/PartyMaster';
 import EmployeeEdit from './FireQube/masters/EmployeeEdit';
 import SystemUserEdit from './FireQube/masters/SystemUserEdit'
 import Login from './FireQube/auth/Login';
@@ -173,6 +174,7 @@ function App() {
       <Route path="/vesselServiceEdit/:id" element={<MasterEditCx mId="VesselService"/>} />
       <Route path="/vesselVoyagePortEdit/:id" element={<MasterEditCx mId="VesselVoyagePort"/>} />
       <Route path="/portEdit/:id" element={<MasterEditPageMultiLevel mId="Port"/>} />
+      <Route path="/partyFullEdit/:id" element={<PartyMaster />} />
       <Route path="/partyListEdit/:id" element={<MasterEditCx mId="Party & Types"/>} />
       <Route path="/partyAddressListEdit/:id" element={<MasterEditPageMultiLevel mId="Party Address & Contacts"/>} />
       <Route path="/partyCommunicationListEdit/:id" element={<MasterEditCx mId="Party Communication"/>} />

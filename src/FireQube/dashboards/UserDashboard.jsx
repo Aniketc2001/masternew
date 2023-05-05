@@ -45,14 +45,47 @@ export default function UserDashboard() {
             </Grid>
             <Grid item spacing={1} xs={3}>
               <Paper elevation={2} sx={{ p: 3, m:1, minHeight: '15vh', backgroundColor: 'orange' }}>
+                <Grid container spacing={0.5} noValidate={false}>
+                    <Grid item spacing={0} xs={4}>
+                      <i className={'bi-people-fill'} style={{color:'whitesmoke', fontSize: '30pt', marginRight: '5px', cursor:'pointer'}}  />
+                    </Grid>
+                    <Grid item spacing={0} xs={8}>
+                        <span style={{fontSize:'25pt', color:'white'}}>12</span>
+                        <br/>
+                        <span style={{fontSize:'12pt', color:'white'}}>Active Users</span>
+
+                    </Grid>
+                  </Grid>
               </Paper>            
             </Grid>
             <Grid item spacing={1} xs={3}>
               <Paper elevation={2} sx={{ p: 3, m:1, minHeight: '15vh', backgroundColor: 'lightgreen' }}>
+                  <Grid container spacing={0.5} noValidate={false}>
+                    <Grid item spacing={0} xs={4}>
+                      <i className={'bi-qr-code'} style={{color:'whitesmoke', fontSize: '30pt', marginRight: '5px', cursor:'pointer'}}  />
+                    </Grid>
+                    <Grid item spacing={0} xs={8}>
+                        <span style={{fontSize:'25pt', color:'white'}}>214</span>
+                        <br/>
+                        <span style={{fontSize:'12pt', color:'white'}}>Checker Inbox</span>
+
+                    </Grid>
+                  </Grid>
               </Paper>            
             </Grid>
             <Grid item spacing={1} xs={3}>
               <Paper elevation={2} sx={{ p: 3, m:1, minHeight: '15vh', backgroundColor: 'lightskyblue' }}>
+                  <Grid container spacing={0.5} noValidate={false}>
+                    <Grid item spacing={0} xs={4}>
+                      <i className={'bi-recycle'} style={{color:'whitesmoke', fontSize: '30pt', marginRight: '5px', cursor:'pointer'}}  />
+                    </Grid>
+                    <Grid item spacing={0} xs={8}>
+                        <span style={{fontSize:'25pt', color:'white'}}>43</span>
+                        <br/>
+                        <span style={{fontSize:'12pt', color:'white'}}>Online Requests</span>
+
+                    </Grid>
+                  </Grid>
               </Paper>            
             </Grid>
 
