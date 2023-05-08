@@ -75,6 +75,7 @@ export default function PartyMaster() {
       setBaseObj({ ...baseObj, [e.target.name]: e.target.value });
 
     // console.log(e.target);
+    // console.log()
   }
 
   function handleSubmit() {
