@@ -140,6 +140,9 @@ function App() {
       <Route path="/partyCommunicationList" element={<MasterListPageCx mId="Party Communication"/>} />
       <Route path="/rebatePartyList" element={<MasterListPageCx mId="Rebate Party"/>} />
       <Route path="/partySalesMapList" element={<MasterListPageCx mId="Party Sales Map"/>} />
+      <Route path="/locationList" element={<MasterListPageCx mId="Location"/>} />
+      <Route path="/commodityCategoryList" element={<MasterListPageCx mId="Commodity Category"/>} />
+      <Route path="/crmTeamList" element={<MasterListPageCx mId="CRM Team"/>} />
 
       <Route path="/appEdit/:id" element={<MasterEditCx mId="App"/>} />
       <Route path="/systemConfigEdit/:id" element={<MasterEditCx mId="System Config"/>} />
@@ -180,7 +183,10 @@ function App() {
       <Route path="/partyCommunicationListEdit/:id" element={<MasterEditCx mId="Party Communication"/>} />
       <Route path="/rebatePartyListEdit/:id" element={<MasterEditCx mId="Rebate Party"/>} />
       <Route path="/partySalesMapEdit/:id" element={<MasterEditCx mId="Party Sales Map"/>} />
- 
+      <Route path="/locationEdit/:id" element={<MasterEditCx mId="Location"/>} />
+      <Route path="/commodityCategoryEdit/:id" element={<MasterEditCx mId="Commodity Category"/>} />
+      <Route path="/crmTeamEdit/:id" element={<MasterEditPageMultiLevel mId="CRM Team"/>} />
+
       <Route path="/accessLevelManage/:id" element={<AccessLevelManage />} />
 
       <Route path="/emplist" element={<EmployeeList />} />

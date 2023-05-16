@@ -31,23 +31,28 @@ export default function AccessLevelManage(props) {
   const [showAR, setShowAR] = useState(false);
   const [openRejectDialog,setopenRejectDialog] = React.useState(false);
   const [rejectReason,setrejectReason] = React.useState("");
-
+  const [accLvlInfo, setAccLvlInfo] = React.useState("");
   const treeViewRef = React.createRef();
+  const [initialmenus, setInitialMenus] = useState(""); 
+  const [accessName, setAccessName] = useState(null);
 
   const config = {
-    headers: {
-      "mId": m
-  }};
+      "mId": m,
+      "accLvlId": id
+  };
 
 
   useEffect(() => {
     try{
         setShowAR(clr === 'c');
         getRecords();
+        getAccessLevelInfo();
+        
+        // eslint-disable-next-line
     }
     catch(ex){
     }
-  }, []);
+  },[]);
    
   const handleCloseNotificationBar = () => {
     setOpenNotificationBar(false);
@@ -62,26 +67,26 @@ export default function AccessLevelManage(props) {
   }
 
   const approveRequest = () => {
+    const FunctionPointNodes = filterNodesByColumn(menus);
+    console.log(FunctionPointNodes);
+    
     const vl = confirm('Confirm approval?','Confirmation Alert');
     vl.then((dialogResult) => {
         if(dialogResult){
           axios({
             method: 'put',
-            url: 'accesslevel/accessgrants/' + id,
-            data: null,
-            headers: {"mId": m, "cact" : 'A'}
+            url: 'accesslevel/GiveGrants',
+            data: FunctionPointNodes,
+            headers: {"mId": m, "accLvlId": id, "cact" : 'A'}
           }).then((response) => {
               //navigate("/" + props.listPageName +  "?m=" + m);
               setnotificationBarMessage("Record approved successfully!");
               setOpenNotificationBar(true);                 
               navigate(-1);
           }).catch((error) => {
-              if(error.response){
-                  if(error.response.status === 417) {
-                    setnotificationBarMessage("Error occured while approving data.." + error.response.data);
-                    setOpenNotificationBar(true);   
-                  }
-              }
+              console.log(error.response);
+              setnotificationBarMessage("Error occured while approving data.." + error.response.data);
+              setOpenNotificationBar(true);   
           })
         }
     });
@@ -129,7 +134,7 @@ export default function AccessLevelManage(props) {
   const buildTreeData = (nodes) => {
     const tmpData = nodes.map(item => {
         if(item.IsParent==="Y"){
-            console.log(item);
+            //console.log(item);
             let fps = buildTreeChildData(item.Items);
             return({menuName: item.MenuName , items: fps,  access: item.Access, parent: 'Y', nodeType: 'Group', MenuIcon: item.MenuIcon });
         }
@@ -139,6 +144,7 @@ export default function AccessLevelManage(props) {
     console.log(tmpData);
 
     setMenus(tmpData);
+    setInitialMenus(JSON.stringify(filterNodesByColumn(tmpData)));
   }
 
   const buildTreeChildData = (nodes) => {
@@ -170,7 +176,7 @@ export default function AccessLevelManage(props) {
                 appnodes.items.forEach(accgrpnodes => {
                     accgrpnodes.items.forEach(accnodes => {
                         tmpNodes.push({
-                            items: {'FunctionPointId': accnodes.FunctionPointId, 'Selected' : accnodes.selected }
+                            'FunctionPointId': accnodes.FunctionPointId, 'Selected' : accnodes.selected 
                         });
     
                     });
@@ -196,16 +202,26 @@ export default function AccessLevelManage(props) {
   
   const saveData = () => {
     const FunctionPointNodes = filterNodesByColumn(menus);
-    console.log(FunctionPointNodes);
+    console.log("FunctionPointNodes",FunctionPointNodes);
+
+    console.log("initial",initialmenus);
+    console.log("new",JSON.stringify(FunctionPointNodes));
+
+
+    if(initialmenus === JSON.stringify(FunctionPointNodes)){
+      alert("No changes were made to the access grants!","Access Grant Validation");
+      return false;
+    }
+    
 
     const vl = confirm('Confirm rights assignment?','Confirmation Alert');
     vl.then((dialogResult) => {
         if(dialogResult){
           axios({
               method: (id === "0" ? 'post' : 'put'),
-              url: 'accessLevel/setGrants',
+              url: 'accessLevel/GiveGrants',
               data: FunctionPointNodes,
-              headers: {"mId": m}
+              headers: {"mId": m, "accLvlId": id}
           }).then((response) => {
               navigate(-1);
           }).catch((error) => {
@@ -222,10 +238,10 @@ export default function AccessLevelManage(props) {
 
   const buildRightsData = (nodes) => {
     const tmpData = nodes.map(item => {
-        return({menuName: item.FunctionPointName, selected: item.Access === "Assigned" ? true : false , initialAccess: item.Access, type: 'FunctionPoints', FunctionPointId: item.FunctionPointId,  nodeType: 'FunctionPoints'  })       
+        return({menuName: item.FunctionPointName, selected: item.Access === "Assigned" ? true : false , initialAccess: item.Access, type: 'FunctionPoints', FunctionPointId: item.FunctionPointId,  nodeType: 'FunctionPoints', CurrentAction : item.CurrentAction  })       
     })
 
-    console.log('tmpdata',tmpData);
+    //console.log('tmpdata',tmpData);
     return (tmpData);
   }
 
@@ -238,14 +254,34 @@ export default function AccessLevelManage(props) {
     }).then((response) => {
       console.log('original',response.data);
       buildTreeData(response.data);
+
     }).catch((error) => {
       console.log('list err');
       console.log(error);
       if(error.response) {
         console.log("Error occured while fetching data. Error message - " + error.message);
       }
-  })
-}
+    })
+  }
+
+  const getAccessLevelInfo = () => {
+    axios({
+      method: 'get',
+      url: 'accessLevel/accessLevelInfo', 
+      headers: config
+    }).then((response) => {
+      console.log('getaccesslevelinfo...',response);
+      setAccessName(response.data.AccessLevelName);
+      setAccLvlInfo(response.data);
+    }).catch((error) => {
+      console.log('list err');
+      console.log(error);
+      if(error.response) {
+        console.log("Error occured while fetching data. Error message - " + error.message);
+      }
+    })
+  }
+
 
 // Define the template for each node
 const nodeTemplate = (item) => {
@@ -271,7 +307,7 @@ const nodeTemplate = (item) => {
         autoComplete="off"
         className="EditPageLayout"
     >
-      <h2 className='PageTitle'>Manage Grants</h2>
+      <h2 className='PageTitle'>Manage Grants {accessName?<b>({accessName})</b>:<></>} </h2>
       <p className='PageSubTitle'>Grant and revoke function points to access levels</p>
       <br />
       <Grid container spacing={1} >
@@ -316,10 +352,11 @@ const nodeTemplate = (item) => {
                 </Stack>
               ) : (clr === null) ? (
                  <Stack spacing={0.2} direction="row" divider={<Divider orientation="vertical" flexItem />} >
+                  {accLvlInfo.AccessLevelCheckerStatus === "W" || accLvlInfo.AccessLevelCheckerStatus === "R" || accLvlInfo.GrantsCheckerStatus === "W" ?<></>:  
                     <BxButton size="sm" style={{ textTransform: "none"}} onClick={() => saveData()}>
                       <i className={'bi-save'} style={{color:'white', fontSize: '9pt', marginRight: '10px'}} />
                       Save Access
-                    </BxButton>      
+                    </BxButton>}      
                     <BxButton size="sm" style={{ textTransform: "none" }} onClick={() => backtolist()} >
                       <i className={'bi-card-checklist'} style={{color:'white', fontSize: '9pt', marginRight: '10px'}} />
                       Back to List
@@ -335,7 +372,18 @@ const nodeTemplate = (item) => {
               }
             </FormControl>
           </Grid>          
+          <Grid item xs={12}>
+            {accLvlInfo.AccessLevelCheckerStatus === "W" || accLvlInfo.AccessLevelCheckerStatus === "R" || accLvlInfo.GrantsCheckerStatus === "W" ?  
+                ( showAR ? <></> :
+                  <Alert severity="warning" variant="standard">
+                        Access Grants or Access Level are currently awaiting Checker Approval!
+                  </Alert>
+                )
+                :
+                <></>
+              }                    
 
+          </Grid>
       </Grid>
       <br/>
       <div style={{overflow:'auto',height:'67vh'}}>
@@ -344,6 +392,7 @@ const nodeTemplate = (item) => {
             ref={treeViewRef}
             items={menus}
             sx={{fontFamily:'Poppins',fontSize:'10pt'}}
+            expandedRow
             selectNodesRecursive={true}
             selectByClick={false}
             showCheckBoxesMode={'selectAll'}
@@ -413,15 +462,35 @@ const nodeTemplate = (item) => {
   );
 }
 
+const Treenodetag = (item) => {
+  console.log('item',item);
+
+}
+
 function renderTreeViewItem(item) {
+ 
   if(item.nodeType === "Group")
     return (<><i className={item.MenuIcon} style={{color:'black', fontSize: '10pt',marginRight:'10px'}}/><b>{item.menuName}</b></>);
   else if(item.nodeType === "Menu")
   return (<><i className={item.MenuIcon} style={{color:'purple', fontSize: '10pt',marginRight:'10px'}}/>{item.menuName}</>);
   else if(item.nodeType === "AccessGroup")
-    return (<><i className={'bi-bookmarks-fill'} style={{color:'paleyellow', fontSize: '10pt',marginRight:'10px'}}/><span style={{color:'darkplum', fontStyle:'italic'}}>{item.menuName}</span></>);
+    return (<><i className={'bi-bookmarks-fill'} style={{color:'orange', fontSize: '10pt',marginRight:'10px'}}/><span style={{color:'darkplum', fontStyle:'italic'}}>{item.menuName}</span></>);
   else if(item.nodeType === "FunctionPoints")
-  return (<><i className={'bi-patch-check-fill'} style={{color:'lightred', fontSize: '10pt',marginRight:'10px'}}/>{item.menuName}</>);
+  return (<><i className={'bi-patch-check-fill'} style={{color:'blue', fontSize: '10pt',marginRight:'10px'}}/>{item.menuName} 
+    {item.CurrentAction === "Revoked"?
+      <><i className={'bi-arrow-return-right'} style={{color:'red', fontSize: '10pt',marginLeft:'20px',marginRight:'8px'}}/> 
+        <span style={{backgroundColor:'red', color:'yellow',  fontSize:'8pt',paddingLeft:'5px',paddingRight:'5px', borderRadius:'10px'}} >Revoked</span>
+      </>
+     :
+      (item.CurrentAction === "New"?
+        <><i className={'bi-arrow-return-left'} style={{color:'green', fontSize: '10pt',marginLeft:'20px',marginRight:'8px'}}/>
+        <span style={{backgroundColor:'green', color:'whitesmoke', fontSize:'8pt',paddingLeft:'5px',paddingRight:'5px', borderRadius:'10px'}} >New assignment</span>
+        </>
+        :
+         <></>
+       )
+    } 
+  </>);
 
 }
 

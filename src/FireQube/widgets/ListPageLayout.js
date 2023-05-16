@@ -390,7 +390,8 @@ export default function ListPageLayout(props) {
         editIconClick(e.row);
         break;
       case 5:
-        customIconClick(e.row);
+        if(props.CustomField)
+          customIconClick(e.row);
         break;
 
     }
