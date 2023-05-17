@@ -168,7 +168,15 @@ export default function Login({setToken}) {
     });
   }
 
-  const loginUser = async () => {
+  const handleEnter = (event) => {
+    console.log(event);
+    if(event.keyCode === 13){
+      console.log('enter...');
+      loginUser();
+    }
+  }
+
+  const loginUser = () => {
     try {
       if (loginCreds.loginId === '' || loginCreds.loginPassword === '') 
       {
@@ -178,9 +186,9 @@ export default function Login({setToken}) {
         return;
       }
 
-      await axios.post('token/authenticate', loginCreds)
+      axios.post('token/authenticate', loginCreds)
       .then((response) => {
-        //console.log(response);
+        console.log(response);
         switch (response.data.ResponseCode) {
           case "AFT":
             setPasswordVal({...passwordVal, 'systemUserId': response.data.SystemUserId});
@@ -258,7 +266,7 @@ export default function Login({setToken}) {
         </Form.Group>
         <Form.Group>
             <Form.Label>Re-type Password</Form.Label>
-            <Form.Control type = 'password' onChange={(evt) => onPwdValChange(evt)} name='retypedPassword' value = {passwordVal.retypedPassword} required />
+            <Form.Control type = 'password' onChange={(evt) => onPwdValChange(evt)} name='retypedPassword' value = {passwordVal.retypedPassword} required  />
         </Form.Group>
 
         <FormControl>
@@ -323,7 +331,7 @@ export default function Login({setToken}) {
         </Form.Group>
         <Form.Group>
             <Form.Label>Password</Form.Label>
-            <Form.Control  type='password' onChange={(evt) => onValChange(evt)} name='loginPassword' autoComplete='off' />
+            <Form.Control  type='password' onChange={(evt) => onValChange(evt)} name='loginPassword' autoComplete='off' onKeyDown={handleEnter} />
         </Form.Group>
         <FormControl>
           <Stack direction="row" spacing={1} justifyContent="flex-start" >

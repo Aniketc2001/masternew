@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 
 import DataGrid, {
     Column, Button, Editing, Grouping, SearchPanel, GroupPanel, Popup, Paging, Lookup,
-    Form, FilterRow, HeaderFilter, Export, ColumnChooser, Font, Selection
+    Form, FilterRow, HeaderFilter, Export, ColumnChooser, Font, Selection, FilterPanel
   } from 'devextreme-react/data-grid';
 
 import BxButton  from 'react-bootstrap/Button';
@@ -45,6 +45,7 @@ export default function ListPageLayout(props) {
   const [displayPageSize, setdisplayPageSize] = useState(12);
   const [displayFilterRow, setdisplayFilterRow] = useState(false);
   const [displayGroupPanel, setdisplayGroupPanel] = useState(false);
+  const [displayFilterPanel, setdisplayFilterPanel] = useState(false);
 
   const [openNotificationBar, setOpenNotificationBar] = React.useState(false); //Notification Bar Flag
   const [notificationBarMessage, setnotificationBarMessage] = React.useState(''); //Notification Message
@@ -126,8 +127,9 @@ export default function ListPageLayout(props) {
                 <i className={'bi-hourglass-split'} style={{color:'darkgray', fontSize: '10pt', marginRight: '5px', cursor:'pointer'}} title='Waiting for approval' />
             :cellData.data.CheckerStatus=="R" ? 
                 <i className={'bi-exclamation-circle-fill'} style={{color:'red', fontSize: '10pt', marginRight: '5px', cursor:'pointer'}} title='Rejected by checker.'/>    
-                :
-                <i className={'bi-patch-check-fill'} style={{color:'darkorange', fontSize: '10pt', marginRight: '5px', cursor:'pointer'}} title='Approved by checker.'/>    
+            :cellData.data.CheckerStatus=="A" ? 
+                <i className={'bi-patch-check-fill'} style={{color:'darkorange', fontSize: '10pt', marginRight: '5px', cursor:'pointer'}} title='Approved by checker.'/>
+            :<></>    
             }
       </div>
     );
@@ -381,7 +383,8 @@ export default function ListPageLayout(props) {
   const handleGridCellClick = (e) => {
     switch(e.columnIndex){
       case 2: //Checker status
-        checkerStatusIconClick(e.row);
+        if(e.data.CheckerStatus !== "D")
+          checkerStatusIconClick(e.row);
         break;
       case 3: // Active Status
         //checkerStatusIconClick(e.row);
@@ -486,6 +489,9 @@ export default function ListPageLayout(props) {
                 <ToggleButton  value="justify" aria-label="justified" onClick={()=> setdisplayFilterRow(!displayFilterRow)}>
                     <i className={'bi-binoculars-fill'} style={{ color:'darkslategray', fontSize: '12pt'}} />
                 </ToggleButton>
+                <ToggleButton value="justify" aria-label="justified" onClick={()=> setdisplayFilterPanel(!displayFilterPanel)}>
+                    <i className={'bi-funnel-fill'} style={{ color:'darkslategray', fontSize: '12pt'}} />
+                </ToggleButton>                
                 <ToggleButton value="justify" aria-label="justified" onClick={()=> setdisplayGroupPanel(!displayGroupPanel)}>
                     <i className={'bi-bar-chart-steps'} style={{ color:'darkslategray', fontSize: '12pt'}} />
                 </ToggleButton>
@@ -518,6 +524,7 @@ export default function ListPageLayout(props) {
               <SearchPanel visible={true} />
               <GroupPanel visible={displayGroupPanel} />
               <FilterRow visible={displayFilterRow} />
+              <FilterPanel visible={displayFilterPanel}/>
               <HeaderFilter visible={true}/>
               <ColumnChooser enabled={true} />
 

@@ -1,27 +1,133 @@
-import { DataGrid, Column, MasterDetail, SearchPanel, Editing, Paging } from 'devextreme-react/data-grid';
+import { DataGrid, Column, MasterDetail, SearchPanel, Editing, Paging, Lookup, FormItem, Form, Popup,Button } from 'devextreme-react/data-grid';
 import Data from './Data';
-import DetailTemplate from './DetailTemplate';
+import DetailTemplate from './PartyContact';
+import { RequiredRule } from 'devextreme-react/form';
+import { useState,useRef } from 'react';
 
-export default function PartySalesMap(){
-    return(
-        <>
-                      <DataGrid id="grid-container"
-                        dataSource={Data}
-                        keyExpr="ID"
-                        showBorders={true} width='100%'
-                        showRowLines={true}
-                        showColumnLines={false}
-                        useIcons={true}
-                        rowAlternationEnabled={true}
-                        allowColumnResizing={true} >
-                        <Paging enabled={true} pageSize={7}/>
-                        <SearchPanel visible={true}/>
-                        <Editing mode="batch" newRowPosition='last' allowAdding={true} allowUpdating={true} allowDeleting={true}/>
-                        <Column dataField="PartyName" width={200} caption="Party Name" />
-                        <Column dataField="ProductName" width={200} />
-                        <Column dataField="PartyAddressCode" width={200} caption="Site Code" />
-                        <Column dataField="SalesPersonName" width={200} />
-                      </DataGrid>
-        </>
-    )
+export default function PartySalesMap({ ancillaryData, PartySalesMaps,baseObj }) {
+  const dataGrid = useRef(null);
+  const [refresh, setRefresh] = useState(false);
+
+  console.log(baseObj.PartySalesMaps)
+
+
+  const renderDeleteStatus = (cellData) => {
+    //console.log("celldata",cellData);
+    return (
+      <div>
+        {cellData.data.MarkedForDelete === "Y" ? <i className={'bi-flag-fill'} style={{ color: 'red', fontSize: '10pt', marginRight: '5px' }} title="Marked for deletion" /> : <></>}
+      </div>
+    );
+  }
+
+  const markCommunicationRecordDelete = (e) => {
+    const updatedData = baseObj.PartySalesMaps.map(row => {
+      console.log(row);
+      if (row["PartySalesMapId"] === e.row.data["PartySalesMapId"]) {
+        //if(parseInt(row["PartyAddressId"]) < 0){
+        var fg = row.MarkedForDelete === "Y" ? "N" : "Y";
+        return { ...row, MarkedForDelete: fg };
+        //}
+        //else{
+        //  dataGrid.current.instance.deleteRow([e.row.rowIndex]);
+        //}
+      }
+      return row;
+    });
+
+    console.log(updatedData);
+    //setBaseObj({...baseObj, PartyAddresses: updatedData});
+    baseObj.PartySalesMaps = updatedData;
+    setRefresh(!refresh);
+  }
+
+  const markRecordEdit = (e) => {
+    dataGrid.current.instance.editRow([e.row.rowIndex]);
+  }
+
+  return (
+    <>
+      <DataGrid id="grid-container"
+        dataSource={baseObj.PartySalesMaps}
+        ref={dataGrid}
+        keyExpr="PartySalesMapId"
+        showBorders={true} width='100%'
+        showRowLines={true}
+        showColumnLines={false}
+        useIcons={true}
+        rowAlternationEnabled={true}
+        onInitNewRow={(e) => {
+          // Set a default value for the key field when adding a new 
+          const gridDataSource = e.component.getDataSource();
+          let totalCount = -1 * gridDataSource.totalCount();
+          //console.log(detailKeyFieldName,totalCount);
+          e.data.PartySalesMapId = totalCount;
+          e.data.PartyId = 0;
+          e.data.ProductId = null;
+          e.data.PartyAddressId = null;
+          e.data.SalesPersonId = null;
+          e.data.Active = 'Y';
+          e.data.CheckerQueueId = 0;
+          e.data.CheckerStatus = 'W';
+          e.data.CreatedBy = 0;
+          // e.data.CreatedDate = null;
+          e.data.ModifiedBy = 0;
+          // e.data.ModifiedDate = null;
+          e.data.MarkedForDelete = 'N';
+          e.data.AddressTypeCode = "";
+          e.data.AddressTypeName = "";
+          e.data.CityCode = "";
+          e.data.SiteCode = "";
+
+        }}
+        allowColumnResizing={true} >
+        <Paging enabled={true} pageSize={7} />
+        <SearchPanel visible={true} />
+        <Editing mode="popup" newRowPosition='last' allowAdding={true} allowUpdating={true} allowDeleting={true} >
+          <Form colCount={1} colSpan={2}>
+          </Form>
+          <Popup title="Party Address Info" showTitle={true} width={500} />
+        </Editing>
+        <Column caption="" cellRender={renderDeleteStatus} width={35} visible={true}>
+          <FormItem visible={false} />
+        </Column>
+        <Column dataField="PartySalesMapId" visible={false} width={0} >
+          <FormItem visible={false} />
+        </Column>
+        <Column dataField="PartyId" visible={false} width={0} >
+          <FormItem visible={false} />
+        </Column>
+        <Column dataField="ProductId" visible={true} width={200} caption="Product">
+          <Lookup dataSource={ancillaryData.anc_products} displayExpr="ProductName" valueExpr="ProductId" />
+          <RequiredRule />
+          <FormItem visible={true}  >
+
+          </FormItem>
+        </Column>
+        <Column dataField="PartyAddressId" visible={true} width={200} caption="Address" >
+          <Lookup dataSource={ancillaryData.anc_addresses} displayExpr="PartyAddressName" valueExpr="PartyAddressId" />
+          <RequiredRule />
+          <FormItem visible={true} />
+        </Column>
+
+        <Column dataField="SalesPersonId" visible={true} width={200} caption="Sales Person">
+          <Lookup dataSource={ancillaryData.anc_salesPeople} displayExpr="SalesPersonName" valueExpr="SalesPersonId" />
+          <RequiredRule />
+          <FormItem visible={true} >
+
+          </FormItem>
+        </Column>
+        <Column type="buttons" width={100} >
+          <Button name="FWEdit" text="Edit1" hint="Edit Record" onClick={markRecordEdit} >
+              <i className={'bi-pencil-square'} style={{ color: 'indigo', fontSize: '10pt', marginRight: '5px', cursor: 'pointer' }} />
+          </Button>          
+          <Button name="FWdelete" text="Delete1" hint="Delete Record" onClick={markCommunicationRecordDelete} >
+            <i className={'bi-trash3-fill'} style={{ color: 'indigo', fontSize: '10pt', marginRight: '5px', cursor: 'pointer' }} />
+          </Button>
+        </Column>
+
+
+      </DataGrid>
+    </>
+  )
 }
