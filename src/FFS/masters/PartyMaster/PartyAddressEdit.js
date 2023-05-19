@@ -3,11 +3,16 @@ import Data from './Data';
 import PartyContact from './PartyContact';
 import { RequiredRule } from 'devextreme-react/form';
 import { useState, useEffect, useRef } from "react";
+import { CheckBox } from 'devextreme-react/check-box';
 
 export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresses, onPartyAddressChange }) {
     const dataGrid = useRef(null);
     const [refresh, setRefresh] = useState(false);
 
+    const displayFlags = [
+        { value: 'Y', text: 'Active' },
+        { value: 'N', text: 'Inactive' },
+      ];
 
     console.log("titles 1", ancillaryData.anc_contactTitles);
 
@@ -47,6 +52,11 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
         dataGrid.current.instance.editRow([e.row.rowIndex]);
     }
 
+    const renderActiveStatus = (e) => {
+        return (
+            <CheckBox defaultValue={e.row.data?}
+        )
+    }
 
     return (
         <>
@@ -56,7 +66,7 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                 keyExpr="PartyAddressId"
                 showBorders={true}
                 showRowLines={true}
-                showColumnLines={false}
+                showColumnLines={true}
                 useIcons={true}
                 rowAlternationEnabled={true}
                 allowColumnResizing={true}
@@ -104,9 +114,9 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                 <Paging enabled={true} pageSize={7} />
                 <SearchPanel visible={true} />
                 <Editing mode="popup" newRowPosition='last' allowAdding={true} allowUpdating={true} allowDeleting={true} >
-                    <Form colCount={1} colSpan={2}>
+                    <Form colCount={2} colSpan={2}>
                     </Form>
-                    <Popup title="Party Address Info" showTitle={true} width={500} />
+                    <Popup title="Party Address Info" showTitle={true} width={900} height={500}/>
                 </Editing>
                 <Column caption="" cellRender={renderDeleteStatus} width={35} visible={true}>
                     <FormItem visible={false} />
@@ -157,6 +167,15 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                 </Column>
                 <Column dataField="Hsncode" caption="HSN Code" visible={false}>
                     <FormItem visible={true} />
+                </Column>
+                <Column dataField="Active" caption="Status" visible={true} width={50} editCellRender={renderActiveStatus} lookup={{
+                    dataSource: displayFlags,
+                    valueExpr: 'value',
+                    displayExpr: 'text'
+                    }} >
+
+                    <FormItem visible={true} />
+                    
                 </Column>
                 <Column type="buttons" width={100} >
                     <Button name="FWEdit" text="Edit1" hint="Edit Record" onClick={markAddressRecordEdit} >

@@ -1,4 +1,4 @@
-import { DataGrid, Column, MasterDetail, SearchPanel, Editing, Paging, Lookup, FormItem, Form, Popup,Button } from 'devextreme-react/data-grid';
+import { DataGrid, Column, MasterDetail, SearchPanel, Editing, Paging, Lookup, FormItem, Form, Popup,Button  } from 'devextreme-react/data-grid';
 import Data from './Data';
 import DetailTemplate from './PartyContact';
 import { RequiredRule } from 'devextreme-react/form';
@@ -7,6 +7,13 @@ import { useState,useRef } from 'react';
 export default function PartySalesMap({ ancillaryData, PartySalesMaps,baseObj }) {
   const dataGrid = useRef(null);
   const [refresh, setRefresh] = useState(false);
+
+  
+  const addressDropdownColumns = [
+    { dataField: 'PartyAddressCode', caption: 'SiteCode' },
+    { dataField: 'PartyAddressName', caption: 'Address' }
+  ];
+
 
   console.log(baseObj.PartySalesMaps)
 
@@ -20,7 +27,7 @@ export default function PartySalesMap({ ancillaryData, PartySalesMaps,baseObj })
     );
   }
 
-  const markCommunicationRecordDelete = (e) => {
+  const markRecordDelete = (e) => {
     const updatedData = baseObj.PartySalesMaps.map(row => {
       console.log(row);
       if (row["PartySalesMapId"] === e.row.data["PartySalesMapId"]) {
@@ -45,6 +52,14 @@ export default function PartySalesMap({ ancillaryData, PartySalesMaps,baseObj })
     dataGrid.current.instance.editRow([e.row.rowIndex]);
   }
 
+  const getDisplayExpr = (item) => {
+    return item ? `${item.PartyAddressName}` + (item.Address1? " - (" : "  " ) + `${item.Address1}`+ (item.Address1? ")" : "" )  : '';
+  }
+
+  const fieldDisp = (item) => {
+    console.log(item);
+  }
+
   return (
     <>
       <DataGrid id="grid-container"
@@ -53,7 +68,7 @@ export default function PartySalesMap({ ancillaryData, PartySalesMaps,baseObj })
         keyExpr="PartySalesMapId"
         showBorders={true} width='100%'
         showRowLines={true}
-        showColumnLines={false}
+        showColumnLines={true}
         useIcons={true}
         rowAlternationEnabled={true}
         onInitNewRow={(e) => {
@@ -63,8 +78,8 @@ export default function PartySalesMap({ ancillaryData, PartySalesMaps,baseObj })
           //console.log(detailKeyFieldName,totalCount);
           e.data.PartySalesMapId = totalCount;
           e.data.PartyId = 0;
-          e.data.ProductId = null;
-          e.data.PartyAddressId = null;
+          e.data.ProductId = 0;
+          e.data.PartyAddressId = 0;
           e.data.SalesPersonId = null;
           e.data.Active = 'Y';
           e.data.CheckerQueueId = 0;
@@ -86,7 +101,7 @@ export default function PartySalesMap({ ancillaryData, PartySalesMaps,baseObj })
         <Editing mode="popup" newRowPosition='last' allowAdding={true} allowUpdating={true} allowDeleting={true} >
           <Form colCount={1} colSpan={2}>
           </Form>
-          <Popup title="Party Address Info" showTitle={true} width={500} />
+          <Popup title="Party Sales Mapping Info" showTitle={true} width={500} />
         </Editing>
         <Column caption="" cellRender={renderDeleteStatus} width={35} visible={true}>
           <FormItem visible={false} />
@@ -105,7 +120,11 @@ export default function PartySalesMap({ ancillaryData, PartySalesMaps,baseObj })
           </FormItem>
         </Column>
         <Column dataField="PartyAddressId" visible={true} width={200} caption="Address" >
-          <Lookup dataSource={ancillaryData.anc_addresses} displayExpr="PartyAddressName" valueExpr="PartyAddressId" />
+            <Lookup dataSource={ancillaryData.anc_addresses} 
+              displayExpr={getDisplayExpr}
+              valueExpr="PartyAddressId"
+              fieldRender={fieldDisp} 
+               />
           <RequiredRule />
           <FormItem visible={true} />
         </Column>
@@ -121,7 +140,7 @@ export default function PartySalesMap({ ancillaryData, PartySalesMaps,baseObj })
           <Button name="FWEdit" text="Edit1" hint="Edit Record" onClick={markRecordEdit} >
               <i className={'bi-pencil-square'} style={{ color: 'indigo', fontSize: '10pt', marginRight: '5px', cursor: 'pointer' }} />
           </Button>          
-          <Button name="FWdelete" text="Delete1" hint="Delete Record" onClick={markCommunicationRecordDelete} >
+          <Button name="FWdelete" text="Delete1" hint="Delete Record" onClick={markRecordDelete} >
             <i className={'bi-trash3-fill'} style={{ color: 'indigo', fontSize: '10pt', marginRight: '5px', cursor: 'pointer' }} />
           </Button>
         </Column>
