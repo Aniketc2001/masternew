@@ -1,11 +1,11 @@
-import { DataGrid, Column, MasterDetail, SearchPanel, Editing, Paging, FormItem, Form, Popup, Button } from 'devextreme-react/data-grid';
+import { DataGrid, Column, MasterDetail, SearchPanel, Editing, Paging, FormItem, Form, Popup, Button, Lookup } from 'devextreme-react/data-grid';
 import Data from './Data';
 import DetailTemplate from './PartyContact';
 import { useState, useEffect,useRef } from 'react';
 import { RequiredRule } from 'devextreme-react/form';
 
 
-export default function RebateParty({ RebateParties, baseObj }) {
+export default function RebateParty({ RebateParties, baseObj, ancillaryData }) {
   const dataGrid = useRef(null);
   const [refresh, setRefresh] = useState(false);
 
@@ -54,7 +54,7 @@ export default function RebateParty({ RebateParties, baseObj }) {
       showBorders={true}
       width='100%'
       showRowLines={true}
-      showColumnLines={false}
+      showColumnLines={true}
       useIcons={true}
       rowAlternationEnabled={true}
       onInitNewRow={(e) => {
@@ -67,6 +67,7 @@ export default function RebateParty({ RebateParties, baseObj }) {
         e.data.CreatedBy = 0;
         e.data.ModifiedBy = 0;
         e.data.MarkedForDelete = 'N';
+        e.data.RebatePartyTypeId = null ;
       }}
       allowColumnResizing={true} >
       <Paging enabled={true} pageSize={7} />
@@ -74,7 +75,7 @@ export default function RebateParty({ RebateParties, baseObj }) {
       <Editing mode="popup" newRowPosition='last' allowAdding={true} allowUpdating={true} allowDeleting={true} >
         <Form colCount={1} colSpan={2}>
         </Form>
-        <Popup title="Party Address Info" showTitle={true} width={500} />
+        <Popup title="Rebate Party Info" showTitle={true} width={500} />
       </Editing>
       <Column caption="" cellRender={renderDeleteStatus} width={35} visible={true}>
         <FormItem visible={false} />
@@ -82,6 +83,10 @@ export default function RebateParty({ RebateParties, baseObj }) {
       <Column dataField="RebatePartyName" width={300} caption="Rebate Party Name" >
         <RequiredRule />
       </Column>
+      <Column dataField="RebatePartyTypeId" caption="Rebate Party Type" width={150} isRequired={true}>
+            <Lookup dataSource={ancillaryData.anc_rebatePartyTypes} displayExpr="LookupItemName" valueExpr="LookupItemId" />
+            <RequiredRule />
+      </Column>      
       <Column dataField="Pan" width={150} />
       <Column dataField="Tan" width={150} />
       <Column type="buttons" width={100} >

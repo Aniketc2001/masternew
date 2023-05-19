@@ -28,12 +28,12 @@ export default function MultiLevelList(props) {
           method: 'get',
           url: "accessLevel/assignedMenus",
         }).then((response) => {
-          console.log(response.data);
+          //console.log(response.data);
           const newData = response.data.map(item => {
             return { ...item, open: false };
           })
-          console.log('revised menu items...');
-          console.log(newData);
+          //console.log('revised menu items...');
+          //console.log(newData);
           setMenuArr(newData);
           //console.log('menu get...');
 

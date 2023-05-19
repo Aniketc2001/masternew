@@ -266,6 +266,27 @@ export default function PartyMaster() {
     })
   }
 
+  const validatePartyType = () => {
+    let retflag = false;
+    for (let column in baseObj) {
+      if(column.startsWith("Is")){
+        if (baseObj.hasOwnProperty(column)) {
+            //console.log(column + ': ' + baseObj[column]);
+            if(baseObj[column]==='Y'){
+              //console.log('flag yes...')
+              retflag=true;
+              break;
+            }
+        }
+      }
+    }
+
+    if(!retflag)
+      alert('Invalid party type, please select atleast one party type before saving!', 'Party Type Validation');
+
+    return(retflag);
+  }
+
   const validateForm = () => {
     //data validations
     if (baseObj.PartyCode === null || baseObj.PartyCode === "") {
@@ -341,7 +362,7 @@ export default function PartyMaster() {
 
   const saveDraft = () => {
     console.log("baseobj", baseObj);
-    if (!validateForm()) {
+    if (!validateForm() || !validatePartyType()) {
       return (false);
     }
 
@@ -358,9 +379,9 @@ export default function PartyMaster() {
           data: x,
           headers: { "mId": m }
         }).then((response) => {
-          setnotificationBarMessage("Party details saved successfully!");
+          setnotificationBarMessage("Party details saved as draft!");
           setOpenNotificationBar(true);
-          navigate(-1);
+          //navigate(-1);
         }).catch((error) => {
           if (error.response) {
             console.log(error.response);
@@ -375,7 +396,7 @@ export default function PartyMaster() {
   const saveRecord = () => {
 
     console.log("baseobj", baseObj);
-    if (!validateForm()) {
+    if (!validateForm() || !validatePartyType()) {
       return (false);
     }
 
@@ -421,8 +442,8 @@ export default function PartyMaster() {
     <>
       {baseObj ?
         <CssBaseline>
-          <Box marginTop={1} >
-            <Paper elevation={3} sx={{ paddingTop: 5, paddingLeft: 4, paddingBottom: 3, paddingRight: 4, fontFamily: 'Poppins' }}>
+          <Box marginTop={0} >
+            <Paper elevation={3} sx={{ paddingTop: 3, paddingLeft: 4, paddingBottom: 3, paddingRight: 4, fontFamily: 'Poppins' }}>
               <h2 style={{ paddingBottom: 0, marginBottom: 0 }}>Party</h2>
               <span>Manage details of parties and associated types</span>
               <Grid container spacing={2} sx={{ paddingTop: 2 }}>
@@ -438,7 +459,7 @@ export default function PartyMaster() {
                           name="PartyCode"
                           value={baseObj.PartyCode}
                           autoComplete="off"
-                          inputProps={{ maxLength: 25 }}
+                          inputProps={{ maxLength: 100 }}
                           id="PartyCode"
                           inputRef={partyCodeRef}
                         />
@@ -451,7 +472,7 @@ export default function PartyMaster() {
                           name="PartyName"
                           value={baseObj.PartyName}
                           autoComplete="off"
-                          inputProps={{ maxLength: 25 }}
+                          inputProps={{ maxLength: 100 }}
                           inputRef={partyNameRef}
                         />
 
@@ -482,7 +503,7 @@ export default function PartyMaster() {
                           name="EfzCertificateNumber"
                           value={baseObj.EfzCertificateNumber}
                           autoComplete="off"
-                          inputProps={{ maxLength: 25 }}
+                          inputProps={{ maxLength: 50 }}
                         />
 
                         <TextField sx={{ paddingRight: 3 }}
@@ -492,7 +513,7 @@ export default function PartyMaster() {
                           name="TdsExceptionNumber"
                           value={baseObj.TdsExceptionNumber}
                           autoComplete="off"
-                          inputProps={{ maxLength: 25 }}
+                          inputProps={{ maxLength: 50 }}
                         />
 
                         <TextField sx={{ paddingRight: 3 }}
@@ -503,7 +524,7 @@ export default function PartyMaster() {
                           value={baseObj.TdsPercentage}
                           autoComplete="off"
                           inputProps={{
-                            maxLength: 25
+                            maxLength: 10
                           }}
                           onKeyPress={(evt) => handleNumeric(evt)}
                         />
@@ -516,7 +537,7 @@ export default function PartyMaster() {
                           name="CreditNumberOfDays"
                           value={baseObj.CreditNumberOfDays}
                           autoComplete="off"
-                          inputProps={{ maxLength: 25 }}
+                          inputProps={{ maxLength: 10 }}
                           onKeyPress={(evt) => handleNumeric(evt)}
                         />
 
@@ -524,7 +545,7 @@ export default function PartyMaster() {
                           variant="standard" label="Credit Amount" onChange={(evt) => onValChange(evt)}
                           name="CreditAmount" value={baseObj.CreditAmount}
                           autoComplete="off"
-                          inputProps={{ maxLength: 25 }}
+                          inputProps={{ maxLength: 20 }}
                           onKeyPress={(evt) => handleNumeric(evt)}
                         />
 
@@ -534,7 +555,7 @@ export default function PartyMaster() {
                           name="Remarks" autoComplete="off"
                           label="Remarks"
                           variant="standard"
-
+                          inputProps={{ maxLength: 250 }}
                         />
                         <FormControl>
                           <FormControlLabel
@@ -571,7 +592,7 @@ export default function PartyMaster() {
 
                   <TabPanel value={value} index={0}>
                     <Grid container spacing={2} >
-                      <Grid item xs={6} >
+                      <Grid item xs={7} >
                         <p style={{ fontWeight: "bold", margin: 0, marginLeft: 17 }} >Types Of Party</p>
                         <Grid container spacing={4}>
                           <Grid item sx={{ marginLeft: 2 }}>
@@ -777,7 +798,7 @@ export default function PartyMaster() {
                       </Stack>
                     ) : (clr === null && baseObj.CheckerStatus !== 'W') ? (
                       <Stack spacing={0.2} direction="row" divider={<Divider orientation="vertical" flexItem />} >
-                        {baseObj.DraftFlag !== 'L' ? <BxButton size="sm" variant="secondary" style={{ textTransform: "none" }} onClick={() => saveDraft()} >
+                        {baseObj.DraftFlag !== 'L' && baseObj.DraftFlag !== 'F' ? <BxButton size="sm" variant="secondary" style={{ textTransform: "none" }} onClick={() => saveDraft()} >
                           <i className={'bi-card-checklist'} style={{ color: 'white', fontSize: '9pt', marginRight: '10px' }} />
                           Save as draft
                         </BxButton> : <></>}

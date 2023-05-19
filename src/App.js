@@ -15,6 +15,9 @@ import CheckerOutboxCx from './FireQube/masters/CheckerOutboxCx';
 import MenuEdit from './FireQube/masters/MenuEdit';
 import MasterEditPageMultiLevel from './FireQube/masters/MasterEditPageMultiLevel';
 
+import BookingList from './FFS/transactions/Booking/BookingList';
+import BookingEdit from './FFS/transactions/Booking/Booking';
+
 import SystemUserList from './FireQube/masters/SystemUserList'
 import DepartmentEdit from './FireQube/masters/DepartmentEdit';
 import PartyMaster from './FFS/masters/PartyMaster/PartyMaster';
@@ -36,7 +39,6 @@ import SideBarNav from './FireQube/widgets/sideBarNav';
 import { Container } from 'react-bootstrap';
 import { styled  } from '@mui/material/styles';
 
-
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -49,6 +51,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 function App() {
   const [token, setToken] = useState(null);
+  const [userInfo,setUserInfo] = useState(null);
   const [open, setOpen] = React.useState(true);
 
   const handleDrawerOpen = () => {
@@ -75,7 +78,7 @@ function App() {
 
 
   if(!token) {
-    return <Login setToken={setToken} />
+    return <Login setToken={setToken} setUserInfo={setUserInfo} />
   }
 
 
@@ -92,6 +95,8 @@ function App() {
             setOpen={setOpen}
             handleDrawerOpen={handleDrawerOpen}
             theme={theme}
+            userInfo={userInfo}
+            setUserInfo={setUserInfo}
           />
          <SideBarNav open={open} setOpen={setOpen} /> 
 
@@ -143,6 +148,7 @@ function App() {
       <Route path="/locationList" element={<MasterListPageCx mId="Location"/>} />
       <Route path="/commodityCategoryList" element={<MasterListPageCx mId="Commodity Category"/>} />
       <Route path="/crmTeamList" element={<MasterListPageCx mId="CRM Team"/>} />
+      <Route path="/bookingList" element={<BookingList mId="Port"/>} />
 
       <Route path="/appEdit/:id" element={<MasterEditCx mId="App"/>} />
       <Route path="/systemConfigEdit/:id" element={<MasterEditCx mId="System Config"/>} />
@@ -186,6 +192,7 @@ function App() {
       <Route path="/locationEdit/:id" element={<MasterEditCx mId="Location"/>} />
       <Route path="/commodityCategoryEdit/:id" element={<MasterEditCx mId="Commodity Category"/>} />
       <Route path="/crmTeamEdit/:id" element={<MasterEditPageMultiLevel mId="CRM Team"/>} />
+      <Route path="/bookingEdit/:id" element={<BookingEdit mId="Port"/>} />
 
       <Route path="/accessLevelManage/:id" element={<AccessLevelManage />} />
 

@@ -1,4 +1,4 @@
-import { DataGrid, Column, MasterDetail, SearchPanel, Editing, Paging, Lookup, FormItem, RequiredRule, Form, Button } from 'devextreme-react/data-grid';
+import { DataGrid, Column, MasterDetail, SearchPanel, Editing, Paging, Lookup, FormItem, RequiredRule, Form, Button,CellTemplate } from 'devextreme-react/data-grid';
 import Data from './Data';
 import { Popup } from 'devextreme-react/data-grid';
 import { useState, useRef } from 'react';
@@ -6,54 +6,67 @@ import { useState, useRef } from 'react';
 
 function PartyContact({ data }) {
   const dataGrid = useRef(null);
-  // const [refresh, setRefresh] = useState(false);
+  const [contactdata,setContactData] = useState(data.data.PartyContacts);
+
+  const [refresh, setRefresh] = useState(false);
+
+  const displayFlags = [
+    { value: 'Y', text: 'Yes' },
+    { value: 'N', text: 'No' },
+  ];
+  
 
   // console.log("titles",contactTitles)
-  console.log("contacts", data);
+  console.log("contacts", contactdata);
 
 
-  // const renderDeleteStatus = (cellData) => {
-  //   //console.log("celldata",cellData);
-  //   return (
-  //     <div>
-  //       {cellData.data.MarkedForDelete === "Y" ? <i className={'bi-flag-fill'} style={{ color: 'red', fontSize: '10pt', marginRight: '5px' }} title="Marked for deletion" /> : <></>}
-  //     </div>
-  //   );
-  // }
+  const renderDeleteStatus = (cellData) => {
+    //console.log("celldata",cellData);
+    return (
+      <div>
+        {cellData.data.MarkedForDelete === "Y" ? <i className={'bi-flag-fill'} style={{ color: 'red', fontSize: '10pt', marginRight: '5px' }} title="Marked for deletion" /> : <></>}
+      </div>
+    );
+  }
 
-  // const markContactRecordDelete = (e) => {
-  //   const updatedData = data.PartyContacts.map(row => {
-  //     console.log(row);
-  //     if (row["PartyContactId"] === e.row.data["PartyContactId"]) {
-  //       //if(parseInt(row["PartyAddressId"]) < 0){
-  //       var fg = row.MarkedForDelete === "Y" ? "N" : "Y";
-  //       return { ...row, MarkedForDelete: fg };
-  //       //}
-  //       //else{
-  //       //  dataGrid.current.instance.deleteRow([e.row.rowIndex]);
-  //       //}
-  //     }
-  //     return row;
-  //   });
+  const markRecordDelete = (e) => {
+    const updatedData = contactdata.map(row => {
+      console.log(row);
+      if (row["PartyContactId"] === e.row.data["PartyContactId"]) {
+        var fg = row.MarkedForDelete === "Y" ? "N" : "Y";
+        return { ...row, MarkedForDelete: fg };
+      }
+      return row;
+    });
 
-  //   console.log(updatedData);
-  //   //setBaseObj({...baseObj, PartyAddresses: updatedData});
-  //   data.PartyContacts = updatedData;
-  //   setRefresh(!refresh);
-  // }
+    console.log(updatedData);
+    setContactData(updatedData);
+    setRefresh(!refresh);
+  }
 
   const markRecordEdit = (e) => {
     dataGrid.current.instance.editRow([e.row.rowIndex]);
   }
 
+  const handleCheckBoxValueChanged = (e) => {
+    const rowKey = e.row.data.id; // assuming the unique identifier of each row is 'id'
+    const isSelected = e.value;
+
+    if (isSelected) {
+      setContactData([...contactdata, rowKey]);
+    } else {
+      setContactData(contactdata.filter((key) => key !== rowKey));
+    }
+  };
+
   return (
     <DataGrid
-      dataSource={data.data.PartyContacts}
+      dataSource={contactdata}
       keyExpr="PartyContactId"
       showBorders={true} width='100%'
       ref={dataGrid}
       showRowLines={true}
-      showColumnLines={false}
+      showColumnLines={true}
       useIcons={true}
       rowAlternationEnabled={true}
       onInitNewRow={(e) => {
@@ -82,9 +95,9 @@ function PartyContact({ data }) {
         </Form>
         <Popup title="Party Contact Info" showTitle={true} width={500} />
       </Editing>
-      {/* <Column caption="" cellRender={renderDeleteStatus} width={35} visible={true}>
+      <Column caption="" cellRender={renderDeleteStatus} width={35} visible={true}>
         <FormItem visible={false} />
-      </Column> */}
+      </Column> 
       <Column dataField="ContactName" caption="Contact Name" width={150}>
         <RequiredRule />
       </Column>
@@ -104,12 +117,21 @@ function PartyContact({ data }) {
         <RequiredRule />
       </Column>
       <Column dataField="DirectNumber" width={100} />
+      <Column
+        dataField="DefaultContactFlag" caption="Default Contact?"
+        width={100} visible={true}   lookup={{
+          dataSource: displayFlags,
+          valueExpr: 'value',
+          displayExpr: 'text'
+        }}
+      >
+      </Column>      
       <Column type="buttons" width={100} >
           <Button name="FWEdit" text="Edit1" hint="Edit Record" onClick={markRecordEdit} >
               <i className={'bi-pencil-square'} style={{ color: 'indigo', fontSize: '10pt', marginRight: '5px', cursor: 'pointer' }} />
           </Button>
 
-          <Button name="FWdelete" text="Delete1" hint="Delete Record"  >
+          <Button name="FWdelete" text="Delete1" hint="Delete Record" onClick={markRecordDelete} >
               <i className={'bi-trash3-fill'} style={{ color: 'indigo', fontSize: '10pt', marginRight: '5px', cursor: 'pointer' }} />
           </Button>
 

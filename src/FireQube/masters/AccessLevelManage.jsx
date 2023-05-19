@@ -307,7 +307,7 @@ const nodeTemplate = (item) => {
         autoComplete="off"
         className="EditPageLayout"
     >
-      <h2 className='PageTitle'>Manage Grants {accessName?<b>({accessName})</b>:<></>} </h2>
+      <h2 className='PageTitle'>Manage Grants {accessName?<b>- {accessName}</b>:<></>} </h2>
       <p className='PageSubTitle'>Grant and revoke function points to access levels</p>
       <br />
       <Grid container spacing={1} >

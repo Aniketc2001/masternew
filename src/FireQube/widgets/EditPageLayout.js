@@ -132,21 +132,20 @@ export default function EditPageLayout(props) {
   }
 
   const handleValueChange = (e) => {
-    console.log('New value:', e, e.component.option("name"),e.value);
+    //console.log('New value:', e, e.component.option("name"),e.value);
     let valueExpr = e.component.option("name");
     setbaseObj({...baseObj, [valueExpr]: e.value});
   };
 
   const onValChange = (e) => {
-    console.log(e.target,e.target.type,e.target.name,e.target.value);
+    //console.log(e.target,e.target.type,e.target.name,e.target.value);
     if(e.target.type === 'checkbox'){
-      console.log(e.target);
+      //console.log(e.target);
       setbaseObj({...baseObj, [e.target.name]: e.target.checked ? true : false});
     }
     else{
       setbaseObj({...baseObj, [e.target.name]: e.target.value});
     }
-
     //console.log(e.target);
   }
 
@@ -253,6 +252,13 @@ export default function EditPageLayout(props) {
   }
 
   const saveRecord = () => {
+    try{
+      dataGrid.current.instance.saveEditData();
+    }
+    catch(ex){
+    }
+
+
     if(!validateForm()){
       return(false);
     }
@@ -536,6 +542,24 @@ export default function EditPageLayout(props) {
     setdetailGridColumns(updatedData);
   }
 
+  const renderDropDownCell = (data) => {
+    return(
+      <>
+      {data.text===""?<span style={{color:'darkgray'}}>Select data...</span>:data.text}
+      </>
+    )
+  }
+
+  const renderTextBox = (data) => {
+    console.log(data);
+    return(
+      <>
+      {data.text===""?<span style={{color:'darkgray'}}>Type here...</span>:data.text}
+      </>
+    )
+  }
+
+
   const renderGridColumn = (column) => {
    // console.log('rendering columns....');
    // console.log(column);
@@ -543,14 +567,14 @@ export default function EditPageLayout(props) {
    {
       if(column.AncillaryObject){
         return(
-            <Column dataField={column.TableFieldName} caption={column.DisplayCaption} width={column.ControlWidth}>
+            <Column dataField={column.TableFieldName} caption={column.DisplayCaption} width={column.ControlWidth} cellRender={renderDropDownCell} >
               <Lookup dataSource={ancillaryData[`${column.AncillaryObject}`]} displayExpr={column.AncillaryObjectValueField} valueExpr={column.AncillaryObjectKeyField} />
             </Column>
         );
       }
       else{
           return(
-        <Column dataField={column.TableFieldName} caption={column.DisplayCaption} width={column.ControlWidth} />
+        <Column dataField={column.TableFieldName} caption={column.DisplayCaption} width={column.ControlWidth} cellRender={renderTextBox}/>
         );
       }
     }
@@ -567,13 +591,13 @@ export default function EditPageLayout(props) {
           "& .MuiTextField-root": { m: 1, width: "25ch" },
           fontFamily: 'Poppins',
           fontSize: 12,
-          margin:0, p: 0.1 
+          margin:0, p: 0
         }}
         noValidate
         autoComplete="off"
         className="EditPageLayout"
       >
-      <Paper elevation={6} sx={{ p: 4, m:1, paddingTop: 4 }}>
+      <Paper elevation={6} sx={{ p: 4, paddingTop: 4 }}>
       <h2 className='PageTitle'>{props.title}</h2>
       <p className='PageSubTitle'>{props.subTitle}</p>
       <br />
@@ -604,19 +628,28 @@ export default function EditPageLayout(props) {
              keyExpr={props.detailKeyFieldName}
              showBorders={true}
              showRowLines={true}
-             showColumnLines={false}
+             showColumnLines={true}
              highlightChanges={true}
              rowAlternationEnabled={true}
              useIcons={true}
              onInitNewRow={(e) => {
-              // Set a default value for the key field when adding a new 
-              const gridDataSource = e.component.getDataSource();
-              let totalCount = -1 * gridDataSource.totalCount();
-              //console.log(detailKeyFieldName,totalCount);
-              e.data[detailKeyFieldName] = totalCount;
-              e.data.Active='Y';
-              e.data.CheckerStatus='W';
-              e.data.MarkedForDelete='N';
+                var rows = dataGrid.current.instance.getVisibleRows();
+                var visibleRows = rows.filter(function(row){
+                    return row.rowType === "data";
+                });
+                var rowCount = visibleRows.length + 1;
+                let totalCount = -1 * rowCount;
+                e.data[detailKeyFieldName] = totalCount;
+                e.data.Active='Y';
+                e.data.CheckerStatus='W';
+                e.data.MarkedForDelete='N';
+                e.data.CheckerQueueId = 0;
+                e.data.CheckerStatus = 'W';
+                e.data.CreatedBy = 0;
+                e.data.CreatedDate = "01-01-2021";
+                e.data.ModifiedBy = 0;
+                e.data.ModifiedDate = "01-01-2021";
+                e.data.MarkedForDelete = 'N';                
             }}
             >
                 <Paging enabled={true} 
@@ -636,9 +669,9 @@ export default function EditPageLayout(props) {
                       renderGridColumn(column)
                   ))}
                   <Column type="buttons" width={60} >
-                        <Button name="FWdelete" text="Delete1"  hint="Delete Record" onClick={markRecordDelete} >
-                            <i className={'bi-trash3-fill'} style={{color:'indigo', fontSize: '10pt', marginRight: '5px', cursor:'pointer'}} />
-                        </Button>
+                      <Button name="FWdelete" text="Delete1"  hint="Delete Record" onClick={markRecordDelete} >
+                          <i className={'bi-trash3-fill'} style={{color:'indigo', fontSize: '10pt', marginRight: '5px', cursor:'pointer'}} />
+                      </Button>
                 
                   </Column>
             </DataGrid>

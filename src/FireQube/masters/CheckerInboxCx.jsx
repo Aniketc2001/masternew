@@ -189,11 +189,11 @@ export default function CheckerInboxCx(props) {
   return (
       <Box sx={{ margin:0, p: 0.1,  padding: 3,minHeight:'90vh', backgroundColor: 'white' }}>
         <Grid container spacing={1} >
-          <Grid item xs={10} >
+          <Grid item xs={9} >
               <h2>Checker Inbox</h2>
               <p style={{color:'gray'}}>Review and verify all the data updates</p>
           </Grid>
-          <Grid item xs={2} >
+          <Grid item xs={3} >
             <ToggleButtonGroup
                 size="small"
                 aria-label="text alignment"
@@ -254,8 +254,7 @@ export default function CheckerInboxCx(props) {
 
               <Column dataField="RequestDate" caption="Request Date"  width={200}  dataType="date" format="dd-MMM-yyyy hh:mm:ss a"/>
               <Column dataField="RequestByName" caption="Requested By"  width={200} />
-              <Column dataField="RequestDescription" caption="Request Description"  width={500} />
-              <Column dataField="DataUrl" caption="URL"  width={150} />
+              <Column dataField="RequestDescription" caption="Request Description"  width={600} />
    
             </DataGrid>
             <Snackbar

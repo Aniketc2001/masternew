@@ -55,7 +55,7 @@ export default function PartyCommunication({ baseObj,ancillaryData, PartyCommuni
         keyExpr="PartyCommunicationId"
         showBorders={true} width='100%'
         showRowLines={true}
-        showColumnLines={false}
+        showColumnLines={true}
         useIcons={true}
         rowAlternationEnabled={true}
         onInitNewRow={(e) => {
@@ -107,7 +107,7 @@ export default function PartyCommunication({ baseObj,ancillaryData, PartyCommuni
         </Column>
         <Column dataField="CcEmailIds" width={100} />
         <Column dataField="BccEmailIds" width={100} />
-        <Column type="buttons" width={50} >
+        <Column type="buttons" width={100} >
           <Button name="FWEdit" text="Edit1" hint="Edit Record" onClick={markRecordEdit} >
               <i className={'bi-pencil-square'} style={{ color: 'indigo', fontSize: '10pt', marginRight: '5px', cursor: 'pointer' }} />
           </Button>          

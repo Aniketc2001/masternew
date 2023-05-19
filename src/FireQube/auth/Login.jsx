@@ -27,7 +27,7 @@ const Container = styled(FormGroup)`
     margin-top: 20px;
   }
 `
-export default function Login({setToken}) {
+export default function Login({setToken, setUserInfo}) {
   const [loginCreds, setLoginCreds] = useState(initialVal);
   const loginRef = useRef();
   const pwdRef = useRef();
@@ -38,7 +38,7 @@ export default function Login({setToken}) {
   const [passwordVal, setPasswordVal] = useState(initialPwdVal);
   const [id, setId] = useState(0);
   const [showAlertMsg, setShowAlertMsg] = useState(false);
-
+ 
   const theme = createTheme({
     typography: {
       fontSize: 10,
@@ -92,7 +92,7 @@ export default function Login({setToken}) {
     setPasswordVal({...passwordVal, [e.target.name]: e.target.value});
   }
 
-  const resetPassword = async () => {
+  const resetPassword =  () => {
     if(passwordVal.newPassword !== passwordVal.retypedPassword) {
       setPwdResetMsg("Typed passwords do not match. Please resolve and retry.");
       setFocus();
@@ -100,7 +100,7 @@ export default function Login({setToken}) {
     }
 
     try {
-      await axios.post('systemUser/resetPassword', passwordVal)
+      axios.post('systemUser/resetPassword', passwordVal)
       .then((response) => {
         if(response.status === 200) {
           // setPasswordVal(initialPwdVal);
@@ -130,8 +130,8 @@ export default function Login({setToken}) {
     window.location.reload(false);
   };
 
-  const newSession = async () => {
-    await axios.put('systemUser/logout/' + id)
+  const newSession = () => {
+    axios.put('systemUser/logout/' + id)
     .then((response) => {
       if(response.status === 200) {
         localStorage.removeItem("authToken");
@@ -169,11 +169,25 @@ export default function Login({setToken}) {
   }
 
   const handleEnter = (event) => {
-    console.log(event);
+    //console.log(event);
     if(event.keyCode === 13){
-      console.log('enter...');
+      //console.log('enter...');
       loginUser();
     }
+  }
+
+  const getUserDetails = (id) => {
+    if(id === "0") { return; }
+    console.log('getting user details...',id);  
+    axios({
+      method: 'get',
+      url: "systemUser/" + id
+    }).then((response) => {
+      console.log('got user details...',response.data);
+      setUserInfo(response.data);
+    }).catch((error) => {
+      console.log("Error occured while getting user details. Error message - " + error.message);
+    })
   }
 
   const loginUser = () => {
@@ -188,7 +202,7 @@ export default function Login({setToken}) {
 
       axios.post('token/authenticate', loginCreds)
       .then((response) => {
-        console.log(response);
+        //console.log("authenticate",response);
         switch (response.data.ResponseCode) {
           case "AFT":
             setPasswordVal({...passwordVal, 'systemUserId': response.data.SystemUserId});
@@ -204,6 +218,7 @@ export default function Login({setToken}) {
             setErrMsg("");
             setToken(response.data);
             localStorage.setItem("authToken", JSON.stringify(response.data));
+            getUserDetails(response.data.SystemUserId);
             break;
           default:
             break;
@@ -305,7 +320,7 @@ export default function Login({setToken}) {
         </Alert>
         <FormControl>
           <Stack direction="row" spacing={2} justifyContent="flex-start">
-            <Button variant='primary' onClick={() => newSession()}>
+            <Button variant='primary' onClick={() => newSession()} autoFocus>
               <i className={'bi-arrow-right-square'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
               Continue?
             </Button>
@@ -324,7 +339,7 @@ export default function Login({setToken}) {
         <span style={{fontSize:10}}>Specify your login credentials to access the console</span>
         <Form.Group>
             <Form.Label>Login Id</Form.Label>
-            <Form.Control onChange={(evt) => onValChange(evt)} name='loginId' autoComplete='off' inputref={loginRef} value={loginCreds.loginId} required />
+            <Form.Control onChange={(evt) => onValChange(evt)} name='loginId' autoComplete='off' inputref={loginRef} value={loginCreds.loginId} required autoFocus />
             <Form.Text className="text-muted">
               We'll never share your credentials with anyone else.
             </Form.Text>

@@ -96,3 +96,8 @@ body
     padding-top: 18px; /* Adjust the value as needed */
     margin-left: 8px;
   }
+
+.dx-datagrid .dx-column-lines > td {
+    border-left: 1px solid #efeeeb;
+    border-right: 1px solid #efeeeb;
+}

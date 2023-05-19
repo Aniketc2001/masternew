@@ -54,8 +54,8 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
 
     const renderActiveStatus = (e) => {
         return (
-            <CheckBox defaultValue={e.row.data?}
-        )
+            <CheckBox defaultValue={e.data.Active==="Y"?true:false} />
+        );
     }
 
     return (
@@ -168,7 +168,7 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                 <Column dataField="Hsncode" caption="HSN Code" visible={false}>
                     <FormItem visible={true} />
                 </Column>
-                <Column dataField="Active" caption="Status" visible={true} width={50} editCellRender={renderActiveStatus} lookup={{
+                <Column dataField="Active" caption="Status" visible={true} width={50} cellRender={renderActiveStatus} lookup={{
                     dataSource: displayFlags,
                     valueExpr: 'value',
                     displayExpr: 'text'

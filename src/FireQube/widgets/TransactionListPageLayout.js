@@ -8,9 +8,6 @@ import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
 
 
-
-
-
 import DataGrid, {
     Column, Button, Editing, Grouping, SearchPanel, GroupPanel, Popup, Paging, Lookup,
     Form, FilterRow, HeaderFilter, Export, ColumnChooser, Font, Selection, FilterPanel
@@ -35,7 +32,7 @@ import axios from 'axios';
 
 
 
-export default function ListPageLayout(props) {
+export default function TransactionListPageLayout(props) {
   const m = new URLSearchParams(useLocation().search).get('m');
   const [gridDataSource, setgridDataSource] = useState([]);
   const navigate = useNavigate();
@@ -154,22 +151,7 @@ export default function ListPageLayout(props) {
       </div>
     );
   }
-  
-  const deleteRecord = (id) => {
-    axios({
-      method: 'delete',
-      url: props.APIName + "/" + id,
-      headers: {"mId": m}
-    }).then((response) => {
-      getRecords();
-    }).catch((error) => {
-      if(error.response) {
-        if(error.response.status === 417) {
-          console.log("Error occured while deleting record..");
-        }
-      }
-    })
-  }
+
 
   const validateSelection = (fg) => {
     const selectedRows = dataGrid.current.instance.getSelectedRowsData();
@@ -250,75 +232,8 @@ export default function ListPageLayout(props) {
       }
   };
 
-  const activeButtonClick = () => {
-    if(!validateSelection('act'))
-      return;
-    
-    var ids = getSelectedRowIDs();
-      if(ids){
-        const vl = confirm('Mark records as active?','Confirmation Alert');
-        vl.then((dialogResult) => {
-            if(dialogResult){
-                axios({
-                  method: 'put',
-                  url: props.APIName + "/" + ids,
-                  headers: {"mId": m, "actstate": 'Y'}
-                }).then((response) => {
-                  getRecords();
-                  setnotificationBarMessage('Records marked as active!');
-                  setOpenNotificationBar(true);
-                }).catch((error) => {
-                  if(error.response) {
-                    if(error.response.status === 417) {
-                      setnotificationBarMessage('Error occured while setting the active flag for the record(s)! <br/>' + error.message);
-                      setOpenNotificationBar(true);
-                    }
-                  }
-                });
-            }
-        });
-      }
-      else{
-        setnotificationBarMessage('No records selected!');
-        setOpenNotificationBar(true);
-      }
-  };
-
  
-  const inactiveButtonClick = () => {
-    if(!validateSelection('inact'))
-      return;
-
-    var ids = getSelectedRowIDs();
-    if(ids){
-      const vl = confirm('Mark records as inactive?','Confirmation Alert');
-      vl.then((dialogResult) => {
-          if(dialogResult){
-            axios({
-              method: 'put',
-              url: props.APIName + "/" + ids,
-              headers: {"mId": m, "actstate": 'N'}
-            }).then((response) => {
-              getRecords();
-              setnotificationBarMessage('Records marked as inactive!');
-              setOpenNotificationBar(true);
-            }).catch((error) => {
-              if(error.response) {
-                if(error.response.status === 417) {
-                  setnotificationBarMessage('Error occured while setting the inactive flag for the record(s)! <br/>' + error.message);
-                  setOpenNotificationBar(true);
-                }
-              }
-            });
-         
-          }
-      });
-    }
-    else{
-      setnotificationBarMessage('No records selected!');
-      setOpenNotificationBar(true);
-    }
-  };
+ 
 
   const hidePopover = () => {
     setOpenPopover(false);
@@ -432,32 +347,9 @@ export default function ListPageLayout(props) {
               onClick={deleteButtonClick}
             >
               <i className={'bi-x-circle'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
-              Delete Records
+              Cancel Booking
             </BxButton>
           </Grid>                  
-          <Grid item xm={1}>
-            <BxButton
-              variant="primary"
-              size="sm"
-              style={{ textTransform: "none" }}
-              onClick={activeButtonClick}
-            >
-              <i className={'bi-calendar2-x'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
-              Active
-            </BxButton>
-          </Grid>
-          <Grid item xm={1}>
-            <BxButton
-              variant="secondary"
-              size="sm"
-              style={{ textTransform: "none" }}
-              color="success"
-              onClick={inactiveButtonClick}
-            >
-              <i className={'bi-card-checklist'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
-              Inactive
-            </BxButton>
-          </Grid>
           <Grid item xm={1}>
             <BxButton
               variant="primary"
@@ -468,8 +360,41 @@ export default function ListPageLayout(props) {
               Advanced Search
             </BxButton>
           </Grid>   
-          <Grid item xm={4}>
-            <ToggleButtonGroup
+          <Grid item xm={9}>
+                  <BxButton
+                  variant="secondary"
+                  size="sm"
+                  style={{ textTransform: "none",fontSize: '8pt',marginRight:'5px',marginLeft:'15px' }}
+                  >
+                    <i className={'bi-thermometer'} style={{ fontSize: '10pt', marginRight: '2px'}} />
+                    Today
+                  </BxButton>
+                  <BxButton
+                  variant="secondary"
+                  size="sm"
+                  style={{ textTransform: "none",fontSize: '8pt',marginRight:'5px' }}
+                  >
+                    <i className={'bi-thermometer-half'} style={{ fontSize: '10pt', marginRight: '2px'}} />
+                    Last 7 days
+                  </BxButton>
+                  <BxButton
+                  variant="secondary"
+                  size="sm"
+                  style={{ textTransform: "none",fontSize: '8pt',marginRight:'5px' }}
+                  >
+                    <i className={'bi-thermometer-high'} style={{ fontSize: '10pt', marginRight: '2px'}} />
+                    Last 30 days
+                  </BxButton>
+                  <BxButton
+                  variant="secondary"
+                  size="sm"
+                  style={{ textTransform: "none",fontSize: '8pt',marginRight:'20px' }}
+                  >
+                    <i className={'bi-thermometer-snow'} style={{ fontSize: '10pt', marginRight: '2px'}} />
+                    Custom
+                  </BxButton>
+
+                  <ToggleButtonGroup
                 size="small"
                 aria-label="text alignment"
                 sx={{ marginTop:0, height:'30px',  backgroundColor:'whitesmoke'}}
@@ -495,7 +420,8 @@ export default function ListPageLayout(props) {
                 <ToggleButton value="justify" aria-label="justified" onClick={()=> setdisplayGroupPanel(!displayGroupPanel)} title="Display Column Grouping">
                     <i className={'bi-bar-chart-steps'} style={{ color:'darkslategray', fontSize: '12pt'}} />
                 </ToggleButton>
-                </ToggleButtonGroup>
+            </ToggleButtonGroup>
+
           </Grid>   
         </Grid>
         {props.columnNamesJSON && gridDataSource && props.KeyFieldName && displayDataGrid?
@@ -572,32 +498,7 @@ export default function ListPageLayout(props) {
                         Checker Information
                     </Alert>
                     <br/>
-                    <Typography variant="button" display="block" gutterBottom>
-                        Requester Details:
-                    </Typography>
-                    <Typography variant="caption" display="block" gutterBottom>
-                        {checkerInfo.RequestDate}
-                    </Typography>                    
-                    <Typography variant="overline" sx={{fontWeight:'bold',fontSize:14}} display="block" gutterBottom>
-                        {checkerInfo.RequestByName}
-                    </Typography>
-                   
-                    <br/>
-                    <Typography variant="button" display="block" gutterBottom>
-                        Checker Details:
-                    </Typography>
-
-                    <Typography variant="caption" display="block" gutterBottom>
-                        {checkerInfo.CheckedDate}
-                    </Typography>
-                    <Typography variant="overline" sx={{fontWeight:'bold',fontSize:14}} display="block" gutterBottom>
-                        {checkerInfo.CheckedBy}
-                    </Typography>                    
-                    <Typography variant="body2" display="block" gutterBottom>
-                        {checkerInfo.CheckerRemarks}
-                    </Typography>
-
-                  
+                    
                 </Paper>
             </Popover>
         </Box>

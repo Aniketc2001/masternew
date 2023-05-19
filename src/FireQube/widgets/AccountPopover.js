@@ -40,16 +40,16 @@ function AccountPopover(props) {
         method: 'put',
         url: 'systemUser/logout/' + id
       }).then((response) => {
-        console.log('logoff response');
-        console.log(response); 
+        //console.log('logoff response');
+        //console.log(response); 
         if(response.status === 200) {
           localStorage.removeItem("authToken");
           //setToken(null);
           toplogoff();
         }
       }).catch((error) => {
-        console.log('logoff err response');
-        console.log(error); 
+        //console.log('logoff err response');
+        //console.log(error); 
         if (error.response) {
           console.log(error.response);
         }

@@ -280,8 +280,7 @@ export default function CheckerOutboxCx(props) {
 
               <Column dataField="RequestDate" caption="Request Date"  width={200}  dataType="date" format="dd-MMM-yyyy hh:mm:ss a"/>
               <Column dataField="RequestByName" caption="Requested By"  width={200} />
-              <Column dataField="RequestDescription" caption="Request Description"  width={500} />
-              <Column dataField="DataUrl" caption="URL"  width={150} />
+              <Column dataField="RequestDescription" caption="Request Description"  width={600} />
    
             </DataGrid>
         </Box>
