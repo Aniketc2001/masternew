@@ -54,8 +54,12 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
 
     const renderActiveStatus = (e) => {
         return (
-            <CheckBox defaultValue={e.data.Active==="Y"?true:false} />
+            <CheckBox defaultValue={e.data.Active==="Y"?true:false} onValueChanged={handleCheckStatus}  />
         );
+    }
+
+    const handleCheckStatus = (e) => {
+        console.log("handle check",e);
     }
 
     return (
@@ -168,14 +172,9 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                 <Column dataField="Hsncode" caption="HSN Code" visible={false}>
                     <FormItem visible={true} />
                 </Column>
-                <Column dataField="Active" caption="Status" visible={true} width={50} cellRender={renderActiveStatus} lookup={{
-                    dataSource: displayFlags,
-                    valueExpr: 'value',
-                    displayExpr: 'text'
-                    }} >
-
+                <Column dataField="Active" caption="Status" visible={true} width={50} cellRender={renderActiveStatus} 
+                    editCellRender={renderActiveStatus}>
                     <FormItem visible={true} />
-                    
                 </Column>
                 <Column type="buttons" width={100} >
                     <Button name="FWEdit" text="Edit1" hint="Edit Record" onClick={markAddressRecordEdit} >
