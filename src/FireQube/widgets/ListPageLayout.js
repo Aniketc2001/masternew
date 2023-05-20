@@ -349,8 +349,8 @@ export default function ListPageLayout(props) {
   }
 
   const editIconClick = (e) => {
-    console.log('edit click');
-    console.log(e);
+    //console.log('edit click');
+    //console.log(e);
     navigate(`/${props.EditPageName}/${e.key}?m=${m}`);
   };
   

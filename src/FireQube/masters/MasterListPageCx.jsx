@@ -37,9 +37,9 @@ export default function MasterListPageCx(props) {
             url: "menu/getMenuInfo",
             headers: hdr
           }).then((response) => {
-            console.log('menu obj MasterListPage...');
+            //console.log('menu obj MasterListPage...');
             setmenuDetails(response.data);
-            console.log(response.data);
+            //console.log(response.data);
           }).catch((error) => {
             console.log('MasterListPage err...',error);
             if(error.response) {
@@ -54,10 +54,10 @@ export default function MasterListPageCx(props) {
             url: "menu/assignedGrants", 
             headers: hdr
           }).then((response) => {
-            console.log('column details obj...',response.data);
+            //console.log('column details obj...',response.data);
             response.data.grants_columns.sort((a, b) => a.FunctionPointId - b.FunctionPointId);
             setcolumnNamesJSON(response.data.grants_columns);
-            console.log(response.data.grants_columns);
+            //console.log(response.data.grants_columns);
           }).catch((error) => {
             console.log('err');
             console.log(error);

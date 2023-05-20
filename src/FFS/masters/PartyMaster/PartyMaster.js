@@ -65,7 +65,7 @@ export default function PartyMaster() {
   const [notificationBarMessage, setnotificationBarMessage] = useState(''); //Notification Message
   const [initialVal, setinitialVal] = useState(null);
   const [ancillaryData, setancillaryData] = useState(null);
-  const { id } = useParams();
+  var { id } = useParams();
   const clr = new URLSearchParams(useLocation().search).get('clr');
   const [showAR, setShowAR] = useState(false);
   const [baseObj, setBaseObj] = useState(null);
@@ -73,11 +73,13 @@ export default function PartyMaster() {
   const [rejectReason, setrejectReason] = useState("");
   const partyCodeRef = useRef(null);
   const partyNameRef = useRef(null);
+  const [loadcustomerAddressFlag,setloadcustomerAddressFlag] = useState(false);
 
 
   const hdr = {
     'mId': m
   };
+
 
   const handleCloseNotificationBar = () => {
     setOpenNotificationBar(false);
@@ -88,8 +90,6 @@ export default function PartyMaster() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
-
 
 
   const hideRejectDialog = () => {
@@ -118,15 +118,15 @@ export default function PartyMaster() {
     }
   }
 
-
   useEffect(() => {
     getinitialVal();
     getancillaryData();
+    //console.log("anc1",ancillaryData);
     setShowAR(clr === 'c');
   }, []);
 
   const getinitialVal = () => {
-    console.log("id", id);
+//    console.log("id", id);
     try {
       axios({
         method: 'get',
@@ -134,7 +134,7 @@ export default function PartyMaster() {
         headers: hdr
       }).then((response) => {
         let x = response.data;
-        console.log(x);
+        //console.log(x);
 
         if (id === "0") {
           x.CreatedDate = '01-01-2023 10:10:10 PM';
@@ -143,6 +143,7 @@ export default function PartyMaster() {
           x.PartyAddresses = [];
           x.RebateParties = [];
           x.PartySalesMaps = [];
+          
         }
 
         setBaseObj(x);
@@ -164,11 +165,14 @@ export default function PartyMaster() {
     try {
       axios({
         method: 'get',
-        url: 'Party' + '/ancillaryData',
+        url: 'Party/ancillaryData/' + id,
         headers: hdr
       }).then((response) => {
-        console.log(response.data)
-        setancillaryData(response.data);
+        var x = response.data;
+        //x.anc_addresses = null;
+        //console.log('x anc',x);
+        setancillaryData(x);
+        //setloadcustomerAddressFlag(true);
       }).catch((error) => {
         setancillaryData("no values");
         if (error.response) {
@@ -379,6 +383,9 @@ export default function PartyMaster() {
           data: x,
           headers: { "mId": m }
         }).then((response) => {
+          console.log(response.data);
+          id = response.data.PartyId;
+          setBaseObj({...baseObj, PartyId: id});
           setnotificationBarMessage("Party details saved as draft!");
           setOpenNotificationBar(true);
           //navigate(-1);
@@ -774,7 +781,7 @@ export default function PartyMaster() {
                   </TabPanel>
 
                   <TabPanel value={value} index={4}>
-                    {baseObj ? <PartySalesMap ancillaryData={ancillaryData} baseObj={baseObj} partySalesMapData={baseObj.PartySalesMaps} /> : <></>}
+                    {baseObj && ancillaryData  ? <PartySalesMap ancillaryData={ancillaryData} baseObj={baseObj} partySalesMapData={baseObj.PartySalesMaps} /> : <></>}
                   </TabPanel>
 
                 </Grid>

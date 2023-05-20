@@ -14,8 +14,7 @@ export default function PartySalesMap({ ancillaryData, PartySalesMaps,baseObj })
     { dataField: 'PartyAddressName', caption: 'Address' }
   ];
 
-
-  console.log(baseObj.PartySalesMaps)
+  //console.log(baseObj.PartySalesMaps)
 
 
   const renderDeleteStatus = (cellData) => {

@@ -98,25 +98,25 @@ function PartyContact({ data }) {
       <Column caption="" cellRender={renderDeleteStatus} width={35} visible={true}>
         <FormItem visible={false} />
       </Column> 
-      <Column dataField="ContactName" caption="Contact Name" width={150}>
+      <Column dataField="ContactName" caption="Contact Name" width={150}  editorOptions={{ maxLength: 100 }}>
         <RequiredRule />
       </Column>
-      <Column dataField="Department" width={100} visible={false}>
+      <Column dataField="Department" width={100} visible={false}  editorOptions={{ maxLength: 50 }}>
         <FormItem visible={true} />
       </Column>
-      <Column dataField="Designation" width={100} visible={false}>
+      <Column dataField="Designation" width={100} visible={false}  editorOptions={{ maxLength: 50 }}>
         <FormItem visible={true} />
       </Column>
-      <Column dataField="SkypeId" width={80} visible={false}>
+      <Column dataField="SkypeId" width={80} visible={false}  editorOptions={{ maxLength: 100 }}>
         <FormItem visible={true} />
       </Column>
-      <Column dataField="EmailId" width={100}>
+      <Column dataField="EmailId" width={100}  editorOptions={{ maxLength: 100 }}>
         <RequiredRule />
       </Column>
-      <Column dataField="MobileNumber" width={120} >
+      <Column dataField="MobileNumber" width={120}  editorOptions={{ maxLength: 25 }}>
         <RequiredRule />
       </Column>
-      <Column dataField="DirectNumber" width={100} />
+      <Column dataField="DirectNumber" width={100}  editorOptions={{ maxLength: 25 }}/>
       <Column
         dataField="DefaultContactFlag" caption="Default Contact?"
         width={100} visible={true}   lookup={{

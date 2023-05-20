@@ -14,9 +14,9 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
         { value: 'N', text: 'Inactive' },
       ];
 
-    console.log("titles 1", ancillaryData.anc_contactTitles);
+    //console.log("titles 1", ancillaryData.anc_contactTitles);
 
-    console.log(PartyAddresses)
+    //console.log(PartyAddresses)
 
     const renderDeleteStatus = (cellData) => {
         //console.log("celldata",cellData);
@@ -54,13 +54,29 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
 
     const renderActiveStatus = (e) => {
         return (
-            <CheckBox defaultValue={e.data.Active==="Y"?true:false} onValueChanged={handleCheckStatus}  />
+            <CheckBox defaultValue={e.data.Active==="Y"?true:false}  readOnly />
         );
     }
 
-    const handleCheckStatus = (e) => {
-        console.log("handle check",e);
-    }
+    const CustomEditCell = (props) => {
+        const { value, onValueChange } = props;
+        //console.log(props);
+        const isChecked = value === "Y"; // Convert the string value to a boolean for the checkbox
+      
+        const handleValueChange = (newValue) => {
+          console.log('new value',newValue,props);
+          const updatedValue = newValue ? "Y" : "N"; // Convert the boolean value to the string representation
+          props.value = newValue.value === true?"Y":"N";
+          props.data.Active = props.value;
+        };
+      
+        return (
+          <CheckBox
+            value={isChecked}
+            onValueChanged={handleValueChange}
+          />
+        );
+    };
 
     return (
         <>
@@ -130,22 +146,22 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                     <Lookup dataSource={ancillaryData.anc_addressTypes} displayExpr="LookupItemName" valueExpr="LookupItemId" />
                     <RequiredRule />
                 </Column>
-                <Column dataField="SiteCode" width={150} caption="Site Code" visible={true}>
+                <Column dataField="SiteCode" width={150} caption="Site Code" visible={true}  editorOptions={{ maxLength: 50 }}>
                     <RequiredRule />
                     <FormItem visible={true} />
                 </Column>
 
-                <Column dataField="SiteName" width={150} caption="Site Name" visible={true}>
+                <Column dataField="SiteName" width={150} caption="Site Name" visible={true}  editorOptions={{ maxLength: 100 }}>
                     <RequiredRule />
                     <FormItem visible={true} />
                 </Column>
-                <Column dataField="Address1" width={150} caption="Address1" visible={false}>
+                <Column dataField="Address1" width={150} caption="Address1" visible={false} editorOptions={{ maxLength: 50 }}>
                     <FormItem visible={true} />
                 </Column>
-                <Column dataField="Address2" width={150} visible={false}>
+                <Column dataField="Address2" width={150} visible={false}  editorOptions={{ maxLength: 50 }}>
                     <FormItem visible={true} />
                 </Column>
-                <Column dataField="Address3" width={150} visible={false}>
+                <Column dataField="Address3" width={150} visible={false}  editorOptions={{ maxLength: 50 }}>
                     <FormItem visible={true} />
                 </Column>
                 <Column dataField="CityId" caption="City" width={150} >
@@ -172,8 +188,9 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                 <Column dataField="Hsncode" caption="HSN Code" visible={false}>
                     <FormItem visible={true} />
                 </Column>
-                <Column dataField="Active" caption="Status" visible={true} width={50} cellRender={renderActiveStatus} 
-                    editCellRender={renderActiveStatus}>
+                <Column dataField="Active" caption="Active" visible={true} width={50} 
+                    cellRender={renderActiveStatus} 
+                    editCellRender={CustomEditCell}>
                     <FormItem visible={true} />
                 </Column>
                 <Column type="buttons" width={100} >

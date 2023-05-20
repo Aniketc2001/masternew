@@ -102,11 +102,11 @@ export default function PartyCommunication({ baseObj,ancillaryData, PartyCommuni
           <RequiredRule />
         </Column>
 
-        <Column dataField="ToEmailIds" width={200} >
+        <Column dataField="ToEmailIds" width={200}  editorOptions={{ maxLength: 500 }} >
           <RequiredRule />
         </Column>
-        <Column dataField="CcEmailIds" width={100} />
-        <Column dataField="BccEmailIds" width={100} />
+        <Column dataField="CcEmailIds" width={100}  editorOptions={{ maxLength: 500 }} />
+        <Column dataField="BccEmailIds" width={100} editorOptions={{ maxLength: 500 }}/>
         <Column type="buttons" width={100} >
           <Button name="FWEdit" text="Edit1" hint="Edit Record" onClick={markRecordEdit} >
               <i className={'bi-pencil-square'} style={{ color: 'indigo', fontSize: '10pt', marginRight: '5px', cursor: 'pointer' }} />
