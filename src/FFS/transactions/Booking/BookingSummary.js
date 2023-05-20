@@ -1,21 +1,20 @@
 import { Grid, Paper, Stack, Typography } from '@mui/material';
 import React from 'react'
 
-export default function BookingSummary({ initialVal, ancillaryData , bookingStatus }) {
-
+export default function BookingSummary({ initialVal,vesselVoyage,pol, fpd,commodityCategory, shippingLine ,bookingStatus , customerName , commodity}) {
 
     const bookingData = [
         {
             label: 'Loading Port',
-            value: 'port 1'
+            value: pol
         },
         {
             label: 'Commodity Category',
-            value: initialVal.CommodityCategoryId ? ancillaryData.anc_commodityCategories.filter(data => data.CommodityCategoryId === initialVal.CommodityCategoryId)[0].CommodityCategoryName : null
+            value: commodityCategory
         },
         {
             label: 'Commodity',
-            value : initialVal.CommodityId ?  ancillaryData.anc_commodities.filter(data=>data.CommodityId === initialVal.CommodityId)[0].CommodityName : null
+            value : commodity
 
         },
     ];
@@ -23,27 +22,23 @@ export default function BookingSummary({ initialVal, ancillaryData , bookingStat
     const bookingInfo = [
         {
             label: 'Vessel Voyage',
-            value: initialVal.VesselVoyagePortId ? ancillaryData.anc_vvpcs.filter(data=> data.VesselVoyagePortId === initialVal.VesselVoyagePortId)[0].VesselVoyagePortName : null
+            value: vesselVoyage
         },
         {
             label: 'Line',
-            value: '14'
+            value: shippingLine
         },
         {
             label: 'FPD',
-            value: initialVal.FpdId ? ancillaryData.anc_ports.filter(data=>data.PortId === initialVal.FpdId)[0].PortName : null
+            value: fpd
         },
 
     ]
 
     const bookingDet = [
         {
-            label: 'Inventory',
-            value: '14242'
-        },
-        {
             label: 'Status',
-            value: bookingStatus === 'Draft' ? null : bookingStatus
+            value:  bookingStatus 
         },
         {
             label: 'Remarks',
@@ -62,7 +57,7 @@ export default function BookingSummary({ initialVal, ancillaryData , bookingStat
                     <Grid container spacing={2}>
                         <Grid item xs={4}>
                             <Paper elevation={1} sx={{ p: 1, height: "10vh", backgroundColor: '#d0f0fb' }}>
-                                <p style={{ fontWeight: 'bold', fontSize: '13pt', marginBottom: 0 }}>Aniket Chate</p>
+                                <p style={{ fontWeight: 'bold', fontSize: '13pt', marginBottom: 0}}>{customerName}</p>
                                 <Typography variant='p' style={{ fontSize: '8pt', color: 'gray' }} component='p'>Booking No : <span style={{ color: 'black', fontSize: '10pt' }}>{initialVal.BookingReference}</span></Typography>
                                 <Typography variant='p' style={{ fontSize: '8pt', color: 'gray' }} component='p'>Booking Date : <span style={{ color: 'black', fontSize: '10pt' }}>{initialVal.BookingDate ? new Date(initialVal.BookingDate).toLocaleDateString() : ''}</span></Typography>
                             </Paper>

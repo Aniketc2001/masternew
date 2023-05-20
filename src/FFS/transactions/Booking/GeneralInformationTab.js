@@ -1,16 +1,18 @@
 import React from 'react'
 import { Box, Checkbox, FormControlLabel, Grid, Paper, TextField } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { DataGrid, Column, Editing, Paging , Lookup } from 'devextreme-react/data-grid';
+import { DataGrid, Column, Editing, Paging, Lookup } from 'devextreme-react/data-grid';
 import SelectBoxDropdown from './SelectBoxDropdown'
+import MultivalSelectbox from './MultivalSelectbox';
+import  {useRef,useState} from 'react'
+import CustomerAddressSBRender from './CustomerAddressSBRender';
 
-
-export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryData }) {
+export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId, setPol, setFpd, salesPersonList, customerAddressList, setCommodityCategory, setproductId, setcustomerId, setCmmodity, setsiteId, setbaseObj, ancillaryData, setcustomerName }) {
 
     const onDateValChange = (fieldName) => (value) => {
         setbaseObj({ ...baseObj, [fieldName]: value });
     }
-   
+
     const onValChange = (e) => {
         if (e.target.type === 'checkbox')
             setbaseObj({ ...baseObj, [e.target.name]: e.target.checked ? true : false });
@@ -19,15 +21,17 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
     }
 
 
+
+
     return (
         <>
             <div style={{ height: "63vh", overflow: 'auto' }}>
-                <Box sx={{ marginTop: 1 }}>
+                <Box sx={{ marginTop: 1, fontSize: '9pt' }}>
                     <Grid container spacing={1}>
                         <Grid item lg={5} xs={12}>
                             <Paper elevation={1} sx={{ p: 1, marginLeft: 1 }}>
                                 <Box>
-                                    <p style={{ fontWeight: 'bold' }}>General Information</p>
+                                    <p style={{ fontWeight: '' }}>General Information</p>
                                     <Grid container spacing={1}>
                                         <Grid item lg={3} sm={4} xs={6}>
                                             <SelectBoxDropdown
@@ -35,6 +39,7 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                                 baseObj={baseObj}
                                                 setbaseObj={setbaseObj}
                                                 value={baseObj.ProductId}
+                                                setpropId={setproductId}
                                                 data={{ name: "ProductId", label: "Product Type", displayExpr: "ProductName", valueExpr: "ProductId", searchExpr: "ProductName" }}
                                             />
                                         </Grid>
@@ -59,6 +64,8 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                         <Grid item lg={3} sm={4} xs={6} alignSelf='end'>
                                             <DatePicker
                                                 label="Booking Date"
+                                                format="dd/MM/yyyy"
+                                                // sx={{fontSize:'9pt'}}
                                                 renderInput={(params) => <TextField fullWidth variant="standard" {...params} />}
                                                 value={baseObj.BookingDate}
                                                 onChange={onDateValChange('BookingDate')}
@@ -101,6 +108,7 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                         </Grid>
                                     </Grid>
                                 </Box>
+                                <hr />
                                 <Box sx={{ marginTop: 2 }}>
                                     <p style={{ fontWeight: 'bold' }}>Cargo Information</p>
                                     <Grid container spacing={1}  >
@@ -117,6 +125,7 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_commodityCategories}
                                                 baseObj={baseObj}
+                                                setpropName={setCommodityCategory}
                                                 setbaseObj={setbaseObj}
                                                 value={baseObj.CommodityCategoryId}
                                                 data={{ name: "CommodityCategoryId", label: "Commodity Category", displayExpr: "CommodityCategoryName", valueExpr: "CommodityCategoryId", searchExpr: "CommodityCategoryName" }}
@@ -126,6 +135,7 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_commodities}
                                                 baseObj={baseObj}
+                                                setpropName={setCmmodity}
                                                 setbaseObj={setbaseObj}
                                                 value={baseObj.CommodityId}
                                                 data={{ name: "CommodityId", label: "Commodity", displayExpr: "CommodityName", valueExpr: "CommodityId", searchExpr: "CommodityName" }}
@@ -165,6 +175,7 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                         </Grid>
                                     </Grid>
                                 </Box>
+                                <hr />
                                 <Box sx={{ marginTop: 2 }}>
                                     <p style={{ fontWeight: 'bold' }}>HAZ Details</p>
                                     <Grid container spacing={1}  >
@@ -204,20 +215,31 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                     <Paper elevation={1} sx={{ p: 1 }}>
                                         <p style={{ fontWeight: 'bold' }}>Parties Involved</p>
                                         <Grid container spacing={0.8}  >
-                                            <Grid item xs={12}>
+                                            <Grid item xs={12} sx={{ fontSize: '12pt' }}>
                                                 <SelectBoxDropdown
                                                     dataSource={ancillaryData.anc_customers}
                                                     baseObj={baseObj}
                                                     setbaseObj={setbaseObj}
                                                     value={baseObj.CustomerId}
+                                                    initialText={baseObj.CustomerName?baseObj.CustomerName:""}
+                                                    initialId={baseObj.CustomerId?baseObj.CustomerId:""}
+                                                    dynamic={true}
+                                                    setpropName={setcustomerName}
+                                                    setpropId={setcustomerId}
+                                                    ancobjectName={ancillaryData.anc_customers}
+                                                    apiName="party/filterparties"
+                                                    listType="customers"
+                                                    fieldName="partyname"
                                                     data={{ name: "CustomerId", label: "Customer", displayExpr: "CustomerName", valueExpr: "CustomerId", searchExpr: "CustomerName" }}
                                                 />
                                             </Grid>
                                             <Grid item xs={12}>
-                                                <SelectBoxDropdown
-                                                    dataSource={ancillaryData.anc_customerSites}
+                                                <MultivalSelectbox
+                                                    dataSource={customerAddressList}
                                                     baseObj={baseObj}
+                                                    setpropId={setsiteId}
                                                     setbaseObj={setbaseObj}
+                                                    itemRenderJsx={CustomerAddressSBRender}
                                                     value={baseObj.CustomerSiteId}
                                                     data={{ name: "CustomerSiteId", label: "Customer Location", displayExpr: "CustomerSiteName", valueExpr: "CustomerSiteId", searchExpr: "CustomerSiteName" }}
                                                 />
@@ -226,6 +248,13 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                                 <SelectBoxDropdown
                                                     dataSource={ancillaryData.anc_shippers}
                                                     baseObj={baseObj}
+                                                    dynamic={true}
+                                                    initialText={baseObj.ShipperName?baseObj.ShipperName:""}
+                                                    initialId={baseObj.ShipperId?baseObj.ShipperId:""}
+                                                    apiName="party/filterparties"
+                                                    fieldName="partyname"
+                                                    listType="shippers"
+                                                    ancobjectName={ancillaryData.anc_shippers}
                                                     setbaseObj={setbaseObj}
                                                     value={baseObj.ShipperId}
                                                     data={{ name: "ShipperId", label: "Shipper", displayExpr: "ShipperName", valueExpr: "ShipperId", searchExpr: "ShipperName" }}
@@ -235,6 +264,14 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                                 <SelectBoxDropdown
                                                     dataSource={ancillaryData.anc_shippingLines}
                                                     baseObj={baseObj}
+                                                    dynamic={true}
+                                                    initialText={baseObj.ShippingLineName?baseObj.ShippingLineName:""}
+                                                    initialId={baseObj.ShippingLineId?baseObj.ShippingLineId:""}
+                                                    apiName="party/filterparties"
+                                                    fieldName="partyname"
+                                                    listType="shippinglines"
+                                                    setpropName={setshippingLine}
+                                                    ancobjectName={ancillaryData.anc_shippingLines}
                                                     setbaseObj={setbaseObj}
                                                     value={baseObj.ShippingLineId}
                                                     data={{ name: "ShippingLineId", label: "Shipping Line", displayExpr: "ShippingLineName", valueExpr: "ShippingLineId", searchExpr: "ShippingLineName" }}
@@ -244,6 +281,13 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                                 <SelectBoxDropdown
                                                     dataSource={ancillaryData.anc_consignees}
                                                     baseObj={baseObj}
+                                                    dynamic={true}
+                                                    apiName="party/filterparties"
+                                                    initialText={baseObj.ConsigneeName?baseObj.ConsigneeName:""}
+                                                    initialId={baseObj.ConsigneeId?baseObj.ConsigneeId:""}
+                                                    fieldName="partyname"
+                                                    listType="consignees"
+                                                    ancobjectName={ancillaryData.anc_consignees}
                                                     setbaseObj={setbaseObj}
                                                     value={baseObj.ConsigneeId}
                                                     data={{ name: "ConsigneeId", label: "Consignee", displayExpr: "ConsigneeName", valueExpr: "ConsigneeId", searchExpr: "ConsigneeName" }}
@@ -253,6 +297,13 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                                 <SelectBoxDropdown
                                                     dataSource={ancillaryData.anc_chas}
                                                     baseObj={baseObj}
+                                                    dynamic={true}
+                                                    apiName="party/filterparties"
+                                                    fieldName="partyname"
+                                                    listType="chas"
+                                                    initialText={baseObj.ChaName?baseObj.ChaName:""}
+                                                    initialId={baseObj.ChaId?baseObj.ChaId:""}
+                                                    ancobjectName={ancillaryData.anc_chas}
                                                     setbaseObj={setbaseObj}
                                                     value={baseObj.ChaId}
                                                     data={{ name: "ChaId", label: "CHA", displayExpr: "ChaName", valueExpr: "ChaId", searchExpr: "ChaName" }}
@@ -260,17 +311,26 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                             </Grid>
                                             <Grid item xs={12}>
                                                 <SelectBoxDropdown
-                                                    dataSource={ancillaryData.anc_salesPeople}
+                                                    dataSource={salesPersonList}
                                                     baseObj={baseObj}
-                                                    setbaseObj={setbaseObj}
+                                                    setbaseObj={setbaseObj}                                                   
+                                                    initialText={baseObj.SalesPersonName?baseObj.SalesPersonName:""}
+                                                    initialId={baseObj.SalesPersonId?baseObj.SalesPersonId:""}
                                                     value={baseObj.SalesPersonId}
-                                                    data={{ name: "SalesPersonId", label: "Sales Person", displayExpr: "SalesPersonName", valueExpr: "SalessPersonId", searchExpr: "SalesPersonName" }}
+                                                    data={{ name: "SalesPersonId", label: "Sales Person", displayExpr: "SalesPersonName", valueExpr: "SalesPersonId", searchExpr: "SalesPersonName" }}
                                                 />
                                             </Grid>
                                             <Grid item xs={12}>
                                                 <SelectBoxDropdown
                                                     dataSource={ancillaryData.anc_osas}
                                                     baseObj={baseObj}
+                                                    dynamic={true}
+                                                    apiName="party/filterparties"
+                                                    fieldName="partyname"
+                                                    listType="osas"
+                                                    initialText={baseObj.OsaName?baseObj.OsaName:""}
+                                                    initialId={baseObj.OsaId?baseObj.OsaId:""}
+                                                    ancobjectName={ancillaryData.anc_osas}
                                                     setbaseObj={setbaseObj}
                                                     value={baseObj.OsaId}
                                                     data={{ name: "OsaId", label: "Overseas Agent", displayExpr: "OsaName", valueExpr: "OsaId", searchExpr: "OsaName" }}
@@ -309,6 +369,8 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                                 dataSource={ancillaryData.anc_ports}
                                                 baseObj={baseObj}
                                                 setbaseObj={setbaseObj}
+                                                setpropName={setPol}
+                                                setpropId={setpolId}
                                                 value={baseObj.PolId}
                                                 data={{ name: "PolId", label: "POL", displayExpr: "PortName", valueExpr: "PortId", searchExpr: "PortName" }}
                                             />
@@ -326,6 +388,7 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_ports}
                                                 baseObj={baseObj}
+                                                setpropName={setFpd}
                                                 setbaseObj={setbaseObj}
                                                 value={baseObj.FpdId}
                                                 data={{ name: "FpdId", label: "FPD", displayExpr: "PortName", valueExpr: "PortId", searchExpr: "PortName" }}
@@ -342,13 +405,14 @@ export default function GeneralInformationTab({ baseObj, setbaseObj, ancillaryDa
                                         </Grid>
                                     </Grid>
                                 </Box>
+                                <hr />
                                 <Box sx={{ marginTop: 2 }}>
                                     <p style={{ fontWeight: 'bold' }}>Container details</p>
                                     <DataGrid
                                         dataSource={baseObj.BookingInventories}
                                         keyExpr="BookingInventoryId"
                                         showBorders={true}
-                                        onInitNewRow={(e)=>{
+                                        onInitNewRow={(e) => {
                                             e.data.BookingInventoryId = 0;
                                             e.data.BookingId = 0;
                                             e.data.CreatedDate = '01-01-2023 10:10:10 PM';

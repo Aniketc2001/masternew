@@ -1,11 +1,46 @@
-import React from "react";
-import { Grid, TextField, Box, Paper} from  '@mui/material'
+import React, { useEffect, useState } from "react";
+import { Grid, TextField, Box, Paper } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import SelectBoxDropdown from "./SelectBoxDropdown";
 import { SelectBox } from "devextreme-react";
+import MultivalSelectbox from "./MultivalSelectbox";
+import VvpcsSBRender from "./VvpcsSBRender";
 
 
-export default function LineDetailsTab({ baseObj, setbaseObj, ancillaryData}) {
+export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, baseObj, setbaseObj, ancillaryData, parentvvpcId }) {
+  const [vvpcId, setvvpcId] = useState(baseObj.VesselVoyagePortId);
+  const [vvpcDetails, setVvpcDetails] = useState();
+  const [PortTerminalName, setPortTerminalName] = useState('');
+  const [Eta, setEta] = useState('');
+  const [Etd, setEtd] = useState('');
+  const [CutOffDate, setCutOffDate] = useState('');
+  const [EtdatDest, setEtdatDest] = useState(baseObj.DestinationETA);
+
+
+  useEffect(() => {
+    const selectedVvpc = vesselVoyageList.filter((data) => data.VesselVoyagePortId === vvpcId);
+    console.log(selectedVvpc);
+    setVvpcDetails(selectedVvpc[0]);
+    console.log('vvpc',vvpcDetails);
+    try{
+      setPortTerminalName(selectedVvpc[0].PortTerminalName);
+      setEta(selectedVvpc[0].Eta);
+      setEtd(selectedVvpc[0].Etd);
+      setCutOffDate(selectedVvpc[0].CutOffDate);
+      setEtdatDest(selectedVvpc[0].EtaDestination);
+      setbaseObj({...baseObj, DestinationETA: selectedVvpc[0].EtaDestination });
+
+      console.log(PortTerminalName);
+    }
+    catch(ex){}
+  }, [vvpcId])
+
+  //console.log('parent vvpc id',parentvvpcId);
+
+
+  useEffect(()=>{
+
+  },[PortTerminalName])
 
   const onDateValChange = (fieldName) => (value) => {
     setbaseObj({ ...baseObj, [fieldName]: value });
@@ -17,6 +52,12 @@ export default function LineDetailsTab({ baseObj, setbaseObj, ancillaryData}) {
     else
       setbaseObj({ ...baseObj, [e.target.name]: e.target.value });
   }
+
+  const handleValueChange = (e) => {
+    let valueExpr = e.component.option("name");
+    setbaseObj({ ...baseObj, [valueExpr]: e.value });
+  };
+
 
 
 
@@ -89,72 +130,46 @@ export default function LineDetailsTab({ baseObj, setbaseObj, ancillaryData}) {
                 <p style={{ fontWeight: 'bold' }}>Vessel Information</p>
                 <Grid container spacing={2}  >
                   <Grid item xs={12} alignSelf='end'>
-                    <SelectBoxDropdown
-                      dataSource={ancillaryData.anc_vvpcs}
+                    <MultivalSelectbox
+                      dataSource={vesselVoyageList}
+                      itemRenderJsx={VvpcsSBRender}
                       baseObj={baseObj}
                       setbaseObj={setbaseObj}
+                      setpropId={setvvpcId}
+                      setpropName={setvesselVoyage}
                       value={baseObj.VesselVoyagePortId}
                       data={{ name: "VesselVoyagePortId", label: "Vessel Voyage", displayExpr: "VesselVoyagePortName", valueExpr: "VesselVoyagePortId", searchExpr: "VesselVoyagePortName" }}
                     />
+
                   </Grid>
                   <Grid item xs={12} alignSelf='end'>
-                    {/* <TextField variant='filled' fullWidth label="Terminal" size="small"
-                      // value={baseObj.terminal}
-                      value="JPJA"
-                      name="terminal"
-                      readOnly
-                    /> */}
-                    <SelectBox dataSource={ancillaryData.anc_portTerminals}
-                      fullWidth
-                      name="PortTerminalId"
-                      displayExpr="PortTerminalName"
-                      valueExpr="PortTerminalId"
-                      label="Terminal"
-                      searchExpr="PortTerminalName"
-                      value={baseObj.PortTerminalId}
-                      searchEnabled={true}
-                      searchMode='contains'
-                      searchTimeout={200}
-                      minSearchLength={0}
-                      showDataBeforeSearch={true}
-                      labelMode='floating'
-                      showSelectionControls={false}
-                      stylingMode='underlined'
-                      height='55px'
-                      style={{ marginLeft: 0 }}
-                      className='select-box-text selectbox-disabled'
+                    <TextField variant='filled' fullWidth label="Terminal" size="small"
+                      value={PortTerminalName}
                       readOnly
                     />
                   </Grid>
                   <Grid item xs={12}>
-                    <DatePicker
-                      label="Cut-off Date"
+                    <TextField variant='filled' fullWidth
+                      label="Cut-off Date" size="small"
+                      value={CutOffDate}
                       readOnly
-                      renderInput={(params) => <TextField fullWidth variant="filled" {...params} />}
-                      // value={baseObj.cutOffDate}
-                      value="2023-05-01T18:30:00.000Z"
-                      name="cutOffDate"
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField variant='filled' fullWidth label="E.T.A" size="small"
-                      // value={baseObj.eta}
-                      value="2023-05-01T18:30:00.000Z"
-                      name="eta"
+                      value={Eta}
                       readOnly
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField variant='filled' fullWidth label="E.T.D" size="small"
-                      // value={baseObj.etd}
-                      value="2023-05-01T18:30:00.000Z"
-                      name="etd"
+                      value={Etd}
                       readOnly
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <DatePicker
-                      label="E.T.A. at Destination"
+                      label="ETA at Destination"
                       renderInput={(params) => <TextField fullWidth variant="standard" {...params} />}
                       value={baseObj.DestinationETA}
                       onChange={onDateValChange('DestinationETA')}
