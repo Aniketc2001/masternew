@@ -24,7 +24,7 @@ export default function SelectBoxDropdown({ dataSource, setpropName,setpropId,ba
 
 
     const handleValueChange = (e) => {
-        console.log('e',e);
+        //console.log('e',e);
         try{
             setpropName(e.component.option("text"));
         }
@@ -77,6 +77,13 @@ export default function SelectBoxDropdown({ dataSource, setpropName,setpropId,ba
         catch(ex){}
     }
 
+    const dynaButton = () =>{
+        return (
+            <i className={'bi-list-columns-reverse'} style={{ color:'orange',fontSize: '10pt', marginRight: '10px'}} />
+          );
+    }
+
+
     return (
         <>
          {dynamic ?
@@ -91,18 +98,19 @@ export default function SelectBoxDropdown({ dataSource, setpropName,setpropId,ba
                     searchEnabled={true}
                     searchMode='contains'
                     searchTimeout={200}
-                    minSearchLength={0}
+                    minSearchLength={3}
                     showDataBeforeSearch={true}
                     showClearButton={false}
                     labelMode='floating'
                     showSelectionControls={false}
-                    stylingMode='underlined'
                     height='45px'
                     ref={selectboxRef}
                     onKeyDown={handleKeyDown}
                     onValueChanged={handleValueChange}
-                    className='select-box-text'
-
+                    dropDownButtonRender={dynaButton}
+                    //className='select-dyna-box-text'
+                    placeholder='Type atleast 3 chars to search...'
+                    stylingMode="underlined"
                 />
                 :
                 <SelectBox dataSource={dataSource}
@@ -123,7 +131,8 @@ export default function SelectBoxDropdown({ dataSource, setpropName,setpropId,ba
                     showSelectionControls={false}
                     stylingMode='underlined'
                     height='45px'
-                    className='select-box-text'
+                    //className='select-box-text'
+                    placeholder='Type to search...'
                     // labelStyle={{ fontSize: '8pt' }}
                     onValueChanged={handleValueChange}
                 />

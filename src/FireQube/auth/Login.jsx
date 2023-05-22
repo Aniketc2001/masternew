@@ -151,23 +151,7 @@ export default function Login({setToken, setUserInfo}) {
     });
   };
 
-  const testSomething = async () => {
-
-    console.log("org pwd = " + loginCreds.loginPassword);
-    let enc = encryptAES(loginCreds.loginPassword);
-    console.log("enc pwd = " + enc);
-    let dec = decryptAES(enc);
-    console.log("dec pwd = " + dec);
-    // return;
-    await axios.post('token/check', {...loginCreds, 'loginPassword': encryptAES(loginCreds.loginPassword)})
-    .then((response) => {
-      console.log(response);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  }
-
+  
   const handleEnter = (event) => {
     //console.log(event);
     if(event.keyCode === 13){
@@ -217,8 +201,8 @@ export default function Login({setToken, setUserInfo}) {
           case "AOK":
             setErrMsg("");
             setToken(response.data);
-            localStorage.setItem("authToken", JSON.stringify(response.data));
             getUserDetails(response.data.SystemUserId);
+            localStorage.setItem("authToken", JSON.stringify(response.data));
             break;
           default:
             break;

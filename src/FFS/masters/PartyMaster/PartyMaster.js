@@ -74,6 +74,7 @@ export default function PartyMaster() {
   const partyCodeRef = useRef(null);
   const partyNameRef = useRef(null);
   const [loadcustomerAddressFlag,setloadcustomerAddressFlag] = useState(false);
+  const [PartyId, setPartyId] = useState(id);
 
 
   const hdr = {
@@ -130,13 +131,13 @@ export default function PartyMaster() {
     try {
       axios({
         method: 'get',
-        url: 'Party' + "/" + id,
+        url: 'Party' + "/" + PartyId,
         headers: hdr
       }).then((response) => {
         let x = response.data;
         //console.log(x);
 
-        if (id === "0") {
+        if (PartyId === "0") {
           x.CreatedDate = '01-01-2023 10:10:10 PM';
           x.ModifiedDate = '01-01-2023 10:10:10 PM';
           x.PartyCommunications = [];
@@ -165,7 +166,7 @@ export default function PartyMaster() {
     try {
       axios({
         method: 'get',
-        url: 'Party/ancillaryData/' + id,
+        url: 'Party/ancillaryData/' + PartyId,
         headers: hdr
       }).then((response) => {
         var x = response.data;
@@ -194,7 +195,7 @@ export default function PartyMaster() {
       if (dialogResult) {
         axios({
           method: (baseObj.MarkedForDelete === 'Y' ? 'delete' : 'put'),
-          url: "Party" + (baseObj.MarkedForDelete === 'Y' ? '/' + id : ''),
+          url: "Party" + (baseObj.MarkedForDelete === 'Y' ? '/' + PartyId : ''),
           data: (baseObj.MarkedForDelete === 'Y' ? null : baseObj),
           headers: { "mId": m, "cact": 'A' }
         }).then((response) => {
@@ -220,7 +221,7 @@ export default function PartyMaster() {
       if (dialogResult) {
         axios({
           method: 'delete',
-          url: "Party" + "/" + id,
+          url: "Party" + "/" + PartyId,
           headers: { "mId": m }
         }).then((response) => {
           navigate(-1);
@@ -253,7 +254,7 @@ export default function PartyMaster() {
 
     axios({
       method: (baseObj.MarkedForDelete === 'Y' ? 'delete' : 'put'),
-      url: "Party" + (baseObj.MarkedForDelete === 'Y' ? '/' + id : ''),
+      url: "Party" + (baseObj.MarkedForDelete === 'Y' ? '/' + PartyId : ''),
       data: (baseObj.MarkedForDelete === 'Y' ? null : baseObj),
       headers: { "mId": m, "cact": 'R', "rmrk": rejectReason }
     }).then((response) => {
@@ -378,14 +379,20 @@ export default function PartyMaster() {
         x.DraftFlag = "D";
         console.log("x", x);
         axios({
-          method: (id === "0" ? 'post' : 'put'),
+          method: (PartyId === "0" ? 'post' : 'put'),
           url: 'Party',
           data: x,
           headers: { "mId": m }
         }).then((response) => {
           console.log(response.data);
-          id = response.data.PartyId;
-          setBaseObj({...baseObj, PartyId: id});
+          var tid =response.data.PartyId;
+          console.log('tid',tid); 
+          if(tid){
+            console.log('updating tid...');
+            id = response.data.PartyId;
+            setBaseObj({...baseObj, PartyId: tid});
+            setPartyId(tid);
+          }
           setnotificationBarMessage("Party details saved as draft!");
           setOpenNotificationBar(true);
           //navigate(-1);
@@ -414,7 +421,7 @@ export default function PartyMaster() {
         x.DraftFlag = "F";
         console.log("x", x);
         axios({
-          method: (id === "0" ? 'post' : 'put'),
+          method: (PartyId === "0" ? 'post' : 'put'),
           url: 'Party',
           data: x,
           headers: { "mId": m }

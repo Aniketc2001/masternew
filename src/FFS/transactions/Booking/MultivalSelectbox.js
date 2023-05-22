@@ -48,10 +48,10 @@ export default function MultivalSelectbox({itemRenderJsx, dataSource,setpropId,s
             showSelectionControls={false}
             stylingMode='underlined'
             height='45px'
-            style={{ marginLeft: 0 }}
-            className='select-box-text'
+            //className='select-box-text'
             onValueChanged={handleValueChange}
             dropDownOptions={dropDownOptions}
+            placeholder='Type to search...'
         />
     )
 }

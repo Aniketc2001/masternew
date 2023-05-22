@@ -79,6 +79,8 @@ export default function BookingList(props) {
             TableName={menuDetails.MenuName}
             KeyFieldName={menuDetails.KeyField}
             columnNamesJSON={columnNamesJSON}
+            DeleteStatusColumnVisibility={false}
+            CheckerStatusColumnVisibility={false}
         />
         :
         <></>

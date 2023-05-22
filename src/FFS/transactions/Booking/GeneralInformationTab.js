@@ -25,15 +25,15 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
 
     return (
         <>
-            <div style={{ height: "63vh", overflow: 'auto' }}>
+            <div style={{ height: "65vh", overflow: 'auto' }}>
                 <Box sx={{ marginTop: 1, fontSize: '9pt' }}>
                     <Grid container spacing={1}>
-                        <Grid item lg={5} xs={12}>
+                        <Grid item lg={6} xs={12}>
                             <Paper elevation={1} sx={{ p: 1, marginLeft: 1 }}>
                                 <Box>
-                                    <p style={{ fontWeight: '' }}>General Information</p>
+                                    <p style={{ fontWeight: 'bold' }}>General Information</p>
                                     <Grid container spacing={1}>
-                                        <Grid item lg={3} sm={4} xs={6}>
+                                        <Grid item lg={4} sm={4} xs={6}>
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_products}
                                                 baseObj={baseObj}
@@ -43,7 +43,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                 data={{ name: "ProductId", label: "Product Type", displayExpr: "ProductName", valueExpr: "ProductId", searchExpr: "ProductName" }}
                                             />
                                         </Grid>
-                                        <Grid item lg={3} sm={4} xs={6}>
+                                        <Grid item lg={4} sm={4} xs={6}>
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_bookingTypes}
                                                 baseObj={baseObj}
@@ -52,7 +52,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                 data={{ name: "BookingTypeId", label: "Booking Type", displayExpr: "LookupItemName", valueExpr: "LookupItemId", searchExpr: "LookupItemName" }}
                                             />
                                         </Grid>
-                                        <Grid item lg={3} sm={4} xs={6}>
+                                        <Grid item lg={4} sm={4} xs={6}>
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_bookingOffices}
                                                 baseObj={baseObj}
@@ -61,7 +61,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                 data={{ name: "BookingOfficeId", label: "Booking Office", displayExpr: "BookingOfficeName", valueExpr: "BookingOfficeId", searchExpr: "BookingOfficeName" }}
                                             />
                                         </Grid>
-                                        <Grid item lg={3} sm={4} xs={6} alignSelf='end'>
+                                        <Grid item lg={4} sm={4} xs={6} alignSelf='end'>
                                             <DatePicker
                                                 label="Booking Date"
                                                 format="dd/MM/yyyy"
@@ -72,7 +72,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                 name="BookingDate"
                                             />
                                         </Grid>
-                                        <Grid item lg={3} sm={4} xs={6}>
+                                        <Grid item lg={4} sm={4} xs={6}>
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_deliveryModes}
                                                 baseObj={baseObj}
@@ -81,7 +81,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                 data={{ name: "DeliveryModeId", label: "Delivery Mode", displayExpr: "LookupItemName", valueExpr: "LookupItemId", searchExpr: "LookupItemName" }}
                                             />
                                         </Grid>
-                                        <Grid item lg={3} sm={4} xs={6}>
+                                        <Grid item lg={4} sm={4} xs={6}>
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_stuffingTypes}
                                                 baseObj={baseObj}
@@ -90,7 +90,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                 data={{ name: "StuffingTypeId", label: "Stuffing Type", displayExpr: "LookupItemName", valueExpr: "LookupItemId", searchExpr: "LookupItemName" }}
                                             />
                                         </Grid>
-                                        <Grid item lg={3} sm={4} xs={6}>
+                                        <Grid item lg={4} sm={4} xs={6}>
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_stuffingLocations}
                                                 baseObj={baseObj}
@@ -99,16 +99,18 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                 data={{ name: "StuffingLocationId", label: "Stuffing Location", displayExpr: "StuffingLocationName", valueExpr: "StuffingLocationId", searchExpr: "StuffingLocationName" }}
                                             />
                                         </Grid>
-                                        <Grid item lg={3} sm={4} xs={6} alignSelf='end'>
-                                            <TextField variant='standard' fullWidth label="Remarks" size="small"
-                                                value={baseObj.Remarks}
-                                                name='Remarks'
-                                                onChange={(evt) => onValChange(evt)}
-                                            />
-                                        </Grid>
+                                        <Grid item lg={4} sm={4} xs={6}>
+                                                <FormControlLabel
+                                                    control={<Checkbox checked={baseObj.LineBLRequiredFlag} size="small" />}
+                                                    label="Line BL Required"
+                                                    sx={{fontSize:'8pt'}}
+                                                    value={baseObj.LineBLRequiredFlag}
+                                                    onChange={(evt) => onValChange(evt)}
+                                                    name='LineBLRequiredFlag'
+                                                />
+                                            </Grid>
                                     </Grid>
                                 </Box>
-                                <hr />
                                 <Box sx={{ marginTop: 2 }}>
                                     <p style={{ fontWeight: 'bold' }}>Cargo Information</p>
                                     <Grid container spacing={1}  >
@@ -175,7 +177,6 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                         </Grid>
                                     </Grid>
                                 </Box>
-                                <hr />
                                 <Box sx={{ marginTop: 2 }}>
                                     <p style={{ fontWeight: 'bold' }}>HAZ Details</p>
                                     <Grid container spacing={1}  >
@@ -212,9 +213,9 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                         <Grid item lg={3} xs={12}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                    <Paper elevation={1} sx={{ p: 1 }}>
+                                    <Paper elevation={1} sx={{ paddingLeft:1, paddingTop:0.5 }}>
                                         <p style={{ fontWeight: 'bold' }}>Parties Involved</p>
-                                        <Grid container spacing={0.8}  >
+                                        <Grid container spacing={0.8} sx={{p:0}} >
                                             <Grid item xs={12} sx={{ fontSize: '12pt' }}>
                                                 <SelectBoxDropdown
                                                     dataSource={ancillaryData.anc_customers}
@@ -336,26 +337,18 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                     data={{ name: "OsaId", label: "Overseas Agent", displayExpr: "OsaName", valueExpr: "OsaId", searchExpr: "OsaName" }}
                                                 />
                                             </Grid>
-                                            <Grid item xs={12}>
-                                                <FormControlLabel
-                                                    control={<Checkbox checked={baseObj.LineBLRequiredFlag} size="small" />}
-                                                    label="Line BL Required"
-                                                    value={baseObj.LineBLRequiredFlag}
-                                                    onChange={(evt) => onValChange(evt)}
-                                                    name='LineBLRequiredFlag'
-                                                />
-                                            </Grid>
+                                            
                                         </Grid>
                                     </Paper>
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid item lg={4} xs={12}>
+                        <Grid item lg={3} xs={12}>
                             <Paper elevation={1} sx={{ p: 1, marginRight: 1 }}>
                                 <Box>
-                                    <p style={{ fontWeight: 'bold' }}>Route Information</p>
-                                    <Grid container spacing={1}  >
-                                        <Grid item lg={4} sm={4} xs={6}>
+                                    <span style={{ fontWeight: 'bold' }}>Route Information</span>
+                                    <Grid container spacing={1} sx={{p:0}}  >
+                                        <Grid item lg={6} sm={4} xs={6}>
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_ports}
                                                 baseObj={baseObj}
@@ -364,7 +357,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                 data={{ name: "PorId", label: "POR", displayExpr: "PortName", valueExpr: "PortId", searchExpr: "PortName" }}
                                             />
                                         </Grid>
-                                        <Grid item lg={4} sm={4} xs={6}>
+                                        <Grid item lg={6} sm={4} xs={6}>
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_ports}
                                                 baseObj={baseObj}
@@ -375,7 +368,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                 data={{ name: "PolId", label: "POL", displayExpr: "PortName", valueExpr: "PortId", searchExpr: "PortName" }}
                                             />
                                         </Grid>
-                                        <Grid item lg={4} sm={4} xs={6}>
+                                        <Grid item lg={6} sm={4} xs={6}>
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_ports}
                                                 baseObj={baseObj}
@@ -384,7 +377,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                 data={{ name: "PodId", label: "POD", displayExpr: "PortName", valueExpr: "PortId", searchExpr: "PortName" }}
                                             />
                                         </Grid>
-                                        <Grid item lg={4} sm={4} xs={6}>
+                                        <Grid item lg={6} sm={4} xs={6}>
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_ports}
                                                 baseObj={baseObj}
@@ -394,7 +387,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                 data={{ name: "FpdId", label: "FPD", displayExpr: "PortName", valueExpr: "PortId", searchExpr: "PortName" }}
                                             />
                                         </Grid>
-                                        <Grid item lg={4} sm={4} xs={6}>
+                                        <Grid item lg={6} sm={4} xs={6}>
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_transportModes}
                                                 baseObj={baseObj}
@@ -405,13 +398,13 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                         </Grid>
                                     </Grid>
                                 </Box>
-                                <hr />
-                                <Box sx={{ marginTop: 2 }}>
-                                    <p style={{ fontWeight: 'bold' }}>Container details</p>
+                                <Box sx={{ marginTop: 0.5 }}>
+                                    <span style={{ fontWeight: 'bold' }}>Container details</span>
                                     <DataGrid
                                         dataSource={baseObj.BookingInventories}
                                         keyExpr="BookingInventoryId"
                                         showBorders={true}
+                                        styling={{fontSize:'8pt'}}
                                         onInitNewRow={(e) => {
                                             e.data.BookingInventoryId = 0;
                                             e.data.BookingId = 0;
@@ -432,6 +425,17 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                         </Column>
                                         <Column dataField="NumberOfUnits" caption="No of Containers" />
                                     </DataGrid>
+                                    <Grid item  xs={12} alignSelf='end' sx={{paddingTop:'8px'}}>
+                                            <TextField variant='standard'
+                                                multiline
+                                                fullWidth 
+                                                label="Remarks" size="sm"
+                                                value={baseObj.Remarks}
+                                                name='Remarks'
+                                                sx={{backgroundColor:'lightyellow'}}
+                                                onChange={(evt) => onValChange(evt)}
+                                            />
+                                    </Grid>
                                 </Box>
                             </Paper>
                         </Grid>

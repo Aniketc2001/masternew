@@ -405,6 +405,14 @@ export default function ListPageLayout(props) {
     //e.rowElement.style.backgroundColor = 'red';
   }
 
+  const customizePager = (pagerOptions) => {
+    return (
+      <div>
+        <span>Total Records: {gridDataSource.length}</span>
+        {pagerOptions}
+      </div>
+    );
+  };
 
   return (
       true
@@ -543,6 +551,7 @@ export default function ListPageLayout(props) {
               ))}
 
             </DataGrid>
+            <p style={{color:'grey',fontSize:'8pt',paddingTop:'3px'}}>Displaying a total list of {gridDataSource.length} record(s)</p>
             <Snackbar
                 open={openNotificationBar}
                 onClose={handleCloseNotificationBar}

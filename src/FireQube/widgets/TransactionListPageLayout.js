@@ -232,9 +232,6 @@ export default function TransactionListPageLayout(props) {
       }
   };
 
- 
- 
-
   const hidePopover = () => {
     setOpenPopover(false);
   }
@@ -296,18 +293,19 @@ export default function TransactionListPageLayout(props) {
 
 
   const handleGridCellClick = (e) => {
-    switch(e.columnIndex){
-      case 2: //Checker status
+    console.log(e);
+    switch(e.column.name){
+      case "CHECKER": //Checker status
         if(e.data.CheckerStatus !== "D")
           checkerStatusIconClick(e.row);
         break;
-      case 3: // Active Status
+      case "ACTIVE": // Active Status
         //checkerStatusIconClick(e.row);
         break;
-      case 4: //Edit Button
+      case "EDIT": //Edit Button
         editIconClick(e.row);
         break;
-      case 5:
+      case "CUSTOM":
         if(props.CustomField)
           customIconClick(e.row);
         break;
@@ -455,11 +453,11 @@ export default function TransactionListPageLayout(props) {
               <ColumnChooser enabled={true} />
 
               <Export enabled={true}   />
-              <Column caption="" cellRender={renderMarkForDeleteStatus} width={25} />
-              <Column caption="" cellRender={renderCheckerStatus} width={25} onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}   />
-              <Column caption="" cellRender={renderActiveStatus} width={25} />
-              <Column caption="" cellRender={renderEditButton}  width={29} onClick={editIconClick}  />
-              <Column caption="" cellRender={renderCustomButton} visible={props.CustomField===true} onClick={editIconClick} width={28} />
+              <Column name="DELETE" caption="" cellRender={renderMarkForDeleteStatus} width={25} visible={props.DeleteStatusColumnVisibility} />
+              <Column name="CHECKER" caption="" cellRender={renderCheckerStatus} width={25} visible={props.CheckerStatusColumnVisibility} onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}   />
+              <Column name="ACTIVE" caption="" cellRender={renderActiveStatus} width={25} />
+              <Column name="EDIT" caption="" cellRender={renderEditButton}  width={29} onClick={editIconClick}  />
+              <Column name="CUSTOM" caption="" cellRender={renderCustomButton} visible={props.CustomField===true} onClick={editIconClick} width={28} />
 
               {props.columnNamesJSON.map(column => (
                   <Column
@@ -469,6 +467,7 @@ export default function TransactionListPageLayout(props) {
               ))}
 
             </DataGrid>
+            <p style={{color:'grey',fontSize:'8pt',paddingTop:'3px'}}>Displaying a total list of {gridDataSource.length} record(s)</p>
             <Snackbar
                 open={openNotificationBar}
                 onClose={handleCloseNotificationBar}

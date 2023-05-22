@@ -192,7 +192,7 @@ function App() {
       <Route path="/locationEdit/:id" element={<MasterEditCx mId="Location"/>} />
       <Route path="/commodityCategoryEdit/:id" element={<MasterEditCx mId="Commodity Category"/>} />
       <Route path="/crmTeamEdit/:id" element={<MasterEditPageMultiLevel mId="CRM Team"/>} />
-      <Route path="/bookingEdit/:id" element={<BookingEdit mId="Port"/>} />
+      <Route path="/bookingEdit/:id" element={<BookingEdit mId="Port" setOpen={setOpen}/>} />
 
       <Route path="/accessLevelManage/:id" element={<AccessLevelManage />} />
 

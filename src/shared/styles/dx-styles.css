@@ -97,7 +97,17 @@ body
     margin-left: 8px;
   }
 
+.select-dyna-box-text{
+    padding-top: 18px; /* Adjust the value as needed */
+    margin-left: 8px;
+    background-color: cadetblue;
+}  
+
 .dx-datagrid .dx-column-lines > td {
     border-left: 1px solid #efeeeb;
     border-right: 1px solid #efeeeb;
+}
+
+.dx-texteditor-input,.dx-texteditor-with-floating-label,.dx-editor-underlined {
+    padding-top: 14px;
 }

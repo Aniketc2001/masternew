@@ -28,7 +28,7 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
       setEtd(selectedVvpc[0].Etd);
       setCutOffDate(selectedVvpc[0].CutOffDate);
       setEtdatDest(selectedVvpc[0].EtaDestination);
-      setbaseObj({...baseObj, DestinationETA: selectedVvpc[0].EtaDestination });
+      setbaseObj({...baseObj, DestinationETA: selectedVvpc[0].EtaDestination, PortTerminalId: selectedVvpc[0].PortTerminalId  });
 
       console.log(PortTerminalName);
     }

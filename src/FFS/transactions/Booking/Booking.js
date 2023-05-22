@@ -10,7 +10,7 @@ import BxButton from "react-bootstrap/button"
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { alert, confirm } from 'devextreme/ui/dialog';
 
-export default function Booking() {
+export default function Booking(props) {
   const m = new URLSearchParams(useLocation().search).get('m');
   const { id } = useParams();
   const navigate = useNavigate();
@@ -36,10 +36,9 @@ export default function Booking() {
   const [customerAddressList, setcustomerAddressList] = useState([]);
   const [vesselVoyageList, setvesselVoyageList] = useState([]);
   const [salesPersonList, setsalesPersonList] = useState([]);
-  
-
+  const [BookingId,setBookingId] = useState(id);
+  const [reloadFlag,setreloadFlag] = useState(false);
   const [polId,setpolId] = useState(null);
-
 
   const hdr = {
     'mId': m
@@ -49,19 +48,30 @@ export default function Booking() {
     setValue(newValue);
   };
 
+  //reload inventories during draft save
   useEffect(() => {
-    getSalesPerson();
+    if(baseObj)
+      reloadInventory(BookingId);
+  }, [reloadFlag]);
+
+  useEffect(() => {
+    if(baseObj)
+      getSalesPerson();
   }, [siteId,productId]);
 
   useEffect(() => {
-    getVesselVoyage();
+    if(baseObj)
+      getVesselVoyage();
   }, [polId]);
 
   useEffect(() => {
-    getCustomerAddress();
+    if(baseObj)
+      getCustomerAddress();
   }, [customerId]);
 
   useEffect(() => {
+    console.log('setsidebar...',props);
+    props.setOpen(false);
     getinitialVal();
     getancillaryData();
     // eslint-disable-next-line
@@ -85,7 +95,7 @@ export default function Booking() {
 
       }).catch((error) => {
         //setancillaryData("no values");
-        setvesselVoyage(null);
+        setvesselVoyageList(null);
         if (error.response) {
           console.log("Error occured while retrieving ancillary data..");
         }
@@ -104,7 +114,7 @@ export default function Booking() {
         url: 'booking/filteredancillarydata/salespeople/' + customerId + "|" + productId + "|" + siteId
       }).then((response) => {
         const x = response.data.anc_results;
-        console.log("party sales",x);
+        //console.log("party sales",x);
         //ancillaryData.anc_salesPeople = x;
         //setancillaryData({ ...ancillaryData, anc_salesPeople: x });
         setsalesPersonList(x);
@@ -144,21 +154,43 @@ export default function Booking() {
     }
   }
 
+
+  const reloadInventory = (bId) => {
+    try {
+      axios({
+        method: 'get',
+        url: `Booking/${bId}`,
+        headers: hdr
+      }).then((response) => {
+        let x = response.data;
+        setbaseObj({...baseObj, BookingInventories: x.BookingInventories});
+      }).catch((error) => {
+        console.log("reloadInventory err:",error);
+      })
+    }
+    catch (ex) {
+
+    }
+
+  }
+
   const getinitialVal = () => {
     try {
       axios({
         method: 'get',
-        url: `Booking/${id}`,
+        url: `Booking/${BookingId}`,
         headers: hdr
       }).then((response) => {
         let x = response.data;
         x.LineBLRequiredFlag = x.LineBLRequiredFlag === 'Y' ? true : false;
-        x.PortTerminalId = 25;
-        if (id === '0') {
+        console.log('b1');
+        if (BookingId === '0') {
           x.CreatedDate = '01-01-2023 10:10:10 PM';
           x.ModifiedDate = '01-01-2023 10:10:10 PM';
+          x.BookingDate = new Date();
           x.BookingInventories = [];
         }
+        console.log('b2');
         console.log('baseObj', x);
         setbaseObj(x);
         
@@ -170,9 +202,13 @@ export default function Booking() {
         //Sales Person
         setsiteId(x.CustomerSiteId);
 
+        console.log('b3');
+
         //Vessel Voyage
         setpolId(x.PolId);
         setparentvvpcId(x.VesselVoyagePortId);
+
+        console.log('b4');
 
         //Set Summary Headers
         setcustomerName(x.CustomerName);
@@ -216,7 +252,7 @@ export default function Booking() {
         x.anc_chas = [];
         x.anc_osas = [];
         setancillaryData(x);
-        console.log(response.data)
+        //console.log(response.data)
       }).catch((error) => {
         setancillaryData("no values");
         if (error.response) {
@@ -238,233 +274,135 @@ export default function Booking() {
 
   const manageCheckBoxFlags = () => {
     const newbaseObj = {};
-
     for (const key in baseObj) {
-      if (baseObj[key] === true || baseObj[key] === false) {
+      if (baseObj[key] === true || baseObj[key] === false) 
         newbaseObj[key] = baseObj[key] ? 'Y' : 'N';
-      }
-      else {
+      else 
         newbaseObj[key] = baseObj[key];
-      }
     }
-
     return (newbaseObj);
   }
 
-  // const saveRecord = (uact) => {
-  //   const newbaseObj = manageCheckBoxFlags();
-  //   console.log('newObj', newbaseObj)
-  //   console.log('mId', module)
-  //   setBookingStatus(uact);
-  //   axios({
-  //     method: (id === "0" ? 'post' : 'put'),
-  //     url: 'Booking',
-  //     data: newbaseObj,
-  //     headers: {
-  //       "mId": m,
-  //       "uact": uact
-  //     }
-  //   }).then((response) => {
-  //     // setBookingStatus(uact);
-  //     console.log('draft', response.data)
-  //   }).catch((error) => {
-  //     console.log(error)
-  //     if (error.response) {
-  //     }
-  //   })
-  // }
-
   const saveRecord = (uact) => {
-    if (uact == "CONFIRMED" || uact == "READY" || uact == "FINALIZED")
-      if (!validateForm()) {
-        return (false);
-      }
+    if(!validate(uact)){
+      return(false);
+    }
     const newbaseObj = manageCheckBoxFlags();
     console.log('newObj', newbaseObj);
     console.log('mId', module);
-
-   
-      //setBookingStatus(uact);
-      const vl = confirm('Confirm updation?', 'Confirmation Alert');
-      vl.then((dialogResult) => {
-        if (dialogResult) {
-          axios({
-            method: (id === "0" ? 'post' : 'put'),
-            url: 'Booking',
-            data: newbaseObj,
-            headers: {
-              "mId": m,
-              "uact": uact
-            }
-          }).then((response) => {
-            setBookingStatus(uact);
-            setnotificationBarMessage("Booking details saved as " +uact+" successfully!");
-            setOpenNotificationBar(true);
-            const x = response.data;
-            console.log('draft', response.data);
-            setbaseObj({...baseObj,BookingId:x.BookingId,BookingReference:x.BookingReference});
-            if(uact === "DRAFT"){
-              return;
-            }
-            navigate(-1);
-          }).catch((error) => {
-            if (error.response) {
-              console.log(error.response);
-              setnotificationBarMessage("Error occurred while saving data: " + error.response.data);
-              setOpenNotificationBar(true);
-            }
-          });
-        }
-      });
+    console.log('uact',uact);
     
+    //setBookingStatus(uact);
+    const vl = confirm('Confirm updation?', 'Confirmation Alert');
+    vl.then((dialogResult) => {
+      if (dialogResult) {
+        axios({
+          method: (BookingId === "0" ? 'post' : 'put'),
+          url: 'Booking',
+          data: newbaseObj,
+          headers: {
+            "mId": m,
+            "uact": uact
+          }
+        }).then((response) => {
+          setBookingStatus(uact);
+          setnotificationBarMessage("Booking details saved as " +uact+" successfully!");
+          setOpenNotificationBar(true);
 
+          const x = response.data;
+          var tId = x.BookingId;
+          console.log(x);
+
+          if(tId){
+            setBookingId(tId);
+            setbaseObj({...baseObj, BookingId: tId,BookingReference: x.BookingReference});
+          }
+
+          if(uact === "DRAFT"){
+            setreloadFlag(true);
+            return;
+          }
+
+          navigate(-1);
+        }).catch((error) => {
+          if (error.response) {
+            console.log(error.response);
+            setnotificationBarMessage("Error occurred while saving data: " + error.response.data);
+            setOpenNotificationBar(true);
+          }
+        });
+      }
+    });
   };
 
 
+  const validate =(uact) =>{
+    var fields = [];
+    if(uact==="DRAFT"){
+      fields = ["ProductId","BookingOfficeId","BookingReference","BookingDate",
+      "ShippingLineId","CustomerId","ShipperId","ConsigneeId","PorId","PolId","PodId",
+      "FpdId","CargoTypeId"];
+    }
+    else if(uact==="READY"){
+      fields = ["ProductId","BookingOfficeId","BookingReference","BookingDate",
+      "StuffingTypeId","ShippingLineId","CustomerId","CustomerSiteId","SalesPersonId",
+      "ShipperId","ConsigneeId","OsaId","PorId","PolId","PodId","FpdId","ModeOfTransportId",
+      "CargoTypeId","CommodityCategoryId","CommodityId"];
+    }
+    else if(uact==="CONFIRMED"){
+      fields = ["ProductId","BookingOfficeId","BookingReference","BookingDate",
+      "DeliveryModeId","StuffingTypeId","StuffingLocationId","ShippingLineId","CustomerId",
+      "CustomerSiteId","SalesPersonId","ShipperId","ConsigneeId","OsaId","PorId","PolId",
+      "PodId","FpdId","ModeOfTransportId","CargoTypeId","CommodityCategoryId","CommodityId",
+      "WeightUnitId","GrossWeight","VolumeUnitId","Volume","PackagingGroup","LineBookingNumber",
+      "LineBookingDate","LineBookingValidity","SiCutOffDate","PickupPointId","VesselVoyagePortId",
+      "PortTerminalId","DestinationETA"];
+    }
+    else if(uact==="FINALIZED"){
+      fields = ["ProductId","BookingOfficeId","BookingReference","BookingDate","DeliveryModeId",
+      "StuffingTypeId","StuffingLocationId","BookingTypeId","ShippingLineId","CustomerId",
+      "CustomerSiteId","SalesPersonId","ShipperId","ConsigneeId","OsaId","PorId","PolId",
+      "PodId","FpdId","ModeOfTransportId","CargoTypeId","CommodityCategoryId","CommodityId",
+      "WeightUnitId","GrossWeight","VolumeUnitId","Volume","PackagingGroup","LineBookingNumber",
+      "LineBookingDate","LineBookingValidity","SiCutOffDate","PickupPointId","VesselVoyagePortId",
+      "PortTerminalId","DestinationETA"];
+    }
+    
+    return validateData(fields);
+  }
 
-  function validateForm(uact) {
-    // Check if the required fields are empty
-    if (!baseObj.ProductId) {
-      alert("Please specify product type", "Booking Validation")
-      return false;
-    }
-    if (!baseObj.BookingTypeId) {
-      alert("Please specify booking type", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.BookingOfficeId) {
-      alert("Please specify booking office", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.BookingDate) {
-      alert("Please specify booking date", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.DeliveryModeId) {
-      alert("Please specify delivery mode", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.StuffingTypeId) {
-      alert("Please specify stuffing type", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.StuffingLocationId) {
-      alert("Please specify stuffing location", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.Remarks) {
-      alert("Please specify remarks", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.CargoTypeId) {
-      alert("Please specify cargo type", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.CommodityCategoryId) {
-      alert("Please specify commodity category", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.CommodityId) {
-      alert("Please specify commodity", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.WeightUnitId) {
-      alert("Please specify weight unit", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.GrossWeight) {
-      alert("Please specify gross weight", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.VolumeUnitId) {
-      alert("Please specify volume unit", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.Volume) {
-      alert("Please specify volume", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.ImoclassId) {
-      alert("Please specify imo class", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.ImounnumberId) {
-      alert("Please specify imo un number", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.PackagingGroup) {
-      alert("Please specify packaging group", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.CustomerId) {
-      alert("Please specify customer", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.CustomerSiteId) {
-      alert("Please specify customer site", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.ShipperId) {
-      alert("Please specify shipper", "Booking Validation");
-      return false;
-    }
+  const validateData = (fields) => {
+    const result = [];
+    var s = "";
+    fields.forEach((item) => {
+      if (baseObj[item] === null) {
+        var tmpItem = item.replace("Id","");
+        const message = `Invalid or blank data in ${tmpItem}<br/>`;
+        s = s + message;
+        result.push(message);
+      }
+    });
 
-    if (!baseObj.ShippingLineId) {
-      alert("Please specify shipping line", "Booking Validation");
+    if(result.length > 0){
+      alert("Following fields have invalid data in them:<br/><br/>" + s, "Booking Validation Check");
       return false;
     }
-    if (!baseObj.ConsigneeId) {
-      alert("Please specify consignee", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.ChaId) {
-      alert("Please specify custom house agent (CHA)", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.SalesPersonId) {
-      alert("Please specify sales person", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.OsaId) {
-      alert("Please specify overseas agent (OSA)", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.PorId) {
-      alert("Please specify place of receipt (POR)", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.PolId) {
-      alert("Please specity port of loading (POL)", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.PodId) {
-      alert("Please specify port of delivery (POD)", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.FpdId) {
-      alert("Please Specify (fpd)", "Booking Validation");
-      return false;
-    }
-    if (!baseObj.ModeOfTransportId) {
-      alert("Please specify mode of transport (MOT)", "Booking Validation");
-      return false;
-    }
+    
     return true;
   }
 
-
   const cancelEntry = () => {
+    //props.setOpen(true);
     navigate(-1);
   }
-
 
   return (
     <>
       {
         baseObj && ancillaryData ?
-          <Box sx={{ fontFamily: 'poppins' }}>
-            <Box>
-              <Paper elevation={5} sx={{ p: 3, paddingBottom: 0, height: '90vh' }}>
+          <Box sx={{ fontFamily: 'poppins',p:0 }}>
+            <Box sx={{p:0,m:0}}>
+              <Paper elevation={5} sx={{ p: 2, paddingBottom: 0, height: '90.5vh' }}>
                 <BookingSummary
                   customerName={customerName}
                   bookingStatus={bookingStatus}
@@ -514,32 +452,36 @@ export default function Booking() {
                       bookingStatus === 'Draft' || bookingStatus === 'DRAFT' ?
                         <>
                           <BxButton variant="secondary" onClick={() => saveRecord('DRAFT')} size='sm'>  <i className="bi bi-card-heading" style={{ marginRight: 10 }} ></i>Save as Draft</BxButton>
-                          <BxButton variant="primary" onClick={() => saveRecord('READY')} size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Booking Ready</BxButton>
-                          <BxButton variant="primary" onClick={() => saveRecord('CONFIRMED')} size='sm'>  <i className="bi bi-check-circle" style={{ marginRight: 10 }} ></i>Confirm</BxButton>
-                          <BxButton variant="primary" onClick={() => saveRecord('FINALIZED')} size='sm'>  <i className="bi bi-hand-thumbs-up" style={{ marginRight: 10 }} ></i>Finalize</BxButton>
+                          <BxButton variant="primary" onClick={() => saveRecord('READY')} size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save</BxButton>
+                          <BxButton variant="primary"  size='sm'>  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>
                           {
-                            id !== '0' ?
+                            BookingId !== '0' ?
                               <BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>
                               : <></>
                           }
                         </> :
-                        bookingStatus === 'READY' ?
+                        bookingStatus.toUpperCase() === 'READY' ?
                           <>
+                            <BxButton variant="primary" onClick={() => saveRecord('READY')} size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save</BxButton>
+                            <BxButton variant="primary"  size='sm' >  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>
                             <BxButton variant="primary" onClick={() => saveRecord('CONFIRMED')} size='sm'>  <i className="bi bi-check-circle" style={{ marginRight: 10 }} ></i>Confirm</BxButton>
                             <BxButton variant="primary" onClick={() => saveRecord('FINALIZED')} size='sm'>  <i className="bi bi-hand-thumbs-up" style={{ marginRight: 10 }} ></i>Finalize</BxButton>
                             <BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>
                           </> :
-                          bookingStatus === 'CONFIRMED' ?
+                          bookingStatus.toUpperCase() === 'CONFIRMED' ?
                             <>
+                              <BxButton variant="primary"  size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save as New</BxButton>
                               <BxButton variant="primary" onClick={() => saveRecord('FINALIZED')} size='sm'>  <i className="bi bi-hand-thumbs-up" style={{ marginRight: 10 }} ></i>Finalize</BxButton>
                               <BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>
                             </> :
-                            bookingStatus === 'FINALIZED' ?
+                            bookingStatus.toUpperCase() === 'FINALIZED' ?
+                              <>
+                              <BxButton variant="primary"  size='sm'>  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>
                               <BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>
+                              </>
                               :
-                              bookingStatus === 'CANCELLED' ?
+                              bookingStatus.toUpperCase() === 'CANCELLED' ?
                                 <>
-                                  <BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>
                                 </>
                                 :
                                 <></>
