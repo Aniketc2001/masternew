@@ -4,11 +4,34 @@ import PartyContact from './PartyContact';
 import { RequiredRule } from 'devextreme-react/form';
 import { useState, useEffect, useRef } from "react";
 import { CheckBox } from 'devextreme-react/check-box';
+import { alert, confirm } from 'devextreme/ui/dialog';
 
 export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresses, onPartyAddressChange }) {
     const dataGrid = useRef(null);
     const [refresh, setRefresh] = useState(false);
-
+    const [cityGST, setCityGST] = useState(null);
+    const [validationRules, setValidationRules] = useState({
+        gst: [
+          {
+            type: 'required',
+            message: 'GST is required',
+          },
+          {
+            type: 'custom',
+            message: "GST No. should start with the selected City's State code",
+            validationCallback: (params) => {
+              const { value, data } = params;
+              console.log('validation call',params);
+              const cityId = data.CityId;
+              const selectedCity = ancillaryData.anc_cities.find((city) => city.id === cityId);
+              const cityCode = selectedCity ? selectedCity.code : '';
+    
+              return value.startsWith(cityCode);
+            },
+          },
+        ],
+      });
+    
     const displayFlags = [
         { value: 'Y', text: 'Active' },
         { value: 'N', text: 'Inactive' },
@@ -58,6 +81,36 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
         );
     }
 
+    const handleCityChange = (e) => {
+        const { dataField, value, component } = e;
+        console.log("e",e);
+        var cityid = e.value;
+        const selectedCity = ancillaryData.anc_cities.find((city) => city.CityId === cityid);
+        console.log("selected city",ancillaryData.anc_cities,selectedCity);
+        if(selectedCity){
+            console.log('setting city gst',selectedCity);
+            setCityGST(selectedCity);
+        }
+        else{
+            console.log('nothing to set in city gst...');
+            setCityGST(null);
+        }
+    };
+
+    const handleGstChange = (e) => {
+        const { dataField, value, component } = e;
+        //console.log("e1",e,cityGST,'gstcode',cityGST.GstStateCode);
+
+        var gst = e.value;
+        if(gst !== '')
+            if(gst.substr(0,2) !== cityGST.GstStateCode){
+                alert("GST State code does not match with the selected city's state! [" + cityGST.GstStateCode + "]" ,'GST State Validation')
+            }
+    };
+
+    
+    
+
     const CustomEditCell = (props) => {
         const { value, onValueChange } = props;
         //console.log(props);
@@ -90,6 +143,15 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                 useIcons={true}
                 rowAlternationEnabled={true}
                 allowColumnResizing={true}
+                onEditorPreparing={(e) => {
+                    if (e.dataField === 'Gstin') {
+                      e.editorOptions.onValueChanged = handleGstChange;
+                    }
+                    if (e.dataField === 'CityId') {
+                        e.editorOptions.onValueChanged = handleCityChange;
+                      }
+  
+                  }}
                 onInitNewRow={(e) => {
                     // Set a default value for the key field when adding a new 
                     const gridDataSource = e.component.getDataSource();
@@ -180,12 +242,6 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                     <FormItem visible={false} />
                 </Column>
                 <Column dataField="Gstin" visible={false}>
-                    <FormItem visible={true} />
-                </Column>
-                <Column dataField="Saccode" caption="SAC Code" visible={false}>
-                    <FormItem visible={true} />
-                </Column>
-                <Column dataField="Hsncode" caption="HSN Code" visible={false}>
                     <FormItem visible={true} />
                 </Column>
                 <Column dataField="Active" caption="Active" visible={true} width={50} 

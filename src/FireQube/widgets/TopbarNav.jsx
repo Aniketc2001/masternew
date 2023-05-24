@@ -171,6 +171,7 @@ function TopBarNav(props) {
             <SearchIcon />
           </SearchIconWrapper>
           <StyledInputBase
+            autoComplete
             placeholder="Search…"
             inputProps={{ "aria-label": "search" }}
           />

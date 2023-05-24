@@ -38,7 +38,9 @@ export default function Login({setToken, setUserInfo}) {
   const [passwordVal, setPasswordVal] = useState(initialPwdVal);
   const [id, setId] = useState(0);
   const [showAlertMsg, setShowAlertMsg] = useState(false);
- 
+  const [fetchUserDetailsFlag, setfetchUserDetailsFlag] = useState(false);
+  const [authData,setauthData] = useState(null);
+
   const theme = createTheme({
     typography: {
       fontSize: 10,
@@ -52,6 +54,11 @@ export default function Login({setToken, setUserInfo}) {
       ].join(','),
     },
   });
+
+  useEffect(() =>{
+    if(fetchUserDetailsFlag)
+      getUserDetails(id);
+  },[fetchUserDetailsFlag])
     
   useEffect(() => {
     setFocus();
@@ -160,15 +167,16 @@ export default function Login({setToken, setUserInfo}) {
     }
   }
 
-  const getUserDetails = (id) => {
-    if(id === "0") { return; }
-    console.log('getting user details...',id);  
+  const getUserDetails = (uid) => {
+    console.log('getuserdetails id',uid);
+    if(uid === "0") { return; }
     axios({
       method: 'get',
-      url: "systemUser/" + id
+      url: "systemUser/" + uid
     }).then((response) => {
-      console.log('got user details...',response.data);
+      //console.log('got user details...',response.data);
       setUserInfo(response.data);
+      setToken(authData);
     }).catch((error) => {
       console.log("Error occured while getting user details. Error message - " + error.message);
     })
@@ -186,7 +194,7 @@ export default function Login({setToken, setUserInfo}) {
 
       axios.post('token/authenticate', loginCreds)
       .then((response) => {
-        //console.log("authenticate",response);
+        console.log("authenticate","[" + response.data.ResponseCode + "]");
         switch (response.data.ResponseCode) {
           case "AFT":
             setPasswordVal({...passwordVal, 'systemUserId': response.data.SystemUserId});
@@ -196,12 +204,16 @@ export default function Login({setToken, setUserInfo}) {
           case "AAS":
             setActiveSession(true);
             setId(response.data.SystemUserId);
+            setfetchUserDetailsFlag(true);
+            setauthData(response.data);
             setErrMsg("There is already an active session for this account.");
             break;
           case "AOK":
+            console.log('setting aok...',response.data);
             setErrMsg("");
-            setToken(response.data);
-            getUserDetails(response.data.SystemUserId);
+            setId(response.data.SystemUserId);
+            setfetchUserDetailsFlag(true);
+            setauthData(response.data);
             localStorage.setItem("authToken", JSON.stringify(response.data));
             break;
           default:

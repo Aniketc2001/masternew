@@ -69,8 +69,13 @@ function SideBarNav(props){
     props.setparentState(fg);
   } 
 
+  const handleDrawerClick = () => {
+    if(!props.open)
+      props.setOpen(true);
+  }
+
 return (
-  <Drawer variant="permanent" open={props.open}  >
+  <Drawer variant="permanent" open={props.open} onClick={handleDrawerClick}  >
     <div style={{overflow: 'none',height: '100'}} className='SidebarBackground' > 
     <DrawerHeader>
       <img

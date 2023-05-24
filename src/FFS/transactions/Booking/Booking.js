@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Box, Paper, Snackbar, Stack, useMediaQuery, useTheme } from '@mui/material'
+import { Alert, Box, Paper, Snackbar, Stack, useMediaQuery, useTheme, MenuItem } from '@mui/material'
 import axios from 'axios';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -9,6 +9,8 @@ import BookingSummary from './BookingSummary';
 import BxButton from "react-bootstrap/button"
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { alert, confirm } from 'devextreme/ui/dialog';
+import { getAssignedGrants, resolveControlGrant } from '../../../shared/scripts/common';
+
 
 export default function Booking(props) {
   const m = new URLSearchParams(useLocation().search).get('m');
@@ -39,6 +41,7 @@ export default function Booking(props) {
   const [BookingId,setBookingId] = useState(id);
   const [reloadFlag,setreloadFlag] = useState(false);
   const [polId,setpolId] = useState(null);
+  const [grantsObj, setGrantsObj] = useState(null);
 
   const hdr = {
     'mId': m
@@ -74,6 +77,7 @@ export default function Booking(props) {
     props.setOpen(false);
     getinitialVal();
     getancillaryData();
+    getAssignedGrants(hdr, setGrantsObj);
     // eslint-disable-next-line
   }, []);
 
@@ -396,6 +400,13 @@ export default function Booking(props) {
     navigate(-1);
   }
 
+  const handleNumeric = (e) => {
+    const charCode = e.which ? e.which : e.keyCode;
+    if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+      e.preventDefault();
+    }
+  }
+
   return (
     <>
       {
@@ -451,33 +462,29 @@ export default function Booking(props) {
                     {
                       bookingStatus === 'Draft' || bookingStatus === 'DRAFT' ?
                         <>
-                          <BxButton variant="secondary" onClick={() => saveRecord('DRAFT')} size='sm'>  <i className="bi bi-card-heading" style={{ marginRight: 10 }} ></i>Save as Draft</BxButton>
-                          <BxButton variant="primary" onClick={() => saveRecord('READY')} size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save</BxButton>
-                          <BxButton variant="primary"  size='sm'>  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>
+                          {resolveControlGrant(grantsObj,'btnDraft')?<BxButton variant="secondary" onClick={() => saveRecord('DRAFT')} size='sm'>  <i className="bi bi-card-heading" style={{ marginRight: 10 }} ></i>Save as Draft</BxButton>:<></>}
+                          {resolveControlGrant(grantsObj,'btnReady')?<BxButton variant="primary" onClick={() => saveRecord('READY')} size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save</BxButton>:<></>}
+                          {resolveControlGrant(grantsObj,'btnCreate')?<BxButton variant="primary"  size='sm'>  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>:<></>}
                           {
                             BookingId !== '0' ?
-                              <BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>
+                            (resolveControlGrant(grantsObj,'btnCancel')?<BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>:<></>)
                               : <></>
                           }
                         </> :
                         bookingStatus.toUpperCase() === 'READY' ?
                           <>
-                            <BxButton variant="primary" onClick={() => saveRecord('READY')} size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save</BxButton>
-                            <BxButton variant="primary"  size='sm' >  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>
-                            <BxButton variant="primary" onClick={() => saveRecord('CONFIRMED')} size='sm'>  <i className="bi bi-check-circle" style={{ marginRight: 10 }} ></i>Confirm</BxButton>
-                            <BxButton variant="primary" onClick={() => saveRecord('FINALIZED')} size='sm'>  <i className="bi bi-hand-thumbs-up" style={{ marginRight: 10 }} ></i>Finalize</BxButton>
-                            <BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>
+                            {resolveControlGrant(grantsObj,'btnReady')?<BxButton variant="primary" onClick={() => saveRecord('READY')} size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save</BxButton>:<></>}
+                            {resolveControlGrant(grantsObj,'btnCreate')?<BxButton variant="primary"  size='sm'>  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>:<></>}
+                            {resolveControlGrant(grantsObj,'btnCancel')?<BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>:<></>}
                           </> :
                           bookingStatus.toUpperCase() === 'CONFIRMED' ?
                             <>
-                              <BxButton variant="primary"  size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save as New</BxButton>
-                              <BxButton variant="primary" onClick={() => saveRecord('FINALIZED')} size='sm'>  <i className="bi bi-hand-thumbs-up" style={{ marginRight: 10 }} ></i>Finalize</BxButton>
-                              <BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>
+                              {resolveControlGrant(grantsObj,'btnCreate')?<BxButton variant="primary"  size='sm'>  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>:<></>}
                             </> :
                             bookingStatus.toUpperCase() === 'FINALIZED' ?
                               <>
-                              <BxButton variant="primary"  size='sm'>  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>
-                              <BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>
+                              {resolveControlGrant(grantsObj,'btnCreate')?<BxButton variant="primary"  size='sm'>  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>:<></>}
+                              {resolveControlGrant(grantsObj,'btnCancel')?<BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>:<></>}
                               </>
                               :
                               bookingStatus.toUpperCase() === 'CANCELLED' ?

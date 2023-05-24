@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Checkbox, FormControlLabel, Grid, Paper, TextField } from '@mui/material'
+import { Box, Checkbox, FormControlLabel, Grid, Paper, TextField, MenuItem } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DataGrid, Column, Editing, Paging, Lookup } from 'devextreme-react/data-grid';
 import SelectBoxDropdown from './SelectBoxDropdown'
@@ -20,8 +20,13 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
             setbaseObj({ ...baseObj, [e.target.name]: e.target.value });
     }
 
-
-
+    
+    const handleNumeric = (e) => {
+        const charCode = e.which ? e.which : e.keyCode;
+        if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+        e.preventDefault();
+        }
+    }
 
     return (
         <>
@@ -234,6 +239,25 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                     data={{ name: "CustomerId", label: "Customer", displayExpr: "CustomerName", valueExpr: "CustomerId", searchExpr: "CustomerName" }}
                                                 />
                                             </Grid>
+                                            <Grid item xs={12} sx={{backgroundColor:'#efefef'}}>
+                                                <TextField label="Credit Basis" variant="standard"  
+                                                    sx={{width:'180px',paddingRight:3}}
+                                                    select value={baseObj.CreditBasisId}
+                                                    onChange={(evt) => onValChange(evt)} name="CreditBasisId">
+                                                </TextField>                        
+
+                                                <TextField sx={{ width:'120px' }}
+                                                    variant="standard"
+                                                    label="Credit Days"
+                                                    onChange={(evt) => onValChange(evt)}
+                                                    type="numnber"
+                                                    name="CreditNumberOfDays"
+                                                    value={baseObj.CreditNumberOfDays}
+                                                    autoComplete="off"
+                                                    inputProps={{ maxLength: 10 }}
+                                                    onKeyPress={(evt) => handleNumeric(evt)}
+                                                />                                                
+                                            </Grid>
                                             <Grid item xs={12}>
                                                 <MultivalSelectbox
                                                     dataSource={customerAddressList}
@@ -292,22 +316,6 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                                     setbaseObj={setbaseObj}
                                                     value={baseObj.ConsigneeId}
                                                     data={{ name: "ConsigneeId", label: "Consignee", displayExpr: "ConsigneeName", valueExpr: "ConsigneeId", searchExpr: "ConsigneeName" }}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <SelectBoxDropdown
-                                                    dataSource={ancillaryData.anc_chas}
-                                                    baseObj={baseObj}
-                                                    dynamic={true}
-                                                    apiName="party/filterparties"
-                                                    fieldName="partyname"
-                                                    listType="chas"
-                                                    initialText={baseObj.ChaName?baseObj.ChaName:""}
-                                                    initialId={baseObj.ChaId?baseObj.ChaId:""}
-                                                    ancobjectName={ancillaryData.anc_chas}
-                                                    setbaseObj={setbaseObj}
-                                                    value={baseObj.ChaId}
-                                                    data={{ name: "ChaId", label: "CHA", displayExpr: "ChaName", valueExpr: "ChaId", searchExpr: "ChaName" }}
                                                 />
                                             </Grid>
                                             <Grid item xs={12}>

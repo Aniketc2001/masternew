@@ -1,4 +1,4 @@
-import { Box, CssBaseline, FormControlLabel, Paper, Stack, Tab, TextField, Typography, Tabs, Snackbar, Alert } from "@mui/material";
+import { Box, CssBaseline, FormControlLabel, Paper, Stack, Tab, TextField, Typography, Tabs, Snackbar, Alert, MenuItem } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Checkbox from "@mui/material/Checkbox";
 import { useState, useEffect, useRef } from "react";
@@ -463,7 +463,7 @@ export default function PartyMaster() {
               <Grid container spacing={2} sx={{ paddingTop: 2 }}>
                 <Grid item xs={12}>
                   <div className="btn-secondary">
-                    <Grid container spacing={2} sx={{}} >
+                    <Grid container spacing={2}  >
                       <Grid item padding={1}>
                         <TextField sx={{ paddingRight: 3, paddingBottom: 2 }}
                           variant="standard"
@@ -520,28 +520,19 @@ export default function PartyMaster() {
                           inputProps={{ maxLength: 50 }}
                         />
 
-                        <TextField sx={{ paddingRight: 3 }}
-                          variant="standard"
-                          label="TDS Exemption Number"
-                          onChange={(evt) => onValChange(evt)}
-                          name="TdsExceptionNumber"
-                          value={baseObj.TdsExceptionNumber}
-                          autoComplete="off"
-                          inputProps={{ maxLength: 50 }}
-                        />
-
-                        <TextField sx={{ paddingRight: 3 }}
-                          variant="standard"
-                          label="TDS Percentage"
-                          onChange={(evt) => onValChange(evt)}
-                          name="TdsPercentage"
-                          value={baseObj.TdsPercentage}
-                          autoComplete="off"
-                          inputProps={{
-                            maxLength: 10
-                          }}
-                          onKeyPress={(evt) => handleNumeric(evt)}
-                        />
+                        <TextField label="Credit Basis" variant="standard"  
+                          sx={{width:'200px',paddingRight:3}}
+                          select value={baseObj.CreditBasisId}
+                          onChange={(evt) => onValChange(evt)} name="CreditBasisId">
+                          {
+                            // eslint-disable-next-line
+                            ancillaryData?
+                            ancillaryData.anc_creditBasis.map((app) => (
+                              <MenuItem key={app["LookupItemId"]}  value={app["LookupItemId"]}>{app["LookupItemName"]}</MenuItem>
+                            ))
+                            :<></>
+                          }
+                        </TextField>                        
 
                         <TextField sx={{ paddingRight: 3 }}
                           variant="standard"
@@ -554,6 +545,7 @@ export default function PartyMaster() {
                           inputProps={{ maxLength: 10 }}
                           onKeyPress={(evt) => handleNumeric(evt)}
                         />
+
 
                         <TextField sx={{ paddingRight: 3 }}
                           variant="standard" label="Credit Amount" onChange={(evt) => onValChange(evt)}
@@ -607,7 +599,7 @@ export default function PartyMaster() {
                   <TabPanel value={value} index={0}>
                     <Grid container spacing={2} >
                       <Grid item xs={7} >
-                        <p style={{ fontWeight: "bold", margin: 0, marginLeft: 17 }} >Types Of Party</p>
+                        <p style={{ fontWeight: "bold", margin: 0, marginLeft: 17 }} >Type of Party</p>
                         <Grid container spacing={4}>
                           <Grid item sx={{ marginLeft: 2 }}>
                             <Stack spacing={0}>
@@ -713,46 +705,10 @@ export default function PartyMaster() {
                       </Grid>
 
                       <Grid item xs={5} sx={{ borderLeft: "1px solid darkgray" }}>
-                        <p style={{ fontWeight: "bold", margin: 0, marginLeft: 31 }} >Other Infomation </p>
                         <Grid container >
                           <Grid item sx={{ marginLeft: 4 }}>
                             <Stack spacing={0} >
-                              <FormControl variant="standard">
-                                <FormControlLabel
-                                  control={<Checkbox checked={baseObj.TdsExemptedFlag === "Y"} />}
-                                  onChange={(evt) => onValChange(evt)}
-                                  name="TdsExemptedFlag"
-                                  label="TDS Exempted"
-                                />
-                              </FormControl>
-                              <FormControl>
-                                <FormControlLabel
-                                  control={<Checkbox checked={baseObj.EconomicFreeZoneFlag === "Y"} />}
-                                  onChange={(evt) => onValChange(evt)}
-                                  name="EconomicFreeZoneFlag"
-                                  label="Economic Free Zone"
-                                />
-                              </FormControl>
-                              <FormControl>
-                                <FormControlLabel
-                                  control={<Checkbox checked={baseObj.PdcAcceptableFlag === "Y"} />}
-                                  onChange={(evt) => onValChange(evt)}
-                                  name="PdcAcceptableFlag"
-                                  label="PDC Acceptable"
-                                />
-                              </FormControl>
-                            </Stack>
-                          </Grid>
-                          <Grid item sx={{ marginLeft: 4 }}>
-                            <Stack>
-                              <FormControl>
-                                <FormControlLabel
-                                  control={<Checkbox checked={baseObj.RebateFlag === "Y"} />}
-                                  onChange={(evt) => onValChange(evt)}
-                                  name="RebateFlag"
-                                  label="Rebate"
-                                />
-                              </FormControl>
+                              <p style={{ fontWeight: "bold", margin: 0 }} >Other Information </p>
                               <FormControl>
                                 <FormControlLabel
                                   control={<Checkbox checked={baseObj.SpecialEconomicZoneFlag === "Y"} />}
@@ -763,12 +719,26 @@ export default function PartyMaster() {
                               </FormControl>
                               <FormControl>
                                 <FormControlLabel
-                                  control={<Checkbox checked={baseObj.LetterUndertakingFlag === "Y"} />}
+                                  control={<Checkbox checked={baseObj.GstNotApplicableFlag === "Y"} />}
                                   onChange={(evt) => onValChange(evt)}
-                                  name="LetterUndertakingFlag"
-                                  label="Letter Undertaking"
+                                  name="GstNotApplicableFlag"
+                                  label="No GST Applicable"
                                 />
                               </FormControl>
+                              <FormControl>
+                                <FormControlLabel
+                                  control={<Checkbox checked={baseObj.KycCompletedFlag === "Y"} />}
+                                  onChange={(evt) => onValChange(evt)}
+                                  name="KycCompletedFlag"
+                                  label="KYC Completed"
+                                />
+                              </FormControl>
+                            </Stack>
+                          </Grid>
+                          <Grid item sx={{ marginLeft: 4 }}>
+                            <Stack>
+                            
+
                             </Stack>
                           </Grid>
                         </Grid>

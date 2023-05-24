@@ -95,8 +95,8 @@ export default function MultiLevelList(props) {
       }  
     
      const handleClick = ( item ) => {
-        console.log('clicked ...');
-        console.log(item);
+        //console.log('clicked ...');
+        //console.log(item);
         setMenuArr(
             menuarr.map((menuarrrec) =>
                 menuarrrec.MenuName === item.MenuName

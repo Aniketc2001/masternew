@@ -134,9 +134,24 @@ export default function AccessLevelManage(props) {
   const buildTreeData = (nodes) => {
     const tmpData = nodes.map(item => {
         if(item.IsParent==="Y"){
-            //console.log(item);
+            console.log("item...",item,"access:",item.ViewAccess[0]);
             let fps = buildTreeChildData(item.Items);
-            return({menuName: item.MenuName , items: fps,  access: item.Access, parent: 'Y', nodeType: 'Group', MenuIcon: item.MenuIcon });
+
+            if(item.ViewAccess.length > 0){
+              let viewRights = {menuName: item.ViewAccess[0].FunctionPointName, selected: item.ViewAccess[0].Access === "Assigned" ? true : false, 
+                            initialAccess:  item.ViewAccess[0].Access, type: 'FunctionPoints', FunctionPointId: item.ViewAccess[0].FunctionPointId,  
+                            nodeType: 'FunctionPoints', CurrentAction : item.ViewAccess[0].CurrentAction};
+
+              let viewMenu = {menuName :'Page Access', items: [viewRights], nodeType: 'AccessGroup',access: item.access};
+              
+              fps.unshift(viewMenu);
+
+              console.log('viewMenu',viewMenu,'fps',fps);
+            }
+            
+
+            return({menuName: item.MenuName , items: fps,  access: item.Access, parent: 'Y', 
+                  nodeType: 'Group', MenuIcon: item.MenuIcon});
         }
     })
 
@@ -170,16 +185,20 @@ export default function AccessLevelManage(props) {
     const tmpNodes = []
     nodes.forEach(grpnodes => {
       if (grpnodes.items) {
-        console.log(grpnodes.items);
-        grpnodes.items.forEach(appnodes => {
+          grpnodes.items.forEach(appnodes => {
             if(appnodes.items){
                 appnodes.items.forEach(accgrpnodes => {
-                    accgrpnodes.items.forEach(accnodes => {
-                        tmpNodes.push({
-                            'FunctionPointId': accnodes.FunctionPointId, 'Selected' : accnodes.selected 
-                        });
-    
-                    });
+                    if(accgrpnodes.items)
+                      accgrpnodes.items.forEach(accnodes => {
+                          tmpNodes.push({
+                              'FunctionPointId': accnodes.FunctionPointId, 'Selected' : accnodes.selected 
+                          });
+                      });
+                    else
+                      tmpNodes.push({
+                        'FunctionPointId': accgrpnodes.FunctionPointId, 'Selected' : accgrpnodes.selected 
+                      });
+
                 });
             }
         })
@@ -207,12 +226,10 @@ export default function AccessLevelManage(props) {
     console.log("initial",initialmenus);
     console.log("new",JSON.stringify(FunctionPointNodes));
 
-
     if(initialmenus === JSON.stringify(FunctionPointNodes)){
       alert("No changes were made to the access grants!","Access Grant Validation");
       return false;
-    }
-    
+    }    
 
     const vl = confirm('Confirm rights assignment?','Confirmation Alert');
     vl.then((dialogResult) => {
