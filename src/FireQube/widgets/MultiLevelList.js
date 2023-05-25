@@ -33,7 +33,7 @@ export default function MultiLevelList(props) {
             return { ...item, open: false };
           })
           //console.log('revised menu items...');
-          //console.log(newData);
+          //console.log("newdata",newData);
           setMenuArr(newData);
           //console.log('menu get...');
 
@@ -50,17 +50,18 @@ export default function MultiLevelList(props) {
       return children.map( ( subOption ) => {
           if ( !subOption.children ) {
             return (
-              <div key={ subOption.MenuName }>
-                <ListItem dense="true" sx={{height:'28px'}}
+              <div key={ subOption.MenuId }>
+                <ListItem dense sx={{height:'28px'}}
                   button 
                   component={Link}
                   to={subOption.MenuUrl}
                   replace={true}
-                  key={ subOption.MenuName }>
+                  key={ subOption.MenuId }>
                   <i className={subOption.MenuIcon} style={{fontSize: '13pt'}} title={subOption.MenuName}></i>
                     <ListItemText 
                       inset 
                       secondary={ subOption.MenuName }
+                      key={subOption.MenuId}
                       sx={{px:2.5,fontFamily: 'tahoma'}} 
                     />
                 </ListItem>
@@ -68,17 +69,18 @@ export default function MultiLevelList(props) {
             )
           }
           return (
-            <div key={ subOption.MenuName }>
-              <ListItem dense="true" sx={{height:'28px',fontFamily: 'sans-serif'}}
+            <div >
+              <ListItem dense sx={{height:'28px',fontFamily: 'sans-serif'}}
                 button 
                 component={Link}
                 to={subOption.MenuUrl}
-                key={ subOption.MenuName }
+                key={ subOption.MenuId }
                 onClick={ () => this.handleClick( subOption.MenuName ) }>
                 <i className={subOption.MenuIcon} style={{fontSize: '13pt'}} title={subOption.MenuName}></i>
-                <ListItemText dense="true"
+                <ListItemText 
                   inset 
                   secondary={ subOption.MenuName }
+                  key={subOption.MenuId}
                   sx={{px:2.5,fontFamily: 'tahoma'}} 
                    />
                 
@@ -110,14 +112,13 @@ export default function MultiLevelList(props) {
       
       const lidata = () => {
         return menuarr.map((tempmenurow) => (
-          <List dense="true" sx={{marginBottom:'0px',p:0}}>
+          <List dense sx={{marginBottom:'0px',p:0}}>
             <ListItemButton onClick={ () => handleClick(tempmenurow) } sx={{height:'30px'}}>
                 <i className={tempmenurow.MenuIcon} sx={{fontWeight: 'bold', color:'lightblue'}} style={{fontSize: '13pt'}} title={tempmenurow.MenuName}></i>
               <ListItemText
-                dense="true"
                 inset
                 primary={tempmenurow.MenuName}
-                key={tempmenurow.MenuName}
+                key={tempmenurow.MenuId}
                 sx ={{ color:'black', fontWeight:'bold', px: 1.9, paddingTop:0, paddingBottom:0 }}
               />
               { tempmenurow.open ? <ExpandLess /> : <ExpandMore />}
