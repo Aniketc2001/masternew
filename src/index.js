@@ -6,7 +6,8 @@ import reportWebVitals from './reportWebVitals';
 import axios from 'axios';
 
 //axios.defaults.baseURL = "http://192.168.0.180:5036/api/";
-axios.defaults.baseURL = "http://103.120.176.146:90/api/";
+//axios.defaults.baseURL = "http://103.120.176.146:90/api/";
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 axios.interceptors.request.use((request) => {
   request.headers.channelname = "Teravista.io FireQube";

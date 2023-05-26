@@ -31,21 +31,22 @@ export default function BookingList(props) {
         getColumnDetails();
     }, [props.mId]);
       
+
     const getDetails = () => {
-        axios({
-            method: 'get',
-            url: "menu/getMenuInfo",
-            headers: hdr
-          }).then((response) => {
-            //console.log('menu obj MasterListPage...');
-            setmenuDetails(response.data);
-            //console.log(response.data);
-          }).catch((error) => {
-            console.log('MasterListPage err...',error);
-            if(error.response) {
-              console.log("Error occured while fetching data. Error message - " + error.message);
-            }
-        })
+      axios({
+          method: 'get',
+          url: "menu/getMenuInfo",
+          headers: hdr
+        }).then((response) => {
+          //console.log('menu obj MasterListPage...');
+          setmenuDetails(response.data);
+          //console.log(response.data);
+        }).catch((error) => {
+          console.log('MasterListPage err...',error);
+          if(error.response) {
+            console.log("Error occured while fetching data. Error message - " + error.message);
+          }
+      })
     }
 
     const getColumnDetails = () => {
@@ -59,8 +60,7 @@ export default function BookingList(props) {
             setcolumnNamesJSON(response.data.grants_columns);
             //console.log(response.data.grants_columns);
           }).catch((error) => {
-            console.log('err');
-            console.log(error);
+            console.log('err',error);
             if(error.response) {
               console.log("Error occured while fetching data. Error message - " + error.message);
             }
@@ -81,6 +81,8 @@ export default function BookingList(props) {
             columnNamesJSON={columnNamesJSON}
             DeleteStatusColumnVisibility={false}
             CheckerStatusColumnVisibility={false}
+            viewState={props.viewState}   
+            setViewState={props.setViewState}
         />
         :
         <></>

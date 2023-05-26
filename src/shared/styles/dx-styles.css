@@ -111,3 +111,13 @@ body
 .dx-texteditor-input,.dx-texteditor-with-floating-label,.dx-editor-underlined {
     padding-top: 14px;
 }
+
+.blink {
+    animation: blinker 3s linear infinite;
+}
+  
+@keyframes blinker {
+50% {
+    opacity: 0;
+}
+}

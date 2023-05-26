@@ -112,7 +112,7 @@ export default function MultiLevelList(props) {
       
       const lidata = () => {
         return menuarr.map((tempmenurow) => (
-          <List dense sx={{marginBottom:'0px',p:0}}>
+          <List dense sx={{marginBottom:'0px',p:0}}  key={tempmenurow.MenuId}>
             <ListItemButton onClick={ () => handleClick(tempmenurow) } sx={{height:'30px'}}>
                 <i className={tempmenurow.MenuIcon} sx={{fontWeight: 'bold', color:'lightblue'}} style={{fontSize: '13pt'}} title={tempmenurow.MenuName}></i>
               <ListItemText

@@ -6,6 +6,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
+import { getFormattedDate } from '../../shared/scripts/common';
 
 
 import DataGrid, {
@@ -50,6 +51,8 @@ export default function TransactionListPageLayout(props) {
   const [anchorElement, setAnchorElement] = React.useState(null);     //Anchor point for Popover
   const [openPopover, setOpenPopover] = React.useState(false);     //Display status for Popover
 
+  const [dateMsg, setDateMsg] = useState(null);
+
   
   const [checkerInfo,setCheckerInfo] = useState({
     CheckedBy: '',
@@ -80,22 +83,97 @@ export default function TransactionListPageLayout(props) {
   };
 
   useEffect(() => {
-    //console.log('useeffect...');
     setdisplayDataGrid(false);
-    getRecords();
+
+    if(props.APIName === props.viewState.listPageName){
+      renderViewState();
+    }
+    else{
+      getRecords();
+    }
+
   }, [props.APIName]);
   
+
+  const renderViewState = () => {
+    console.log('rendering viewstate...');
+    setgridDataSource(props.viewState.dataSource);
+    setdisplayDataGrid(true);
+    dataGrid.current.instance.pageIndex(props.viewState.pageNumber);
+  }
+
+  const updateViewState = () => {
+    var currpage = "";
+    try{
+      currpage =dataGrid.current.instance.pageIndex();
+    }
+    catch(ex){}
+    console.log('currpage',currpage);
+    props.setViewState({...props.viewState, dataSource: gridDataSource, pageNumber: currpage, listPageName: props.APIName });
+  }
+
+  const handle7DaysClick = () => {
+    var frdt =  getFormattedDate(new Date());
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // Subtract 6 days to get the start date
+    var todt = getFormattedDate(sevenDaysAgo);
+
+    props.setViewState({...props.viewState, fromDate: todt, toDate: frdt });
+    props.viewState.fromDate = todt;
+    props.viewState.toDate = frdt;
+
+    getRecords();
+  }
+
+  const handleTodayClick = () => {
+    var frdt =  getFormattedDate(new Date());
+    var todt = getFormattedDate(new Date());
+
+    props.setViewState({...props.viewState, fromDate: todt, toDate: frdt });
+    props.viewState.fromDate = todt;
+    props.viewState.toDate = frdt;
+
+    getRecords();
+  }
+
+  const handle30DaysClick = () => {
+    var frdt =  getFormattedDate(new Date());
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29); // Subtract 29 days to get the start date
+    var todt = getFormattedDate(thirtyDaysAgo);
+
+    props.setViewState({...props.viewState, fromDate: todt, toDate: frdt });
+    props.viewState.fromDate = todt;
+    props.viewState.toDate = frdt;
+
+    getRecords();
+  }
+
+
   const getRecords =  () => {
       //console.log('inside getrecords');
+      var frdt = props.viewState.fromDate;
+      var todt = props.viewState.toDate;
+      var msg = "";
+      
+      if(frdt !== todt)
+        msg = "Displaying data between " + frdt + " and " + todt;
+      else
+        msg = "Displaying data for " + frdt ;
+
+      console.log('msg',msg);
+      setDateMsg(msg);
+
       axios({
         method: 'get',
         url: props.APIName, 
-        headers: hdr
+        headers: {mId: m, frdt: frdt, todt: todt}
       }).then((response) => {
         //console.log('listpage getrecords...');
         setgridDataSource(response.data);
         //console.log(response.data);
         setdisplayDataGrid(true);
+        updateViewState();
       }).catch((error) => {
         console.log('list err');
         console.log(error);
@@ -257,12 +335,12 @@ export default function TransactionListPageLayout(props) {
   }
 
   const createButtonClick = () => {
+    updateViewState();
     navigate(`/${props.EditPageName}/0?m=${m}`);
   }
 
   const editIconClick = (e) => {
-    console.log('edit click');
-    console.log(e);
+    updateViewState();
     navigate(`/${props.EditPageName}/${e.key}?m=${m}`);
   };
   
@@ -324,7 +402,7 @@ export default function TransactionListPageLayout(props) {
       ?
       <Box   sx={{ p: 2,  paddingTop: 2, minHeight:'90vh', minWidth:'90vh',  backgroundColor: 'white', fontFamily:'Poppins' }}>
         <h2 className='PageTitle'>{props.ListPageTitle}</h2>
-        <p className='PageSubTitle'>{props.SubTitle}</p>
+        <p className='PageSubTitle'>{props.SubTitle} <span style={{paddingLeft:'10px'}}>{dateMsg}</span></p>
         <Grid container spacing={1} >
           <Grid item xm={1} >
             <BxButton
@@ -342,10 +420,10 @@ export default function TransactionListPageLayout(props) {
               variant="primary"
               size="sm"
               style={{ textTransform: "none" }}
-              onClick={deleteButtonClick}
+              onClick={getRecords}
             >
-              <i className={'bi-x-circle'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
-              Cancel Booking
+              <i className={'bi-arrow-repeat'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
+              Refresh Data
             </BxButton>
           </Grid>                  
           <Grid item xm={1}>
@@ -362,6 +440,7 @@ export default function TransactionListPageLayout(props) {
                   <BxButton
                   variant="secondary"
                   size="sm"
+                  onClick={handleTodayClick}
                   style={{ textTransform: "none",fontSize: '8pt',marginRight:'5px',marginLeft:'15px' }}
                   >
                     <i className={'bi-thermometer'} style={{ fontSize: '10pt', marginRight: '2px'}} />
@@ -370,6 +449,7 @@ export default function TransactionListPageLayout(props) {
                   <BxButton
                   variant="secondary"
                   size="sm"
+                  onClick={handle7DaysClick}
                   style={{ textTransform: "none",fontSize: '8pt',marginRight:'5px' }}
                   >
                     <i className={'bi-thermometer-half'} style={{ fontSize: '10pt', marginRight: '2px'}} />
@@ -378,6 +458,7 @@ export default function TransactionListPageLayout(props) {
                   <BxButton
                   variant="secondary"
                   size="sm"
+                  onClick={handle30DaysClick}
                   style={{ textTransform: "none",fontSize: '8pt',marginRight:'5px' }}
                   >
                     <i className={'bi-thermometer-high'} style={{ fontSize: '10pt', marginRight: '2px'}} />
@@ -441,7 +522,6 @@ export default function TransactionListPageLayout(props) {
               onSelectionChanged={rowSelectionFunction}
               onCellClick={handleGridCellClick}
               onRowPrepared={handleCheckBoxVisibility}
-              loadPanel={true}
             >
               <Selection mode="multiple"  />
               <Paging enabled={true} pageSize={displayPageSize} />
@@ -453,16 +533,17 @@ export default function TransactionListPageLayout(props) {
               <ColumnChooser enabled={true} />
 
               <Export enabled={true}   />
-              <Column name="DELETE" caption="" cellRender={renderMarkForDeleteStatus} width={25} visible={props.DeleteStatusColumnVisibility} />
-              <Column name="CHECKER" caption="" cellRender={renderCheckerStatus} width={25} visible={props.CheckerStatusColumnVisibility} onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}   />
-              <Column name="ACTIVE" caption="" cellRender={renderActiveStatus} width={25} />
-              <Column name="EDIT" caption="" cellRender={renderEditButton}  width={29} onClick={editIconClick}  />
-              <Column name="CUSTOM" caption="" cellRender={renderCustomButton} visible={props.CustomField===true} onClick={editIconClick} width={28} />
+              <Column name="DELETE" key="1" caption="" cellRender={renderMarkForDeleteStatus} width={25} visible={props.DeleteStatusColumnVisibility} />
+              <Column name="CHECKER" key="2" caption="" cellRender={renderCheckerStatus} width={25} visible={props.CheckerStatusColumnVisibility} onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}   />
+              <Column name="ACTIVE" key="3" caption="" cellRender={renderActiveStatus} width={25} />
+              <Column name="EDIT" key="4" caption="" cellRender={renderEditButton}  width={29} onClick={editIconClick}  />
+              <Column name="CUSTOM" key="5" caption="" cellRender={renderCustomButton} visible={props.CustomField===true} onClick={editIconClick} width={28} />
 
               {props.columnNamesJSON.map(column => (
                   <Column
                     dataField={column.FunctionPointName}
                     caption={column.ColumnCaption}
+                    key={column.FunctionPointName}
                   />
               ))}
 

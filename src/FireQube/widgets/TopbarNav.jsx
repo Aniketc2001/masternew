@@ -142,6 +142,24 @@ function TopBarNav(props) {
     setappmenupopoverFlag(false);
   };
 
+  const RenderEnv = () => {
+    var bclr = "";
+    var fclr = "";
+    
+    if(process.env.REACT_APP_ENVIRONMENT==="Development"){
+      bclr = 'limegreen';
+      fclr = '#111111';
+    }
+    else {
+      bclr = 'jasper';
+      fclr = 'white';
+    }
+    //console.log('render...',bclr,fclr);
+    return(
+      <span style={{marginLeft:'20px',paddingLeft:'10px',paddingRight:'10px',fontSize:'8pt',backgroundColor:bclr, borderRadius:'10px',color:fclr}}>{process.env.REACT_APP_ENVIRONMENT}</span>
+    );
+  }
+
   return (
     //0F6CBD
     <AppBar position="fixed" open={props.open}>
@@ -165,13 +183,14 @@ function TopBarNav(props) {
           sx={{ fontFamily: "Poppins", fontWeight: "light", flexGrow: 1 }}
         >
           <strong>Teravista.io</strong> Application Console
+          <RenderEnv/> 
         </Typography>
+        
         <Search>
           <SearchIconWrapper>
             <SearchIcon />
           </SearchIconWrapper>
           <StyledInputBase
-            autoComplete
             placeholder="Search…"
             inputProps={{ "aria-label": "search" }}
           />

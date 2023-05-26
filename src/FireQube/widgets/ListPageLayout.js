@@ -525,7 +525,6 @@ export default function ListPageLayout(props) {
               onSelectionChanged={rowSelectionFunction}
               onCellClick={handleGridCellClick}
               onRowPrepared={handleCheckBoxVisibility}
-              loadPanel={true}
             >
               <Selection mode="multiple"  />
               <Paging enabled={true} pageSize={displayPageSize} />

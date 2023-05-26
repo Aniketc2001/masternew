@@ -145,8 +145,12 @@ export default function Login({setToken, setUserInfo}) {
 
         axios.post('token/authenticate', loginCreds)
         .then((response) => {
+          //console.log('new session',response.data);
           setErrMsg("");
-          setToken(response.data);
+          setId(response.data.SystemUserId);
+          setfetchUserDetailsFlag(true);
+          setauthData(response.data);
+          //setToken(response.data);
           localStorage.setItem("authToken", JSON.stringify(response.data));
         })
       }
@@ -168,7 +172,7 @@ export default function Login({setToken, setUserInfo}) {
   }
 
   const getUserDetails = (uid) => {
-    console.log('getuserdetails id',uid);
+    //console.log('getuserdetails id',uid);
     if(uid === "0") { return; }
     axios({
       method: 'get',
@@ -194,7 +198,7 @@ export default function Login({setToken, setUserInfo}) {
 
       axios.post('token/authenticate', loginCreds)
       .then((response) => {
-        console.log("authenticate","[" + response.data.ResponseCode + "]");
+        //console.log("authenticate","[" + response.data.ResponseCode + "]");
         switch (response.data.ResponseCode) {
           case "AFT":
             setPasswordVal({...passwordVal, 'systemUserId': response.data.SystemUserId});
@@ -204,12 +208,12 @@ export default function Login({setToken, setUserInfo}) {
           case "AAS":
             setActiveSession(true);
             setId(response.data.SystemUserId);
-            setfetchUserDetailsFlag(true);
+            setfetchUserDetailsFlag(false);
             setauthData(response.data);
             setErrMsg("There is already an active session for this account.");
             break;
           case "AOK":
-            console.log('setting aok...',response.data);
+            //console.log('setting aok...',response.data);
             setErrMsg("");
             setId(response.data.SystemUserId);
             setfetchUserDetailsFlag(true);
@@ -332,7 +336,7 @@ export default function Login({setToken, setUserInfo}) {
     ) : (
       <Container>
         <Typography variant="h1"><b>Hello!</b></Typography>
-        <span style={{fontSize:10}}>Specify your login credentials to access the console</span>
+        <span style={{fontSize:10}}>Specify your login credentials to access the <b>{process.env.REACT_APP_ENVIRONMENT}</b> console  </span>
         <Form.Group>
             <Form.Label>Login Id</Form.Label>
             <Form.Control onChange={(evt) => onValChange(evt)} name='loginId' autoComplete='off' inputref={loginRef} value={loginCreds.loginId} required autoFocus />

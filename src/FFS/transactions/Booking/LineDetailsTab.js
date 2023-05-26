@@ -7,7 +7,7 @@ import MultivalSelectbox from "./MultivalSelectbox";
 import VvpcsSBRender from "./VvpcsSBRender";
 
 
-export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, baseObj, setbaseObj, ancillaryData, parentvvpcId }) {
+export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, baseObj, setbaseObj, ancillaryData, parentvvpcId, lineServiceContractList }) {
   const [vvpcId, setvvpcId] = useState(baseObj.VesselVoyagePortId);
   const [vvpcDetails, setVvpcDetails] = useState();
   const [PortTerminalName, setPortTerminalName] = useState('');
@@ -19,20 +19,23 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
 
   useEffect(() => {
     const selectedVvpc = vesselVoyageList.filter((data) => data.VesselVoyagePortId === vvpcId);
-    console.log(selectedVvpc);
-    setVvpcDetails(selectedVvpc[0]);
-    console.log('vvpc',vvpcDetails);
-    try{
-      setPortTerminalName(selectedVvpc[0].PortTerminalName);
-      setEta(selectedVvpc[0].Eta);
-      setEtd(selectedVvpc[0].Etd);
-      setCutOffDate(selectedVvpc[0].CutOffDate);
-      setEtdatDest(selectedVvpc[0].EtaDestination);
-      setbaseObj({...baseObj, DestinationETA: selectedVvpc[0].EtaDestination, PortTerminalId: selectedVvpc[0].PortTerminalId  });
+    if(selectedVvpc){
+      //console.log(selectedVvpc);
+      setVvpcDetails(selectedVvpc[0]);
+      console.log('vvpc',vvpcDetails);
 
-      console.log(PortTerminalName);
+      try{
+        setPortTerminalName(selectedVvpc[0].PortTerminalName);
+        setEta(selectedVvpc[0].Eta);
+        setEtd(selectedVvpc[0].Etd);
+        setCutOffDate(selectedVvpc[0].CutOffDate);
+        setEtdatDest(selectedVvpc[0].EtaDestination);
+        setbaseObj({...baseObj, DestinationETA: selectedVvpc[0].EtaDestination, PortTerminalId: selectedVvpc[0].PortTerminalId  });
+
+        console.log(PortTerminalName);
+      }
+      catch(ex){}
     }
-    catch(ex){}
   }, [vvpcId])
 
   //console.log('parent vvpc id',parentvvpcId);
@@ -107,11 +110,15 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
                     />
                   </Grid>
                   <Grid item xs={12} alignSelf='end'>
-                    <TextField fullWidth variant='standard' label="Service Contract Number" size="small"
-                      value={baseObj.ServiceContractNumber}
-                      name="ServiceContractNumber"
-                      onChange={(evt) => onValChange(evt)}
-                    />
+                    <SelectBoxDropdown
+                        dataSource={lineServiceContractList}
+                        initialText={baseObj.ServiceContractNumber?baseObj.ServiceContractNumber:""}
+                        initialId={baseObj.LineServiceContractId?baseObj.LineServiceContractId:""}
+                        baseObj={baseObj}
+                        setbaseObj={setbaseObj}
+                        value={baseObj.LineServiceContractId}
+                        data={{ name: "LineServiceContractId", label: "Service Contract Number", displayExpr: "ServiceContractNumber", valueExpr: "LineServiceContractId", searchExpr: "ServiceContractNumber" }}
+                    />                    
                   </Grid>
                   <Grid item xs={12}>
                     <SelectBoxDropdown

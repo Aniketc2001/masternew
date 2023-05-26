@@ -4,10 +4,16 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DataGrid, Column, Editing, Paging, Lookup } from 'devextreme-react/data-grid';
 import SelectBoxDropdown from './SelectBoxDropdown'
 import MultivalSelectbox from './MultivalSelectbox';
-import  {useRef,useState} from 'react'
+import  {useRef,useState, useEffect} from 'react'
 import CustomerAddressSBRender from './CustomerAddressSBRender';
+import { Stack } from 'react-bootstrap';
 
-export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId, setPol, setFpd, salesPersonList, customerAddressList, setCommodityCategory, setproductId, setcustomerId, setCmmodity, setsiteId, setbaseObj, ancillaryData, setcustomerName }) {
+export default function GeneralInformationTab({ baseObj,setshippingLine, setshippingLineId, setpolId, setPol, setFpd, salesPersonList, customerAddressList, setCommodityCategory, setproductId, setcustomerId, setCmmodity, setsiteId, setbaseObj, ancillaryData, setcustomerName, setancds }) {
+    
+
+    useEffect(()=>{
+
+    },[baseObj.CreditNumberOfDays]);
 
     const onDateValChange = (fieldName) => (value) => {
         setbaseObj({ ...baseObj, [fieldName]: value });
@@ -33,21 +39,178 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
             <div style={{ height: "65vh", overflow: 'auto' }}>
                 <Box sx={{ marginTop: 1, fontSize: '9pt' }}>
                     <Grid container spacing={1}>
-                        <Grid item lg={6} xs={12}>
-                            <Paper elevation={1} sx={{ p: 1, marginLeft: 1 }}>
+                        <Grid item lg={4} xs={12}>
+                               
+                                    <Paper elevation={1} sx={{ paddingLeft:1, paddingTop:0.5, marginLeft:1 }}>
+                                        <p style={{ fontWeight: 'bold' }}>Parties Involved</p>
+                                        <Grid container spacing={0.8} sx={{p:0}} >
+                                            <Grid item xs={12} sx={{ fontSize: '12pt' }}>
+                                                <SelectBoxDropdown
+                                                    dataSource={ancillaryData.anc_customers}
+                                                    baseObj={baseObj}
+                                                    setbaseObj={setbaseObj}
+                                                    value={baseObj.CustomerId}
+                                                    initialText={baseObj.CustomerName?baseObj.CustomerName:""}
+                                                    initialId={baseObj.CustomerId?baseObj.CustomerId:""}
+                                                    dynamic={true}
+                                                    setpropName={setcustomerName}
+                                                    setpropId={setcustomerId}
+                                                    ancobjectName={ancillaryData.anc_customers}
+                                                    setancds={setancds}
+                                                    ancchild="anc_customers"
+                                                    apiName="party/filterparties"
+                                                    listType="customers"
+                                                    fieldName="partyname"
+                                                    autoFocus
+                                                    data={{ name: "CustomerId", label: "Customer", displayExpr: "CustomerName", valueExpr: "CustomerId", searchExpr: "CustomerName" }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sx={{backgroundColor:'#efefef'}}>
+                                                <Grid container spacing={1}>
+                                                    <Grid item xs={4}>
+                                                        <SelectBoxDropdown
+                                                            dataSource={ancillaryData.anc_creditBasis}
+                                                            initialText={baseObj.CreditBasisName?baseObj.CreditBasisName:""}
+                                                            initialId={baseObj.CreditBasisId?baseObj.CreditBasisId:""}
+                                                            baseObj={baseObj}
+                                                            setbaseObj={setbaseObj}
+                                                            value={baseObj.CreditBasisId}
+                                                            data={{ name: "creditBasisId", label: "Credit Basis", displayExpr: "LookupItemName", valueExpr: "LookupItemId", searchExpr: "LookupItemName" }}
+                                                        />
+                                                    </Grid>
+                                                    <Grid item xs={4}>
+                                                        <TextField 
+                                                            fullWidth
+                                                            variant="standard"
+                                                            label="Credit Days"
+                                                            onChange={(evt) => onValChange(evt)}
+                                                            type="number"
+                                                            name="CreditNumberOfDays"
+                                                            value={baseObj.CreditNumberOfDays}
+                                                            autoComplete="off"
+                                                            inputProps={{ maxLength: 10 }}
+                                                            onKeyPress={(evt) => handleNumeric(evt)}
+                                                        />
+                                                    </Grid>
+                                                    <Grid item xs={4}>
+                                                        <SelectBoxDropdown
+                                                            dataSource={ancillaryData.anc_products}
+                                                            baseObj={baseObj}
+                                                            setbaseObj={setbaseObj}
+                                                            value={baseObj.ProductId}
+                                                            setpropId={setproductId}
+                                                            data={{ name: "ProductId", label: "Product Type", displayExpr: "ProductName", valueExpr: "ProductId", searchExpr: "ProductName" }}
+                                                        />
+                                                    </Grid>
+                
+                                                </Grid>                                
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <MultivalSelectbox
+                                                    dataSource={customerAddressList}
+                                                    baseObj={baseObj}
+                                                    setpropId={setsiteId}
+                                                    setbaseObj={setbaseObj}
+                                                    itemRenderJsx={CustomerAddressSBRender}
+                                                    value={baseObj.CustomerSiteId}
+                                                    data={{ name: "CustomerSiteId", label: "Customer Location", displayExpr: "CustomerSiteName", valueExpr: "CustomerSiteId", searchExpr: "CustomerSiteName" }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <SelectBoxDropdown
+                                                    dataSource={salesPersonList}
+                                                    baseObj={baseObj}
+                                                    setbaseObj={setbaseObj}                                                   
+                                                    initialText={baseObj.SalesPersonName?baseObj.SalesPersonName:""}
+                                                    initialId={baseObj.SalesPersonId?baseObj.SalesPersonId:""}
+                                                    value={baseObj.SalesPersonId}
+                                                    data={{ name: "SalesPersonId", label: "Sales Person", displayExpr: "SalesPersonName", valueExpr: "SalesPersonId", searchExpr: "SalesPersonName" }}
+                                                />
+                                            </Grid>
+
+                                            <Grid item xs={12}>
+                                                <SelectBoxDropdown
+                                                    dataSource={ancillaryData.anc_shippingLines}
+                                                    baseObj={baseObj}
+                                                    dynamic={true}
+                                                    initialText={baseObj.ShippingLineName?baseObj.ShippingLineName:""}
+                                                    initialId={baseObj.ShippingLineId?baseObj.ShippingLineId:""}
+                                                    apiName="party/filterparties"
+                                                    fieldName="partyname"
+                                                    listType="shippinglines"
+                                                    setancds={setancds}
+                                                    ancchild="anc_shippingLines"
+                                                    setpropName={setshippingLine}
+                                                    setpropId={setshippingLineId}
+                                                    ancobjectName={ancillaryData.anc_shippingLines}
+                                                    setbaseObj={setbaseObj}
+                                                    value={baseObj.ShippingLineId}
+                                                    data={{ name: "ShippingLineId", label: "Shipping Line", displayExpr: "ShippingLineName", valueExpr: "ShippingLineId", searchExpr: "ShippingLineName" }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <SelectBoxDropdown
+                                                    dataSource={ancillaryData.anc_shippers}
+                                                    baseObj={baseObj}
+                                                    dynamic={true}
+                                                    initialText={baseObj.ShipperName?baseObj.ShipperName:""}
+                                                    initialId={baseObj.ShipperId?baseObj.ShipperId:""}
+                                                    apiName="party/filterparties"
+                                                    fieldName="partyname"
+                                                    listType="shippers"
+                                                    setancds={setancds}
+                                                    ancchild="anc_shippers"
+                                                    ancobjectName={ancillaryData.anc_shippers}
+                                                    setbaseObj={setbaseObj}
+                                                    value={baseObj.ShipperId}
+                                                    data={{ name: "ShipperId", label: "Shipper", displayExpr: "ShipperName", valueExpr: "ShipperId", searchExpr: "ShipperName" }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <SelectBoxDropdown
+                                                    dataSource={ancillaryData.anc_consignees}
+                                                    baseObj={baseObj}
+                                                    dynamic={true}
+                                                    apiName="party/filterparties"
+                                                    initialText={baseObj.ConsigneeName?baseObj.ConsigneeName:""}
+                                                    initialId={baseObj.ConsigneeId?baseObj.ConsigneeId:""}
+                                                    fieldName="partyname"
+                                                    listType="consignees"
+                                                    setancds={setancds}
+                                                    ancchild="anc_consignees"
+                                                    ancobjectName={ancillaryData.anc_consignees}
+                                                    setbaseObj={setbaseObj}
+                                                    value={baseObj.ConsigneeId}
+                                                    data={{ name: "ConsigneeId", label: "Consignee", displayExpr: "ConsigneeName", valueExpr: "ConsigneeId", searchExpr: "ConsigneeName" }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <SelectBoxDropdown
+                                                    dataSource={ancillaryData.anc_osas}
+                                                    baseObj={baseObj}
+                                                    dynamic={true}
+                                                    apiName="party/filterparties"
+                                                    fieldName="partyname"
+                                                    listType="osas"
+                                                    setancds={setancds}
+                                                    ancchild="anc_osas"
+                                                    initialText={baseObj.OsaName?baseObj.OsaName:""}
+                                                    initialId={baseObj.OsaId?baseObj.OsaId:""}
+                                                    ancobjectName={ancillaryData.anc_osas}
+                                                    setbaseObj={setbaseObj}
+                                                    value={baseObj.OsaId}
+                                                    data={{ name: "OsaId", label: "Overseas Agent", displayExpr: "OsaName", valueExpr: "OsaId", searchExpr: "OsaName" }}
+                                                />
+                                            </Grid>
+                                            
+                                        </Grid>
+                                    </Paper>
+                        </Grid>                        
+                        <Grid item lg={5} xs={12}>
+                            <Paper elevation={1} sx={{ p: 1, marginLeft: 0 }}>
                                 <Box>
                                     <p style={{ fontWeight: 'bold' }}>General Information</p>
                                     <Grid container spacing={1}>
-                                        <Grid item lg={4} sm={4} xs={6}>
-                                            <SelectBoxDropdown
-                                                dataSource={ancillaryData.anc_products}
-                                                baseObj={baseObj}
-                                                setbaseObj={setbaseObj}
-                                                value={baseObj.ProductId}
-                                                setpropId={setproductId}
-                                                data={{ name: "ProductId", label: "Product Type", displayExpr: "ProductName", valueExpr: "ProductId", searchExpr: "ProductName" }}
-                                            />
-                                        </Grid>
                                         <Grid item lg={4} sm={4} xs={6}>
                                             <SelectBoxDropdown
                                                 dataSource={ancillaryData.anc_bookingTypes}
@@ -160,6 +323,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                         <Grid item lg={3} sm={4} xs={6} alignSelf='end'>
                                             <TextField variant='standard' fullWidth label="Gross Weight" size="small"
                                                 value={baseObj.GrossWeight}
+                                                type="number"
                                                 name='GrossWeight'
                                                 onChange={(evt) => onValChange(evt)}
                                             />
@@ -176,6 +340,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                         <Grid item lg={3} sm={4} xs={6} alignSelf='end'>
                                             <TextField variant='standard' fullWidth label="Volume" size="small"
                                                 name="Volume"
+                                                type="number"
                                                 value={baseObj.Volume}
                                                 onChange={(evt) => onValChange(evt)}
                                             />
@@ -214,142 +379,6 @@ export default function GeneralInformationTab({ baseObj,setshippingLine,setpolId
                                     </Grid>
                                 </Box>
                             </Paper>
-                        </Grid>
-                        <Grid item lg={3} xs={12}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    <Paper elevation={1} sx={{ paddingLeft:1, paddingTop:0.5 }}>
-                                        <p style={{ fontWeight: 'bold' }}>Parties Involved</p>
-                                        <Grid container spacing={0.8} sx={{p:0}} >
-                                            <Grid item xs={12} sx={{ fontSize: '12pt' }}>
-                                                <SelectBoxDropdown
-                                                    dataSource={ancillaryData.anc_customers}
-                                                    baseObj={baseObj}
-                                                    setbaseObj={setbaseObj}
-                                                    value={baseObj.CustomerId}
-                                                    initialText={baseObj.CustomerName?baseObj.CustomerName:""}
-                                                    initialId={baseObj.CustomerId?baseObj.CustomerId:""}
-                                                    dynamic={true}
-                                                    setpropName={setcustomerName}
-                                                    setpropId={setcustomerId}
-                                                    ancobjectName={ancillaryData.anc_customers}
-                                                    apiName="party/filterparties"
-                                                    listType="customers"
-                                                    fieldName="partyname"
-                                                    data={{ name: "CustomerId", label: "Customer", displayExpr: "CustomerName", valueExpr: "CustomerId", searchExpr: "CustomerName" }}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={12} sx={{backgroundColor:'#efefef'}}>
-                                                <TextField label="Credit Basis" variant="standard"  
-                                                    sx={{width:'180px',paddingRight:3}}
-                                                    select value={baseObj.CreditBasisId}
-                                                    onChange={(evt) => onValChange(evt)} name="CreditBasisId">
-                                                </TextField>                        
-
-                                                <TextField sx={{ width:'120px' }}
-                                                    variant="standard"
-                                                    label="Credit Days"
-                                                    onChange={(evt) => onValChange(evt)}
-                                                    type="numnber"
-                                                    name="CreditNumberOfDays"
-                                                    value={baseObj.CreditNumberOfDays}
-                                                    autoComplete="off"
-                                                    inputProps={{ maxLength: 10 }}
-                                                    onKeyPress={(evt) => handleNumeric(evt)}
-                                                />                                                
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <MultivalSelectbox
-                                                    dataSource={customerAddressList}
-                                                    baseObj={baseObj}
-                                                    setpropId={setsiteId}
-                                                    setbaseObj={setbaseObj}
-                                                    itemRenderJsx={CustomerAddressSBRender}
-                                                    value={baseObj.CustomerSiteId}
-                                                    data={{ name: "CustomerSiteId", label: "Customer Location", displayExpr: "CustomerSiteName", valueExpr: "CustomerSiteId", searchExpr: "CustomerSiteName" }}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <SelectBoxDropdown
-                                                    dataSource={ancillaryData.anc_shippers}
-                                                    baseObj={baseObj}
-                                                    dynamic={true}
-                                                    initialText={baseObj.ShipperName?baseObj.ShipperName:""}
-                                                    initialId={baseObj.ShipperId?baseObj.ShipperId:""}
-                                                    apiName="party/filterparties"
-                                                    fieldName="partyname"
-                                                    listType="shippers"
-                                                    ancobjectName={ancillaryData.anc_shippers}
-                                                    setbaseObj={setbaseObj}
-                                                    value={baseObj.ShipperId}
-                                                    data={{ name: "ShipperId", label: "Shipper", displayExpr: "ShipperName", valueExpr: "ShipperId", searchExpr: "ShipperName" }}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <SelectBoxDropdown
-                                                    dataSource={ancillaryData.anc_shippingLines}
-                                                    baseObj={baseObj}
-                                                    dynamic={true}
-                                                    initialText={baseObj.ShippingLineName?baseObj.ShippingLineName:""}
-                                                    initialId={baseObj.ShippingLineId?baseObj.ShippingLineId:""}
-                                                    apiName="party/filterparties"
-                                                    fieldName="partyname"
-                                                    listType="shippinglines"
-                                                    setpropName={setshippingLine}
-                                                    ancobjectName={ancillaryData.anc_shippingLines}
-                                                    setbaseObj={setbaseObj}
-                                                    value={baseObj.ShippingLineId}
-                                                    data={{ name: "ShippingLineId", label: "Shipping Line", displayExpr: "ShippingLineName", valueExpr: "ShippingLineId", searchExpr: "ShippingLineName" }}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <SelectBoxDropdown
-                                                    dataSource={ancillaryData.anc_consignees}
-                                                    baseObj={baseObj}
-                                                    dynamic={true}
-                                                    apiName="party/filterparties"
-                                                    initialText={baseObj.ConsigneeName?baseObj.ConsigneeName:""}
-                                                    initialId={baseObj.ConsigneeId?baseObj.ConsigneeId:""}
-                                                    fieldName="partyname"
-                                                    listType="consignees"
-                                                    ancobjectName={ancillaryData.anc_consignees}
-                                                    setbaseObj={setbaseObj}
-                                                    value={baseObj.ConsigneeId}
-                                                    data={{ name: "ConsigneeId", label: "Consignee", displayExpr: "ConsigneeName", valueExpr: "ConsigneeId", searchExpr: "ConsigneeName" }}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <SelectBoxDropdown
-                                                    dataSource={salesPersonList}
-                                                    baseObj={baseObj}
-                                                    setbaseObj={setbaseObj}                                                   
-                                                    initialText={baseObj.SalesPersonName?baseObj.SalesPersonName:""}
-                                                    initialId={baseObj.SalesPersonId?baseObj.SalesPersonId:""}
-                                                    value={baseObj.SalesPersonId}
-                                                    data={{ name: "SalesPersonId", label: "Sales Person", displayExpr: "SalesPersonName", valueExpr: "SalesPersonId", searchExpr: "SalesPersonName" }}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <SelectBoxDropdown
-                                                    dataSource={ancillaryData.anc_osas}
-                                                    baseObj={baseObj}
-                                                    dynamic={true}
-                                                    apiName="party/filterparties"
-                                                    fieldName="partyname"
-                                                    listType="osas"
-                                                    initialText={baseObj.OsaName?baseObj.OsaName:""}
-                                                    initialId={baseObj.OsaId?baseObj.OsaId:""}
-                                                    ancobjectName={ancillaryData.anc_osas}
-                                                    setbaseObj={setbaseObj}
-                                                    value={baseObj.OsaId}
-                                                    data={{ name: "OsaId", label: "Overseas Agent", displayExpr: "OsaName", valueExpr: "OsaId", searchExpr: "OsaName" }}
-                                                />
-                                            </Grid>
-                                            
-                                        </Grid>
-                                    </Paper>
-                                </Grid>
-                            </Grid>
                         </Grid>
                         <Grid item lg={3} xs={12}>
                             <Paper elevation={1} sx={{ p: 1, marginRight: 1 }}>

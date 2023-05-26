@@ -3,7 +3,7 @@ import { SelectBox } from 'devextreme-react';
 import React , {useEffect, useRef,useState} from 'react'
 import axios from 'axios';
 
-export default function SelectBoxDropdown({ dataSource, setpropName,setpropId,baseObj, value, initialText, initialId, ancobjectName, setbaseObj, data, dynamic,apiName,listType,fieldName }) {
+export default function SelectBoxDropdown({ dataSource, setpropName,setpropId,baseObj, value, initialText, initialId, ancobjectName, setbaseObj, data, dynamic,apiName,listType,fieldName, ancchild,setancds }) {
     const [selectboxDatasource, setselectboxDatasource] = useState(dataSource)
     const selectboxRef = useRef(null);
 
@@ -15,6 +15,7 @@ export default function SelectBoxDropdown({ dataSource, setpropName,setpropId,ba
 
     const setInitialData = () => {
         try{
+            //console.log('setinitval selectbox',initialText);
             if(initialText !== ""){
                 getData(apiName,listType,fieldName,initialText);
             }
@@ -24,21 +25,30 @@ export default function SelectBoxDropdown({ dataSource, setpropName,setpropId,ba
 
 
     const handleValueChange = (e) => {
-        //console.log('e',e);
-        try{
-            setpropName(e.component.option("text"));
-        }
-        catch(ex){}
+        //console.log('SBD handleValueChange e',e, 'curr value',value);
 
         try{
-            setpropId(e.value);
+            if(typeof e.value !== 'undefined')
+                setpropName(e.component.option("text"));
         }
         catch(ex){
-            //console.log(ex)
+            //console.log('ex1',ex);
+        }
+
+        try{
+            if(typeof e.value !== 'undefined')
+                setpropId(e.value);
+        }
+        catch(ex){
+            //console.log('ex2',ex);
         }
         
         let valueExpr = e.component.option("name");
-        setbaseObj({ ...baseObj, [valueExpr]: e.value });
+        if(typeof e.value !== 'undefined'){
+            setbaseObj(prevItem => ({ ...prevItem, [valueExpr]: e.value }));
+        //    baseObj[valueExpr] = e.value;
+        }
+        
     };
 
 
@@ -50,31 +60,29 @@ export default function SelectBoxDropdown({ dataSource, setpropName,setpropId,ba
               method: 'get',
               url: apiName + '/' + listType + '/' + fieldName + '/' + fieldValue,
             }).then((response) => {
-              //console.log(response.data);
+              //console.log('getting data...',response.data.anc_results);
               setselectboxDatasource(response.data.anc_results);
               ancobjectName = response.data.anc_results;
-              
-              //console.log(selectboxDatasource);
+              setancds(ancchild,response.data.anc_results);
             }).catch((error) => {
-
-              if (error.response) {
+              if (error.response) 
                 console.log("Error occured while retrieving ancillary data..");
-              }
             })
           }
-          catch (ex) {
-          }
+          catch (ex) {}
     }
 
     const handleKeyDown = (event) =>{
         try{
             var s = selectboxRef.current.instance.option('text');
-            console.log(s);
+            //console.log(s);
             if(s.length === 2){
                 getData(apiName,listType,fieldName,s);
             }
         }
-        catch(ex){}
+        catch(ex){
+            console.log('keydown err',ex);
+        }
     }
 
     const dynaButton = () =>{
@@ -106,6 +114,7 @@ export default function SelectBoxDropdown({ dataSource, setpropName,setpropId,ba
                     height='45px'
                     ref={selectboxRef}
                     onKeyDown={handleKeyDown}
+                    //onValueChanged={handleValueChange}
                     onValueChanged={handleValueChange}
                     dropDownButtonRender={dynaButton}
                     //className='select-dyna-box-text'
