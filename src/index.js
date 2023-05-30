@@ -34,7 +34,8 @@ axios.interceptors.response.use((response) => {
 
       const rfrTokenBody = {  
         "AccessToken": token.AccessToken,
-        "RefreshToken": token.RefreshToken
+        "RefreshToken": token.RefreshToken,
+        "AppId": token.AppId
       };
       
       const res = await axios.post('token/refreshtoken', rfrTokenBody)

@@ -5,7 +5,7 @@ import { useState, useEffect,useRef } from 'react';
 import { RequiredRule } from 'devextreme-react/form';
 
 
-export default function RebateParty({ RebateParties, baseObj, ancillaryData }) {
+export default function RebateParty({ RebateParties, baseObj, ancillaryData,  PartyId }) {
   const dataGrid = useRef(null);
   const [refresh, setRefresh] = useState(false);
 
@@ -61,6 +61,7 @@ export default function RebateParty({ RebateParties, baseObj, ancillaryData }) {
         const gridDataSource = e.component.getDataSource();
         let totalCount = -1 * gridDataSource.totalCount();
         e.data.RebatePartyId = totalCount;
+        e.data.PartyId = PartyId;
         e.data.Active = 'Y';
         e.data.CheckerQueueId = 0;
         e.data.CheckerStatus = 'W';

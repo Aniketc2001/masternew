@@ -16,7 +16,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContentText from '@mui/material/DialogContentText';
-
+import { getFormattedDate } from '../../shared/scripts/common';
 import BxButton  from 'react-bootstrap/Button';
 
 import '../../shared/styles/dx-styles.css';
@@ -319,11 +319,11 @@ export default function EditPageLayout(props) {
     var errmsg = "";
 
     filteredData.map(item => {
-      //console.log(item);
-
       var valmsg = item.ValidationMessage;
-      //console.log(baseObj[item.TableFieldName]);
-      if(baseObj[item.TableFieldName] === "" || baseObj[item.TableFieldName] === null ){
+      console.log(item.TableFieldName,baseObj[item.TableFieldName]);
+      if(baseObj[item.TableFieldName] === "" || baseObj[item.TableFieldName] === null || baseObj[item.TableFieldName] === 0 ){
+        console.log('adding to validation...',item.TableFieldName,baseObj[item.TableFieldName]);
+        
         if(valmsg === "" || valmsg === null)
           valmsg = "Invalid data";
         
@@ -340,32 +340,50 @@ export default function EditPageLayout(props) {
   }
 
   const renderControl = (column) => {
-    //console.log(column);
+    console.log(column);
     if(column.ControlType==="Text Field" || column.ControlType==="Numeric Field"  ){
         return(
             <TextField onChange={(evt) => onValChange(evt)} label={column.DisplayCaption} required={column.IsMandatory=='Y'?true:false} 
             title={baseObj[`${column.TableFieldName}`] }
-             variant="standard" name={column.TableFieldName} value={baseObj[`${column.TableFieldName}`] } autoComplete="off" sx={{width:200}}  inputProps={{ maxLength: `${column.MaxLength}`, readOnly: baseObj[`${column.TableFieldName}`] === 'Y'  }} />
+             variant="standard" name={column.TableFieldName} value={baseObj[`${column.TableFieldName}`] } autoComplete="off" sx={{width:200}}  inputProps={{ maxLength: `${column.MaxLength}`, readOnly: (column.IsReadOnly==='Y'?true:false)  }} />
         );
     }
     else if(column.ControlType==="Text Area"){
         return(
-            <TextField onChange={(evt) => onValChange(evt)} label={column.DisplayCaption} variant="standard" name={column.TableFieldName} title={column.HelpText}  value={baseObj[`${column.TableFieldName}`] } autoComplete="off" sx={{width:`${column.ControlWidth}`}}  inputProps={{ maxLength: `${column.MaxLength}`, readOnly: baseObj[`${column.TableFieldName}`] === 'Y'  }} maxRows={4} multiline />
+            <TextField onChange={(evt) => onValChange(evt)} label={column.DisplayCaption} variant="standard" name={column.TableFieldName} title={column.HelpText}  value={baseObj[`${column.TableFieldName}`] } autoComplete="off" sx={{width:`${column.ControlWidth}`}}  inputProps={{ maxLength: `${column.MaxLength}`,  readOnly: (column.IsReadOnly==='Y'?true:false)   }} maxRows={4} multiline />
         )
     }
-    else if(column.ControlType==="Date Picker"){
-      let readonlyfg = '';
-      readonlyfg = baseObj[`${column.TableFieldName}`] === 'Y'?'readonly':''
+    else if(column.ControlType==="Password"){
       return(
-              <DatePicker 
-              label={column.DisplayCaption} 
-              renderInput = {(params) => <TextField variant="standard" {...params} />}
-              value={baseObj[`${column.TableFieldName}`] }
-              onChange={onDateValChange(column.TableFieldName)} 
-              name={column.TableFieldName} 
-              {...readonlyfg}
-              />
+          <TextField onChange={(evt) => onValChange(evt)} label={column.DisplayCaption} variant="standard" name={column.TableFieldName} title={column.HelpText}  type="password" value={baseObj[`${column.TableFieldName}`] } autoComplete="off" sx={{width:`${column.ControlWidth}`}}  inputProps={{ maxLength: `${column.MaxLength}`, readOnly: (column.IsReadOnly==='Y'?true:false)   }}  />
       )
+    }    
+    else if(column.ControlType==="Date Picker"){
+      if(column.IsReadOnly==='N'){
+        return(
+                <DatePicker 
+                label={column.DisplayCaption} 
+                renderInput = {(params) => <TextField variant="standard" {...params} />}
+                value={baseObj[`${column.TableFieldName}`] }
+                onChange={onDateValChange(column.TableFieldName)} 
+                name={column.TableFieldName} 
+                inputProps={{  readOnly: (column.IsReadOnly==='Y'?true:false) }}
+                />
+        );
+      }
+      else{
+        var dt = new Date(baseObj[`${column.TableFieldName}`]);
+        var fdt = "";
+
+        if(baseObj[`${column.TableFieldName}`]!=="")
+          fdt = getFormattedDate(dt);
+          
+        return(
+             <TextField onChange={(evt) => onValChange(evt)} label={column.DisplayCaption} required={column.IsMandatory=='Y'?true:false} 
+             title={baseObj[`${column.TableFieldName}`] }
+             variant="standard" name={column.TableFieldName} value={fdt } autoComplete="off" sx={{width:200}}  inputProps={{ maxLength: `${column.MaxLength}`, readOnly: (column.IsReadOnly==='Y'?true:false)  }} />
+        );
+      }
     }
     else if(column.ControlType==="Check Box"){
         return(

@@ -88,6 +88,23 @@ export default function ListPageLayout(props) {
     getRecords();
   }, [props.APIName]);
   
+  const clearViewState = () => {
+    props.setViewState(null);
+  }
+
+  const renderViewState = () => {
+    setdisplayPageSize(props.viewState.pageSize);
+    console.log('currpage get',props.viewState.pageNumber);
+    dataGrid.current.instance.pageIndex(props.viewState.pageNumber);
+    setdisplayDataGrid(true);
+    try{
+      //dataGrid.current.instance.filter(props.viewState.filter);
+    }
+    catch(ex){}
+
+  }
+
+
   const getRecords =  () => {
       //console.log('inside getrecords');
       axios({
@@ -344,13 +361,27 @@ export default function ListPageLayout(props) {
     setTimeout(hidePopover,6000);
   }
 
+  const updateViewState = () => {
+    var currpage = "";
+    var gridfilter = "";
+    try{
+      currpage = dataGrid.current.instance.pageIndex();
+      console.log('currpage set',currpage);
+      //gridfilter = dataGrid.current.instance.getCombinedFilter();
+    }
+    catch(ex){}
+    console.log('currpage',currpage,gridfilter);
+    props.setViewState({...props.viewState, pageNumber: currpage, listPageName: props.APIName, pageSize: displayPageSize, filter: gridfilter });
+  }
+
+
   const createButtonClick = () => {
+    //updateViewState();
     navigate(`/${props.EditPageName}/0?m=${m}`);
   }
 
   const editIconClick = (e) => {
-    //console.log('edit click');
-    //console.log(e);
+    //updateViewState();
     navigate(`/${props.EditPageName}/${e.key}?m=${m}`);
   };
   

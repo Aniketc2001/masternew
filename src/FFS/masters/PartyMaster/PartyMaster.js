@@ -75,6 +75,7 @@ export default function PartyMaster() {
   const partyNameRef = useRef(null);
   const [loadcustomerAddressFlag,setloadcustomerAddressFlag] = useState(false);
   const [PartyId, setPartyId] = useState(id);
+  const [reloadPage,setreloadPage] = useState(0);
 
 
   const hdr = {
@@ -124,7 +125,7 @@ export default function PartyMaster() {
     getancillaryData();
     //console.log("anc1",ancillaryData);
     setShowAR(clr === 'c');
-  }, []);
+  }, [reloadPage]);
 
   const getinitialVal = () => {
 //    console.log("id", id);
@@ -294,15 +295,21 @@ export default function PartyMaster() {
 
   const validateForm = () => {
     //data validations
+    var msg = "";
     if (baseObj.PartyCode === null || baseObj.PartyCode === "") {
-      alert("Invalid party code!", "Party validation");
-      partyCodeRef.current.focus();
-      return false;
+      msg = msg + "Invalid Party Code!" + "<br/>";
     }
 
     if (baseObj.PartyName === null || baseObj.PartyName === "") {
-      alert("Invalid party name!", "Party validation");
-      partyNameRef.current.focus();
+      msg = msg + "Invalid Party Name!" + "<br/>";
+    }
+
+    if (baseObj.CreditBasisId === null ) {
+      msg = msg + "Invalid Credit Basis!" + "<br/>";
+    }
+
+    if(msg !== ""){
+      alert(msg,"Party Validation Errors");
       return false;
     }
 
@@ -355,9 +362,6 @@ export default function PartyMaster() {
       alert('Party salesperson mapping contains invalid rows!', 'Party Salesperson mapping Validation');
       return false;
     }
-
-
-
     return true;
   }
 
@@ -395,6 +399,7 @@ export default function PartyMaster() {
           }
           setnotificationBarMessage("Party details saved as draft!");
           setOpenNotificationBar(true);
+          setreloadPage(reloadPage+1);
           //navigate(-1);
         }).catch((error) => {
           if (error.response) {
@@ -746,19 +751,19 @@ export default function PartyMaster() {
                     </Grid>
                   </TabPanel>
                   <TabPanel value={value} index={1} >
-                    {baseObj ? <PartyAddressEdit ancillaryData={ancillaryData} partyAddressData={baseObj.PartyAddresses} baseObj={baseObj} setBaseObj={setBaseObj} onPartyAddressChange={handlePartyAddressChange} /> : <></>}
+                    {baseObj ? <PartyAddressEdit PartyId={PartyId} ancillaryData={ancillaryData} partyAddressData={baseObj.PartyAddresses} baseObj={baseObj} setBaseObj={setBaseObj} onPartyAddressChange={handlePartyAddressChange} /> : <></>}
 
                   </TabPanel>
                   <TabPanel value={value} index={2}>
-                    {baseObj ? <PartyCommunication ancillaryData={ancillaryData} baseObj={baseObj} partyCommunicationData={baseObj.PartyCommunications} /> : <></>}
+                    {baseObj ? <PartyCommunication PartyId={PartyId} ancillaryData={ancillaryData} baseObj={baseObj} partyCommunicationData={baseObj.PartyCommunications} /> : <></>}
                   </TabPanel>
 
                   <TabPanel value={value} index={3}>
-                    {baseObj ? <RebateParty ancillaryData={ancillaryData} baseObj={baseObj} rebatePartyData={baseObj.RebateParties} /> : <></>}
+                    {baseObj ? <RebateParty PartyId={PartyId} ancillaryData={ancillaryData} baseObj={baseObj} rebatePartyData={baseObj.RebateParties} /> : <></>}
                   </TabPanel>
 
                   <TabPanel value={value} index={4}>
-                    {baseObj && ancillaryData  ? <PartySalesMap ancillaryData={ancillaryData} baseObj={baseObj} partySalesMapData={baseObj.PartySalesMaps} /> : <></>}
+                    {baseObj && ancillaryData  ? <PartySalesMap PartyId={PartyId} ancillaryData={ancillaryData} baseObj={baseObj} partySalesMapData={baseObj.PartySalesMaps} /> : <></>}
                   </TabPanel>
 
                 </Grid>

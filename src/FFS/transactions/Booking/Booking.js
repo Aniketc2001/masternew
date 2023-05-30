@@ -10,7 +10,7 @@ import BxButton from "react-bootstrap/button"
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { alert, confirm } from 'devextreme/ui/dialog';
 import { getAssignedGrants, resolveControlGrant } from '../../../shared/scripts/common';
-
+import { getFormattedDate } from '../../../shared/scripts/common';
 
 export default function Booking(props) {
   const m = new URLSearchParams(useLocation().search).get('m');
@@ -255,7 +255,7 @@ export default function Booking(props) {
         if (BookingId === '0') {
           x.CreatedDate = '01-01-2023 10:10:10 PM';
           x.ModifiedDate = '01-01-2023 10:10:10 PM';
-          x.BookingDate = new Date();
+          x.BookingDate = getFormattedDate(new Date());
           x.BookingInventories = [];
         }
         console.log('b2');

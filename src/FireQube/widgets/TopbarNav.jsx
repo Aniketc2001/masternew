@@ -142,6 +142,11 @@ function TopBarNav(props) {
     setappmenupopoverFlag(false);
   };
 
+  const getDBEnv = () => {
+    
+  }
+
+
   const RenderEnv = () => {
     var bclr = "";
     var fclr = "";
@@ -150,13 +155,20 @@ function TopBarNav(props) {
       bclr = 'limegreen';
       fclr = '#111111';
     }
-    else {
-      bclr = 'jasper';
+    else  if(process.env.REACT_APP_ENVIRONMENT.indexOf("UAT") > 0 || process.env.REACT_APP_ENVIRONMENT.indexOf("Test") > 0){ 
+      bclr = '#d73b3e';
       fclr = 'white';
     }
+    else  if(process.env.REACT_APP_ENVIRONMENT.indexOf("Prod") > 0 ){ 
+      bclr = '#e34234';
+      fclr = 'yellow';
+    }
+
     //console.log('render...',bclr,fclr);
     return(
-      <span style={{marginLeft:'20px',paddingLeft:'10px',paddingRight:'10px',fontSize:'8pt',backgroundColor:bclr, borderRadius:'10px',color:fclr}}>{process.env.REACT_APP_ENVIRONMENT}</span>
+      <span style={{marginLeft:'20px',paddingLeft:'10px',paddingRight:'10px',
+        fontSize:'8pt',backgroundColor:bclr, borderRadius:'10px',color:fclr}}>
+        {process.env.REACT_APP_ENVIRONMENT}</span>
     );
   }
 

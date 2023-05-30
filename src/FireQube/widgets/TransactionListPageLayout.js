@@ -7,6 +7,7 @@ import Alert from '@mui/material/Alert';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
 import { getFormattedDate } from '../../shared/scripts/common';
+import { DateBox } from 'devextreme-react';
 
 
 import DataGrid, {
@@ -19,7 +20,6 @@ import { useNavigate,useLocation, useParams } from 'react-router-dom';
 
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-
 
 /* ListPageLayout Component Props 
     - ColumnVisibilityJSON (columnDisplayMap)
@@ -51,7 +51,15 @@ export default function TransactionListPageLayout(props) {
   const [anchorElement, setAnchorElement] = React.useState(null);     //Anchor point for Popover
   const [openPopover, setOpenPopover] = React.useState(false);     //Display status for Popover
 
+  const [anchorElDates, setAnchorElDates] = React.useState(null);     //Anchor point for Popover
+  const [openDatesPopover, setOpenDatesPopover] = React.useState(false);     //Display status for Popover
+
+  const [fromDate, setFromDate] = React.useState(new Date());
+  const maxToDate = new Date(2030, 11, 31);
+  const [toDate, setToDate] = React.useState(new Date());
+
   const [dateMsg, setDateMsg] = useState(null);
+  const [datebtn, setDateBtn] = useState("TODAY");
 
   
   const [checkerInfo,setCheckerInfo] = useState({
@@ -84,22 +92,15 @@ export default function TransactionListPageLayout(props) {
 
   useEffect(() => {
     setdisplayDataGrid(false);
-
-    if(props.APIName === props.viewState.listPageName){
+    getRecords();
+    if(props.APIName === props.viewState.listPageName)
       renderViewState();
-    }
-    else{
-      getRecords();
-    }
-
-  }, [props.APIName]);
+  }, [datebtn]);
   
 
   const renderViewState = () => {
-    console.log('rendering viewstate...');
-    setgridDataSource(props.viewState.dataSource);
-    setdisplayDataGrid(true);
     dataGrid.current.instance.pageIndex(props.viewState.pageNumber);
+    setdisplayDataGrid(true);
   }
 
   const updateViewState = () => {
@@ -118,6 +119,7 @@ export default function TransactionListPageLayout(props) {
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // Subtract 6 days to get the start date
     var todt = getFormattedDate(sevenDaysAgo);
 
+    setDateBtn('LAST7DAYS');
     props.setViewState({...props.viewState, fromDate: todt, toDate: frdt });
     props.viewState.fromDate = todt;
     props.viewState.toDate = frdt;
@@ -129,6 +131,7 @@ export default function TransactionListPageLayout(props) {
     var frdt =  getFormattedDate(new Date());
     var todt = getFormattedDate(new Date());
 
+    setDateBtn('TODAY');
     props.setViewState({...props.viewState, fromDate: todt, toDate: frdt });
     props.viewState.fromDate = todt;
     props.viewState.toDate = frdt;
@@ -142,6 +145,7 @@ export default function TransactionListPageLayout(props) {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29); // Subtract 29 days to get the start date
     var todt = getFormattedDate(thirtyDaysAgo);
 
+    setDateBtn('LAST30DAYS');
     props.setViewState({...props.viewState, fromDate: todt, toDate: frdt });
     props.viewState.fromDate = todt;
     props.viewState.toDate = frdt;
@@ -149,6 +153,48 @@ export default function TransactionListPageLayout(props) {
     getRecords();
   }
 
+  const handleCustomDatesClick = (event) => {
+    console.log('event',event);
+    setAnchorElDates(event.currentTarget);
+    setOpenDatesPopover(true);
+  }
+
+  const handleCustomDatesClose = () => {
+    // Check if both from date and to date are selected
+    if (!fromDate || !toDate) {
+      alert('Please specify the date range!');
+      return;
+    }
+
+    // Check if to date is greater than from date
+    if (toDate < fromDate) {
+      alert("'To date' should be greater than 'From date'");
+      return;
+    }
+    if (fromDate > maxToDate) {
+      alert("'From date' should be less than 'To date'");
+      return;
+    }
+
+    props.setViewState({...props.viewState, fromDate: getFormattedDate(fromDate), toDate: getFormattedDate(toDate) });
+    props.viewState.fromDate = getFormattedDate(fromDate);
+    props.viewState.toDate = getFormattedDate(toDate);
+
+    setDateBtn('CUSTOM');
+    getRecords();
+
+
+    setOpenDatesPopover(false);
+  };
+
+  const handleFromDateChange = (e) => {
+    const selectedFromDate = e.value;
+    setFromDate(selectedFromDate);
+  };
+  const handleToDateChange = (e) => {
+    setToDate(e.value);
+    console.log(e.value);
+  }
 
   const getRecords =  () => {
       //console.log('inside getrecords');
@@ -157,10 +203,17 @@ export default function TransactionListPageLayout(props) {
       var msg = "";
       
       if(frdt !== todt)
-        msg = "Displaying data between " + frdt + " and " + todt;
+        msg = "Displaying list of bookings between " + frdt + " and " + todt;
       else
-        msg = "Displaying data for " + frdt ;
+        msg = "Displaying list of bookings for " + frdt ;
 
+      if(datebtn === "TODAY")
+        msg = "Displaying list of bookings for Today...";
+      else if(datebtn === "LAST7DAYS")
+        msg = "Displaying list of bookings for last 7 days...";
+      else if(datebtn === "LAST30DAYS")
+        msg = "Displaying list of bookings for last 30 days...";
+      
       console.log('msg',msg);
       setDateMsg(msg);
 
@@ -171,7 +224,7 @@ export default function TransactionListPageLayout(props) {
       }).then((response) => {
         //console.log('listpage getrecords...');
         setgridDataSource(response.data);
-        //console.log(response.data);
+        console.log('getrecords',response.data);
         setdisplayDataGrid(true);
         updateViewState();
       }).catch((error) => {
@@ -402,7 +455,7 @@ export default function TransactionListPageLayout(props) {
       ?
       <Box   sx={{ p: 2,  paddingTop: 2, minHeight:'90vh', minWidth:'90vh',  backgroundColor: 'white', fontFamily:'Poppins' }}>
         <h2 className='PageTitle'>{props.ListPageTitle}</h2>
-        <p className='PageSubTitle'>{props.SubTitle} <span style={{paddingLeft:'10px'}}>{dateMsg}</span></p>
+        <p className='PageSubTitle'>{props.SubTitle} <span style={{paddingLeft:'20px',color:'blue'}}>{dateMsg}</span></p>
         <Grid container spacing={1} >
           <Grid item xm={1} >
             <BxButton
@@ -467,12 +520,37 @@ export default function TransactionListPageLayout(props) {
                   <BxButton
                   variant="secondary"
                   size="sm"
+                  onClick={handleCustomDatesClick}
                   style={{ textTransform: "none",fontSize: '8pt',marginRight:'20px' }}
                   >
                     <i className={'bi-thermometer-snow'} style={{ fontSize: '10pt', marginRight: '2px'}} />
                     Custom
                   </BxButton>
-
+                    <Popover
+                      id='dates-popover'
+                      open={openDatesPopover}
+                      anchorEl={anchorElDates}
+                      onClose={handleCustomDatesClose}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                      }}
+                    >
+                      <Paper elevation={0} sx={{ width: "430px", height: "80px", p: 2, backgroundColor:'lightgoldenrodyellow' }}>
+                        <Grid container gap={3} alignItems="baseline">
+                          <DateBox width={120} value={fromDate} onValueChanged={handleFromDateChange} stylingMode="underlined" label='From Date' labelMode='floating' displayFormat="dd-MMM-yyyy" />
+                          <DateBox width={120} max={maxToDate} value={toDate} onValueChanged={handleToDateChange} stylingMode="underlined" label='To Date' labelMode='floating' displayFormat="dd-MMM-yyyy" />
+                          <BxButton
+                            variant="primary"
+                            size="sm"
+                            style={{ textTransform: "none", fontSize: '9pt', marginRight: '20px', marginTop: '5px', height: "29px" }} 
+                            onClick={handleCustomDatesClose}
+                          ><i className={'bi-thermometer-snow'} style={{ fontSize: '10pt', marginRight: '2px' }} />
+                            Set Dates
+                          </BxButton>
+                        </Grid>
+                      </Paper>
+                    </Popover>
                   <ToggleButtonGroup
                 size="small"
                 aria-label="text alignment"

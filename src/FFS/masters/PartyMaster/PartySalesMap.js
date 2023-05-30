@@ -4,7 +4,7 @@ import DetailTemplate from './PartyContact';
 import { RequiredRule } from 'devextreme-react/form';
 import { useState,useRef } from 'react';
 
-export default function PartySalesMap({ ancillaryData, PartySalesMaps,baseObj }) {
+export default function PartySalesMap({ ancillaryData, PartySalesMaps,baseObj, PartyId }) {
   const dataGrid = useRef(null);
   const [refresh, setRefresh] = useState(false);
 
@@ -76,7 +76,7 @@ export default function PartySalesMap({ ancillaryData, PartySalesMaps,baseObj })
           let totalCount = -1 * gridDataSource.totalCount();
           //console.log(detailKeyFieldName,totalCount);
           e.data.PartySalesMapId = totalCount;
-          e.data.PartyId = 0;
+          e.data.PartyId = PartyId;
           e.data.ProductId = 0;
           e.data.PartyAddressId = 0;
           e.data.SalesPersonId = null;

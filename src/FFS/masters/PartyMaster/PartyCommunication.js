@@ -5,7 +5,7 @@ import { Row } from 'devextreme-react/responsive-box';
 import { RequiredRule } from 'devextreme-react/form';
 import { useState,useRef } from 'react';
 
-export default function PartyCommunication({ baseObj,ancillaryData, PartyCommunications }) {
+export default function PartyCommunication({ baseObj,ancillaryData, PartyCommunications, PartyId }) {
   const dataGrid = useRef(null);
   const [refresh, setRefresh] = useState(false);
 
@@ -64,7 +64,7 @@ export default function PartyCommunication({ baseObj,ancillaryData, PartyCommuni
           let totalCount = -1 * gridDataSource.totalCount();
           //console.log(detailKeyFieldName,totalCount);
           e.data.PartyCommunicationId = totalCount;
-          e.data.PartyId = 0;
+          e.data.PartyId = PartyId;
           e.data.TriggerPointId = null;
           e.data.Active = 'Y';
           e.data.CheckerQueueId = 0;

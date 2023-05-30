@@ -86,7 +86,7 @@ export default function BookingSummary({ initialVal,vesselVoyage,pol, fpd,commod
                                     <Grid item xs={5}>
                                         <Stack width='100%'>
                                              <Typography variant='caption' style={{ fontSize: '8pt', color: 'gray' }} component='p'>Status: <span style={{ color: 'black', fontSize: '8pt', borderRadius:'15px',backgroundColor:'purple',paddingLeft:'8px',paddingRight:'8px', color:'white' }}>{bookingStatus}</span></Typography>
-                                             <Typography variant='caption' style={{ fontSize: '8pt', color: 'gray' }} component='p'>Remarks: <span style={{ color: 'black', fontSize: '8pt' }}>{initialVal.Remarks?initialVal.Remarks.substr(0,200):''}</span></Typography>
+                                             <Typography variant='caption' style={{ fontSize: '8pt', color: 'gray' }} component='p'>Remarks: <span style={{ color: 'black', fontSize: '8pt' }} title={initialVal.Remarks}>{initialVal.Remarks?initialVal.Remarks.substr(0,80) + (initialVal.Remarks.length > 80?'...':''):''}</span></Typography>
                                         </Stack>
                                     </Grid>
                                 </Grid>

@@ -121,3 +121,7 @@ body
     opacity: 0;
 }
 }
+
+.dx-overlay-shader{
+    background-color: rgb(25,25,25,0.8);
+}

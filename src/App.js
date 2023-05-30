@@ -154,7 +154,7 @@ function App() {
       <Route path="/vesselServiceList" element={<MasterListPageCx mId="VesselService"/>} />
       <Route path="/vesselVoyagePortList" element={<MasterListPageCx mId="VesselVoyagePort"/>} />
       <Route path="/portList" element={<MasterListPageCx mId="Port"/>} />
-      <Route path="/partyList" element={<MasterListPageCx mId="Party & Types"/>} />
+      <Route path="/partyList" element={<MasterListPageCx mId="Party & Types" viewState={viewState} setViewState={setViewState}/>} />
       <Route path="/partyAddressList" element={<MasterListPageCx mId="Party Address & Contacts"/>} />
       <Route path="/partyCommunicationList" element={<MasterListPageCx mId="Party Communication"/>} />
       <Route path="/rebatePartyList" element={<MasterListPageCx mId="Rebate Party"/>} />

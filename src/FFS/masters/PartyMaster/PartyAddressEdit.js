@@ -1,4 +1,4 @@
-import { DataGrid, Column, MasterDetail, SearchPanel, Editing, Paging, Form, Item, Lookup, FormItem, Popup, Button } from 'devextreme-react/data-grid';
+import { DataGrid, Column, MasterDetail, SearchPanel, Editing, Paging, Form, Item, Lookup, FormItem, Popup, Button, AsyncRule } from 'devextreme-react/data-grid';
 import Data from './Data';
 import PartyContact from './PartyContact';
 import { RequiredRule } from 'devextreme-react/form';
@@ -6,31 +6,22 @@ import { useState, useEffect, useRef } from "react";
 import { CheckBox } from 'devextreme-react/check-box';
 import { alert, confirm } from 'devextreme/ui/dialog';
 
-export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresses, onPartyAddressChange }) {
+export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresses, onPartyAddressChange, PartyId }) {
     const dataGrid = useRef(null);
     const [refresh, setRefresh] = useState(false);
     const [cityGST, setCityGST] = useState(null);
-    const [validationRules, setValidationRules] = useState({
-        gst: [
-          {
-            type: 'required',
-            message: 'GST is required',
-          },
-          {
-            type: 'custom',
-            message: "GST No. should start with the selected City's State code",
-            validationCallback: (params) => {
-              const { value, data } = params;
-              console.log('validation call',params);
-              const cityId = data.CityId;
-              const selectedCity = ancillaryData.anc_cities.find((city) => city.id === cityId);
-              const cityCode = selectedCity ? selectedCity.code : '';
+    const [dataRow,setdataRow] = useState();
+    const [currId, setCurrId] = useState(0);
+    const [newrec,setnewrec] = useState(false);
+    const [cityId, setcityId] = useState(null);
     
-              return value.startsWith(cityCode);
-            },
-          },
-        ],
-      });
+
+    var tmpcityid = "";     //temporary variables for storing cityid during new/edit mode
+    var tmpgstval = "";     //temporary variables for storing gstin during new/edit mode
+    var errmsg = "";
+
+   // console.log('party address',baseObj.PartyAddresses);
+    
     
     const displayFlags = [
         { value: 'Y', text: 'Active' },
@@ -81,35 +72,110 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
         );
     }
 
-    const handleCityChange = (e) => {
-        const { dataField, value, component } = e;
-        console.log("e",e);
-        var cityid = e.value;
-        const selectedCity = ancillaryData.anc_cities.find((city) => city.CityId === cityid);
-        console.log("selected city",ancillaryData.anc_cities,selectedCity);
-        if(selectedCity){
-            console.log('setting city gst',selectedCity);
-            setCityGST(selectedCity);
-        }
-        else{
-            console.log('nothing to set in city gst...');
-            setCityGST(null);
-        }
-    };
+    const handleEditingStart = (e) => {
+        console.log('editing start',e);
+        setcityId(e.data.CityId);
+        tmpcityid = e.data.CityId;
+        tmpgstval = e.data.Gstin;
+        console.log('in edit start city',tmpcityid,'gst',tmpgstval);
+        setdataRow(e.data);
+        setCurrId(e.key);
+    }
 
-    const handleGstChange = (e) => {
-        const { dataField, value, component } = e;
-        //console.log("e1",e,cityGST,'gstcode',cityGST.GstStateCode);
+    const handleRowUpdating = (e) => {
+        //console.log('row updating',e);
+    }
 
-        var gst = e.value;
-        if(gst !== '')
-            if(gst.substr(0,2) !== cityGST.GstStateCode){
-                alert("GST State code does not match with the selected city's state! [" + cityGST.GstStateCode + "]" ,'GST State Validation')
+    
+    const handleSavingData1 = (e) => {
+        console.log('all options',e.component.option());
+        const currdata = e.component.option("dataSource");
+        var currrec;
+        if(!newrec)
+            currrec= currdata.filter((item) => item.PartyAddressId === currId);
+        else
+            currrec = currdata[currdata.length];
+
+        console.log('handleSavingData',e,"currid",currId,"currdata",currdata);
+        console.log('current row data',currrec);        
+
+        try{
+            //console.log('length',e.changes.length);
+
+            if(e.changes.length > 0){
+                const rec = currrec.find((item) => item.PartyAddressId === currId);
+                //console.log('record ',rec,dataRow,e.newData);
+                var gst = dataRow.Gstin;
+                // console.log('gst',gst,e.changes[0].data.Gstin);
+                if(typeof e.changes[0].data.Gstin !== "undefined"){
+                    gst = e.changes[0].data.Gstin;
+                    // console.log('revised gst',gst);
+                }
+
+                if(gst !== ''){
+                    var cid = currrec.CityId;
+                    // console.log('cityid',cid);
+
+                    if(typeof e.changes[0].data.CityId !== "undefined"){
+                        cid = e.changes[0].data.CityId;
+                        // console.log('revised cityid',cid);
+                    }
+                    
+                    var statecode = ""; 
+                    const selectedCity = ancillaryData.anc_cities.find((city) => city.CityId === cid);
+                    if(selectedCity){
+                        //console.log('selectedcity',selectedCity);
+                        setCityGST(selectedCity);
+                        statecode = selectedCity.GstStateCode;
+                    }
+
+                    if(gst.substr(0,2) !== statecode){
+                        alert("GST State code does not match with the selected city's state! [" + statecode + "]" ,'GST State Validation')
+                        e.cancel = true;
+                    }
+                }
             }
-    };
+        }
+        catch(ex){
+            //alert(ex,'Save error');
+        }
+    }
+    
+    const validateGSTStateCode = () => {
+        try{
+            var gst = tmpgstval;
+            if(gst === "") return true;
 
-    
-    
+            var cid = tmpcityid;
+            if(cid==="")
+                cid = cityId;
+
+            console.log('city',cid,'gst',gst);
+            var statecode = ""; 
+            const selectedCity = ancillaryData.anc_cities.find((city) => city.CityId === cid);
+            if(selectedCity){
+                console.log('selectedcity',selectedCity);
+                statecode = selectedCity.GstStateCode;
+            }
+
+            if(gst.substr(0,2) !== statecode){
+                errmsg = "GST initials does not match with the selected city's state GST Code! [" + statecode + "]";
+                return false;
+            }
+            return true;
+        }
+        catch(ex){
+            console.log('validate gst',ex);
+        }
+
+    }
+
+    const handleSavingData = (e) => {
+        if(!validateGSTStateCode()){
+            alert(errmsg,"Party Address Validation");
+            e.cancel = true;
+        }
+    }
 
     const CustomEditCell = (props) => {
         const { value, onValueChange } = props;
@@ -131,6 +197,18 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
         );
     };
 
+    const setCityValue = (newData,value,currentRowData) => {
+        console.log('rowdata city',newData,value,currentRowData);
+        tmpcityid = value;
+        newData.CityId = value;
+    }
+
+    const setGstValue = (newData,value,currentRowData) => {
+        console.log('rowdata gst',newData,value,currentRowData);
+        tmpgstval = value;
+        newData.Gstin = value;
+    }
+
     return (
         <>
             <DataGrid id="grid-container" width="100%"
@@ -143,22 +221,16 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                 useIcons={true}
                 rowAlternationEnabled={true}
                 allowColumnResizing={true}
-                onEditorPreparing={(e) => {
-                    if (e.dataField === 'Gstin') {
-                      e.editorOptions.onValueChanged = handleGstChange;
-                    }
-                    if (e.dataField === 'CityId') {
-                        e.editorOptions.onValueChanged = handleCityChange;
-                      }
-  
-                  }}
+                onSaving={handleSavingData}
+                onEditingStart={handleEditingStart}
                 onInitNewRow={(e) => {
                     // Set a default value for the key field when adding a new 
                     const gridDataSource = e.component.getDataSource();
                     let totalCount = -1 * gridDataSource.totalCount();
                     //console.log(detailKeyFieldName,totalCount);
+                    setCurrId(totalCount);
                     e.data.PartyAddressId = totalCount;
-                    e.data.PartyId = 0;
+                    e.data.PartyId = PartyId;
                     e.data.AddressTypeId = null;
                     e.data.CityId = null;
                     e.data.PartyContacts = [
@@ -191,7 +263,13 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                     e.data.AddressTypeName = "";
                     e.data.CityCode = "";
                     e.data.SiteCode = "";
-                    console.log(e.data);
+                    setnewrec(true);
+                    setdataRow(null);
+                    setCurrId(null);
+                    tmpcityid = null;
+                    tmpgstval = null;
+                    setcityId(null);
+                    //console.log(e.data);
                 }} >
                 <Paging enabled={true} pageSize={7} />
                 <SearchPanel visible={true} />
@@ -204,7 +282,7 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                     <FormItem visible={false} />
                 </Column>
 
-                <Column dataField="AddressTypeId" caption="Address Type" width={150} isRequired={true}>
+                <Column dataField="AddressTypeId" caption="Address Type" width={150} isRequired={true} >
                     <Lookup dataSource={ancillaryData.anc_addressTypes} displayExpr="LookupItemName" valueExpr="LookupItemId" />
                     <RequiredRule />
                 </Column>
@@ -226,12 +304,12 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                 <Column dataField="Address3" width={150} visible={false}  editorOptions={{ maxLength: 50 }}>
                     <FormItem visible={true} />
                 </Column>
-                <Column dataField="CityId" caption="City" width={150} >
-                    <Lookup dataSource={ancillaryData.anc_cities} displayExpr="CityName" valueExpr="CityId" />
-                    <RequiredRule />
+                <Column dataField="CityId" caption="City" width={150} setCellValue={setCityValue}>
+                    <Lookup dataSource={ancillaryData.anc_cities} displayExpr="CityName" 
+                        valueExpr="CityId"  />
                     <FormItem visible={true} />
                 </Column>
-                <Column dataField="PinCode" visible={false} caption="Pin Code" >
+                <Column dataField="PinCode" visible={true} caption="Pin Code" >
                     <RequiredRule />
                     <FormItem visible={true} />
                 </Column>
@@ -241,7 +319,7 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                 <Column dataField="CityCode" visible={false} width={0} >
                     <FormItem visible={false} />
                 </Column>
-                <Column dataField="Gstin" visible={false}>
+                <Column dataField="Gstin" visible={true} width={150} setCellValue={setGstValue}>
                     <FormItem visible={true} />
                 </Column>
                 <Column dataField="Active" caption="Active" visible={true} width={50} 

@@ -7,6 +7,7 @@ import MultivalSelectbox from './MultivalSelectbox';
 import  {useRef,useState, useEffect} from 'react'
 import CustomerAddressSBRender from './CustomerAddressSBRender';
 import { Stack } from 'react-bootstrap';
+import { getFormattedDate } from '../../../shared/scripts/common';
 
 export default function GeneralInformationTab({ baseObj,setshippingLine, setshippingLineId, setpolId, setPol, setFpd, salesPersonList, customerAddressList, setCommodityCategory, setproductId, setcustomerId, setCmmodity, setsiteId, setbaseObj, ancillaryData, setcustomerName, setancds }) {
     
@@ -16,7 +17,8 @@ export default function GeneralInformationTab({ baseObj,setshippingLine, setship
     },[baseObj.CreditNumberOfDays]);
 
     const onDateValChange = (fieldName) => (value) => {
-        setbaseObj({ ...baseObj, [fieldName]: value });
+        //console.log('dt',value,getFormattedDate(new Date(value)));
+        setbaseObj({ ...baseObj, [fieldName]: getFormattedDate(new Date(value)) });
     }
 
     const onValChange = (e) => {

@@ -55,7 +55,7 @@ export default function MasterListPageCx(props) {
             headers: hdr
           }).then((response) => {
             //console.log('column details obj...',response.data);
-            response.data.grants_columns.sort((a, b) => a.FunctionPointId - b.FunctionPointId);
+            //response.data.grants_columns.sort((a, b) => a.FunctionPointId - b.FunctionPointId);
             setcolumnNamesJSON(response.data.grants_columns);
             //console.log(response.data.grants_columns);
           }).catch((error) => {
@@ -79,6 +79,8 @@ export default function MasterListPageCx(props) {
             TableName={menuDetails.MenuName}
             KeyFieldName={menuDetails.KeyField}
             columnNamesJSON={columnNamesJSON}
+            viewState={props.viewState}   
+            setViewState={props.setViewState}
         />
         :
         <></>
