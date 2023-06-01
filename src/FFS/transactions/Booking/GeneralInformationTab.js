@@ -9,7 +9,7 @@ import CustomerAddressSBRender from './CustomerAddressSBRender';
 import { Stack } from 'react-bootstrap';
 import { getFormattedDate } from '../../../shared/scripts/common';
 
-export default function GeneralInformationTab({ baseObj,setshippingLine, setshippingLineId, setpolId, setPol, setFpd, salesPersonList, customerAddressList, setCommodityCategory, setproductId, setcustomerId, setCmmodity, setsiteId, setbaseObj, ancillaryData, setcustomerName, setancds }) {
+export default function GeneralInformationTab({ baseObj,setshippingLine, setshippingLineId, setpolId, setpodId, setPol, setFpd, salesPersonList, customerAddressList, setCommodityCategory, setproductId, setcustomerId, setCmmodity, setsiteId, setbaseObj, ancillaryData, setcustomerName, setancds }) {
     
 
     useEffect(()=>{
@@ -412,6 +412,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine, setship
                                                 dataSource={ancillaryData.anc_ports}
                                                 baseObj={baseObj}
                                                 setbaseObj={setbaseObj}
+                                                setpropId={setpodId}
                                                 value={baseObj.PodId}
                                                 data={{ name: "PodId", label: "POD", displayExpr: "PortName", valueExpr: "PortId", searchExpr: "PortName" }}
                                             />

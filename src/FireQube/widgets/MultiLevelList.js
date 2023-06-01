@@ -19,8 +19,9 @@ export default function MultiLevelList(props) {
     const [menuarr,setMenuArr] = React.useState([])
 
     useEffect(() => {
+      console.log('useEffect multilevelist');
       getRecords();
-    }, [props.open]);
+    }, [props.reloadMenu]);
     
 
     const getRecords = () => {
@@ -28,7 +29,7 @@ export default function MultiLevelList(props) {
           method: 'get',
           url: "accessLevel/assignedMenus",
         }).then((response) => {
-          //console.log(response.data);
+          console.log(response.data);
           const newData = response.data.map(item => {
             return { ...item, open: false };
           })

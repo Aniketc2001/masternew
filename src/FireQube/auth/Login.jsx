@@ -27,7 +27,7 @@ const Container = styled(FormGroup)`
     margin-top: 20px;
   }
 `
-export default function Login({setToken, setUserInfo}) {
+export default function Login({setToken, setUserInfo, setdbEnvironment}) {
   const [loginCreds, setLoginCreds] = useState(initialVal);
   const loginRef = useRef();
   const pwdRef = useRef();
@@ -56,8 +56,10 @@ export default function Login({setToken, setUserInfo}) {
   });
 
   useEffect(() =>{
-    if(fetchUserDetailsFlag)
+    if(fetchUserDetailsFlag){
       getUserDetails(id);
+      getdbEnvironment();
+    }
   },[fetchUserDetailsFlag])
     
   useEffect(() => {
@@ -90,6 +92,18 @@ export default function Login({setToken, setUserInfo}) {
     passwordVal.newPassword = '';
     passwordVal.retypedPassword = '';
   };
+
+  const getdbEnvironment = () => {
+    axios({
+      method: 'get',
+      url: 'systemconfig/getconfiguration/system_environment'
+    }).then((response) => {
+      setdbEnvironment(response.data.ConfigValue);
+    }).catch((error) => {
+      console.log("Error occured while getting dbenv details. Error message - " + error.message);
+    })
+    
+  }
 
   const onValChange = (e) => {
     setLoginCreds({...loginCreds, [e.target.name]: e.target.value});
@@ -176,9 +190,9 @@ export default function Login({setToken, setUserInfo}) {
     if(uid === "0") { return; }
     axios({
       method: 'get',
-      url: "systemUser/" + uid
+      url: "systemUser/getUserInfo/" + uid
     }).then((response) => {
-      //console.log('got user details...',response.data);
+      console.log('got user details...',response.data);
       setUserInfo(response.data);
       setToken(authData);
     }).catch((error) => {

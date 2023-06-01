@@ -15,7 +15,7 @@ code {
 
 
 *::-webkit-scrollbar {
-  width: 4px;               /* width of the entire scrollbar */
+  width: 6px;               /* width of the entire scrollbar */
 }
 
 *::-webkit-scrollbar-track {
@@ -23,7 +23,7 @@ code {
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: orange;    /* color of the scroll thumb */
+  background-color: rgb(9, 3, 72);    /* color of the scroll thumb */
   border-radius: 20px;       /* roundness of the scroll thumb */
-  border: 3px solid rgb(250, 209, 132);  /* creates padding around scroll thumb */
+  border-left: 15px solid rgba(243, 229, 203, 0.642);  /* creates padding around scroll thumb rgb(250, 209, 132) */
 }

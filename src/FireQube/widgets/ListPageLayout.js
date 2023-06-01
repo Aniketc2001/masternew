@@ -42,7 +42,7 @@ export default function ListPageLayout(props) {
 
   const [displayDataGrid, setdisplayDataGrid] = useState(true);
 
-  const [displayPageSize, setdisplayPageSize] = useState(12);
+  const [displayPageSize, setdisplayPageSize] = useState(10);
   const [displayFilterRow, setdisplayFilterRow] = useState(false);
   const [displayGroupPanel, setdisplayGroupPanel] = useState(false);
   const [displayFilterPanel, setdisplayFilterPanel] = useState(false);
@@ -450,7 +450,8 @@ export default function ListPageLayout(props) {
       ?
       <Box   sx={{ p: 2,  paddingTop: 2, minHeight:'90vh', minWidth:'90vh',  backgroundColor: 'white', fontFamily:'Poppins' }}>
         <h2 className='PageTitle'>{props.ListPageTitle}</h2>
-        <p className='PageSubTitle'>{props.SubTitle}</p>
+        <p className='PageSubTitle'>{props.SubTitle}  <span style={{color:'grey',fontSize:'8pt',paddingLeft:'20px'}}>Displaying a total list of {gridDataSource.length} record(s)</span></p> 
+
         <Grid container spacing={1} >
           <Grid item xm={1} >
             <BxButton
@@ -513,8 +514,8 @@ export default function ListPageLayout(props) {
                 aria-label="text alignment"
                 sx={{ marginTop:0, height:'30px',  backgroundColor:'whitesmoke'}}
                 >
-                <ToggleButton value="left" aria-label="left aligned" onClick={()=> setdisplayPageSize(12)} hint="Pagesize: 12">
-                    12
+                <ToggleButton value="left" aria-label="left aligned" onClick={()=> setdisplayPageSize(10)} hint="Pagesize: 12">
+                    10
                 </ToggleButton>
                 <ToggleButton value="center" aria-label="centered" onClick={()=> setdisplayPageSize(20)}>
                     20
@@ -552,10 +553,12 @@ export default function ListPageLayout(props) {
               allowColumnResizing={true}
               columnAutoWidth={true}
               keyExpr={props.KeyFieldName}
-              focusedRowEnabled={false}
+              focusedRowEnabled={true}
               onSelectionChanged={rowSelectionFunction}
               onCellClick={handleGridCellClick}
               onRowPrepared={handleCheckBoxVisibility}
+              onRowDblClick={editIconClick}
+              height={500}
             >
               <Selection mode="multiple"  />
               <Paging enabled={true} pageSize={displayPageSize} />
@@ -581,7 +584,6 @@ export default function ListPageLayout(props) {
               ))}
 
             </DataGrid>
-            <p style={{color:'grey',fontSize:'8pt',paddingTop:'3px'}}>Displaying a total list of {gridDataSource.length} record(s)</p>
             <Snackbar
                 open={openNotificationBar}
                 onClose={handleCloseNotificationBar}

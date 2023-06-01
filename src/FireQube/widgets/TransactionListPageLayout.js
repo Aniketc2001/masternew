@@ -40,7 +40,7 @@ export default function TransactionListPageLayout(props) {
 
   const [displayDataGrid, setdisplayDataGrid] = useState(true);
 
-  const [displayPageSize, setdisplayPageSize] = useState(12);
+  const [displayPageSize, setdisplayPageSize] = useState(10);
   const [displayFilterRow, setdisplayFilterRow] = useState(false);
   const [displayGroupPanel, setdisplayGroupPanel] = useState(false);
   const [displayFilterPanel, setdisplayFilterPanel] = useState(false);
@@ -91,6 +91,7 @@ export default function TransactionListPageLayout(props) {
   };
 
   useEffect(() => {
+    console.log("viewstate",props.viewState);
     setdisplayDataGrid(false);
     getRecords();
     if(props.APIName === props.viewState.listPageName)
@@ -99,18 +100,21 @@ export default function TransactionListPageLayout(props) {
   
 
   const renderViewState = () => {
+    setdisplayPageSize(props.viewState.pageSize);
     dataGrid.current.instance.pageIndex(props.viewState.pageNumber);
     setdisplayDataGrid(true);
   }
 
   const updateViewState = () => {
     var currpage = "";
+    var fltr = "";
     try{
       currpage =dataGrid.current.instance.pageIndex();
+     // fltr = 
     }
     catch(ex){}
-    console.log('currpage',currpage);
-    props.setViewState({...props.viewState, dataSource: gridDataSource, pageNumber: currpage, listPageName: props.APIName });
+    console.log('currpage',currpage,'pagesize',displayPageSize);
+    props.setViewState({...props.viewState, dataSource: gridDataSource, pageSize: displayPageSize, pageNumber: currpage, listPageName: props.APIName, datebtn: datebtn, filter: fltr });
   }
 
   const handle7DaysClick = () => {
@@ -120,9 +124,10 @@ export default function TransactionListPageLayout(props) {
     var todt = getFormattedDate(sevenDaysAgo);
 
     setDateBtn('LAST7DAYS');
-    props.setViewState({...props.viewState, fromDate: todt, toDate: frdt });
+    props.setViewState({...props.viewState, fromDate: todt, toDate: frdt, datebtn: 'LAST7DAYS' });
     props.viewState.fromDate = todt;
     props.viewState.toDate = frdt;
+    props.viewState.datebtn = 'LAST7DAYS';
 
     getRecords();
   }
@@ -132,9 +137,10 @@ export default function TransactionListPageLayout(props) {
     var todt = getFormattedDate(new Date());
 
     setDateBtn('TODAY');
-    props.setViewState({...props.viewState, fromDate: todt, toDate: frdt });
+    props.setViewState({...props.viewState, fromDate: todt, toDate: frdt, datebtn: 'TODAY' });
     props.viewState.fromDate = todt;
     props.viewState.toDate = frdt;
+    props.viewState.datebtn = 'TODAY';
 
     getRecords();
   }
@@ -146,9 +152,10 @@ export default function TransactionListPageLayout(props) {
     var todt = getFormattedDate(thirtyDaysAgo);
 
     setDateBtn('LAST30DAYS');
-    props.setViewState({...props.viewState, fromDate: todt, toDate: frdt });
+    props.setViewState({...props.viewState, fromDate: todt, toDate: frdt, datebtn: 'LAST30DAYS' });
     props.viewState.fromDate = todt;
     props.viewState.toDate = frdt;
+    props.viewState.datebtn = 'LAST30DAYS';
 
     getRecords();
   }
@@ -176,13 +183,13 @@ export default function TransactionListPageLayout(props) {
       return;
     }
 
-    props.setViewState({...props.viewState, fromDate: getFormattedDate(fromDate), toDate: getFormattedDate(toDate) });
+    props.setViewState({...props.viewState, fromDate: getFormattedDate(fromDate), toDate: getFormattedDate(toDate), datebtn: 'CUSTOM' });
     props.viewState.fromDate = getFormattedDate(fromDate);
     props.viewState.toDate = getFormattedDate(toDate);
+    props.viewState.datebtn = 'CUSTOM';
 
     setDateBtn('CUSTOM');
     getRecords();
-
 
     setOpenDatesPopover(false);
   };
@@ -191,6 +198,7 @@ export default function TransactionListPageLayout(props) {
     const selectedFromDate = e.value;
     setFromDate(selectedFromDate);
   };
+
   const handleToDateChange = (e) => {
     setToDate(e.value);
     console.log(e.value);
@@ -200,21 +208,22 @@ export default function TransactionListPageLayout(props) {
       //console.log('inside getrecords');
       var frdt = props.viewState.fromDate;
       var todt = props.viewState.toDate;
+      var dbtn = props.viewState.datebtn;
       var msg = "";
       
       if(frdt !== todt)
-        msg = "Displaying list of bookings between " + frdt + " and " + todt;
+        msg = "Displaying list of transactions between " + frdt + " and " + todt;
       else
-        msg = "Displaying list of bookings for " + frdt ;
+        msg = "Displaying list of transactions for " + frdt ;
 
-      if(datebtn === "TODAY")
-        msg = "Displaying list of bookings for Today...";
-      else if(datebtn === "LAST7DAYS")
-        msg = "Displaying list of bookings for last 7 days...";
-      else if(datebtn === "LAST30DAYS")
-        msg = "Displaying list of bookings for last 30 days...";
+      if(dbtn === "TODAY")
+        msg = "Displaying list of transactions for Today...";
+      else if(dbtn === "LAST7DAYS")
+        msg = "Displaying list of transactions for last 7 days...";
+      else if(dbtn === "LAST30DAYS")
+        msg = "Displaying list of transactions for last 30 days...";
       
-      console.log('msg',msg);
+      //console.log('msg',msg);
       setDateMsg(msg);
 
       axios({
@@ -224,12 +233,13 @@ export default function TransactionListPageLayout(props) {
       }).then((response) => {
         //console.log('listpage getrecords...');
         setgridDataSource(response.data);
-        console.log('getrecords',response.data);
+        //console.log('getrecords',response.data);
         setdisplayDataGrid(true);
+        renderViewState();
         updateViewState();
       }).catch((error) => {
-        console.log('list err');
-        console.log(error);
+        //console.log('list err');
+        //console.log(error);
         if(error.response) {
           console.log("Error occured while fetching data. Error message - " + error.message);
         }
@@ -282,7 +292,6 @@ export default function TransactionListPageLayout(props) {
       </div>
     );
   }
-
 
   const validateSelection = (fg) => {
     const selectedRows = dataGrid.current.instance.getSelectedRowsData();
@@ -455,7 +464,7 @@ export default function TransactionListPageLayout(props) {
       ?
       <Box   sx={{ p: 2,  paddingTop: 2, minHeight:'90vh', minWidth:'90vh',  backgroundColor: 'white', fontFamily:'Poppins' }}>
         <h2 className='PageTitle'>{props.ListPageTitle}</h2>
-        <p className='PageSubTitle'>{props.SubTitle} <span style={{paddingLeft:'20px',color:'blue'}}>{dateMsg}</span></p>
+        <p className='PageSubTitle'>{props.SubTitle} <span style={{paddingLeft:'20px',color:'blue'}}>{dateMsg} [Total records: {gridDataSource.length}]</span></p>
         <Grid container spacing={1} >
           <Grid item xm={1} >
             <BxButton
@@ -556,8 +565,8 @@ export default function TransactionListPageLayout(props) {
                 aria-label="text alignment"
                 sx={{ marginTop:0, height:'30px',  backgroundColor:'whitesmoke'}}
                 >
-                <ToggleButton value="left" aria-label="left aligned" onClick={()=> setdisplayPageSize(12)} hint="Pagesize: 12">
-                    12
+                <ToggleButton value="left" aria-label="left aligned" onClick={()=> setdisplayPageSize(10)} hint="Pagesize: 12">
+                    10
                 </ToggleButton>
                 <ToggleButton value="center" aria-label="centered" onClick={()=> setdisplayPageSize(20)}>
                     20
@@ -596,12 +605,13 @@ export default function TransactionListPageLayout(props) {
               allowColumnResizing={true}
               columnAutoWidth={true}
               keyExpr={props.KeyFieldName}
-              focusedRowEnabled={false}
+              focusedRowEnabled={true}
               onSelectionChanged={rowSelectionFunction}
               onCellClick={handleGridCellClick}
               onRowPrepared={handleCheckBoxVisibility}
+              onRowDblClick={editIconClick}
+              height={520}
             >
-              <Selection mode="multiple"  />
               <Paging enabled={true} pageSize={displayPageSize} />
               <SearchPanel visible={true} />
               <GroupPanel visible={displayGroupPanel} />
@@ -626,7 +636,6 @@ export default function TransactionListPageLayout(props) {
               ))}
 
             </DataGrid>
-            <p style={{color:'grey',fontSize:'8pt',paddingTop:'3px'}}>Displaying a total list of {gridDataSource.length} record(s)</p>
             <Snackbar
                 open={openNotificationBar}
                 onClose={handleCloseNotificationBar}

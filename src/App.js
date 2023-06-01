@@ -67,6 +67,12 @@ function App() {
   var frdt = getFormattedDate(new Date());
   var todt = getFormattedDate(new Date());
   const [viewState,setViewState] = useState({fromDate: frdt, toDate: todt});
+  const [dbEnvironment,setdbEnvironment] = useState();
+  const [reloadMenu,setreloadMenu] = useState(0);
+
+  useEffect(()=>{
+
+  },[userInfo]);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -92,7 +98,7 @@ function App() {
 
 
   if(!token) {
-    return <Login setToken={setToken} setUserInfo={setUserInfo} />
+    return <Login setToken={setToken} setUserInfo={setUserInfo} setdbEnvironment={setdbEnvironment} />
   }
 
 
@@ -103,7 +109,7 @@ function App() {
         <CssBaseline />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
     <BrowserRouter>
-        <TopBarNav
+        {userInfo?<><TopBarNav
             open={open}
             setToken={setToken}
             setOpen={setOpen}
@@ -111,8 +117,11 @@ function App() {
             theme={theme}
             userInfo={userInfo}
             setUserInfo={setUserInfo}
+            dbEnvironment={dbEnvironment}
+            reloadMenu={reloadMenu}
+            setreloadMenu={setreloadMenu}
           />
-         <SideBarNav open={open} setOpen={setOpen} /> 
+         <SideBarNav open={open} setOpen={setOpen} reloadMenu={reloadMenu} /></>:<></>} 
 
     {/* <Navbar setToken={setToken} /> */}
     <Box component="main" sx={{ flexGrow: 1, p: 0, m: 0 , height: "120%", width: '80vw' }}>
@@ -195,7 +204,7 @@ function App() {
       <Route path="/imoUnNumberEdit/:id" element={<MasterEditCx mId="IMO UN Number"/>} />
       <Route path="/containerSizeTypeEdit/:id" element={<MasterEditCx mId="Container Size Type"/>} />
       <Route path="/vesselEdit/:id" element={<MasterEditCx mId="Vessel"/>} />
-      <Route path="/vesselServiceEdit/:id" element={<MasterEditCx mId="VesselService"/>} />
+      <Route path="/vesselServiceEdit/:id" element={<MasterEditPageMultiLevel mId="VesselService"/>} />
       <Route path="/vesselVoyagePortEdit/:id" element={<MasterEditCx mId="VesselVoyagePort"/>} />
       <Route path="/portEdit/:id" element={<MasterEditPageMultiLevel mId="Port"/>} />
       <Route path="/partyFullEdit/:id" element={<PartyMaster />} />

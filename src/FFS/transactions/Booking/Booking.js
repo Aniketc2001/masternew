@@ -44,6 +44,7 @@ export default function Booking(props) {
   const [BookingId,setBookingId] = useState(id);
   const [reloadFlag,setreloadFlag] = useState(false);
   const [polId,setpolId] = useState(null);
+  const [podId,setpodId] = useState(null);
   const [grantsObj, setGrantsObj] = useState(null);
   const [baseObjLoaded,setbaseObjLoaded] = useState(false);
   
@@ -70,9 +71,9 @@ export default function Booking(props) {
 
   useEffect(() => {
     console.log('vessel voyage...');
-    if(baseObj && polId)
+    if(baseObj && polId && podId)
       getVesselVoyage();
-  }, [polId]);
+  }, [polId,podId]);
 
   useEffect(() => {
     console.log('customer details...',customerId);
@@ -111,10 +112,10 @@ export default function Booking(props) {
     try {
       axios({
         method: 'get',
-        url: 'booking/filteredancillarydata/vvpcs/' + polId
+        url: 'booking/filteredancillarydata/vvpcs/' + polId + "|" + podId
       }).then((response) => {
         const x = response.data.anc_results;
-        console.log('vessel', x);
+        console.log('vessel booking/filteredancillarydata/vvpcs/' + polId + "|" + podId, x);
         setvesselVoyageList(x);
       }).catch((error) => {
         setvesselVoyageList(null);
@@ -278,6 +279,8 @@ export default function Booking(props) {
 
         //Vessel Voyage
         setpolId(x.PolId);
+        setpodId(x.PodId);
+
         setparentvvpcId(x.VesselVoyagePortId);
 
         console.log('b4');
@@ -525,7 +528,7 @@ export default function Booking(props) {
                   {
                     value === 0 ?
                       <div>
-                        {baseObjLoaded?<GeneralInformationTab setshippingLine={setshippingLine} setshippingLineId={setshippingLineId}  salesPersonList={salesPersonList} setpolId={setpolId} setPol={setPol} setFpd={setFpd} customerAddressList={customerAddressList} setCommodityCategory={setCommodityCategory} setCmmodity={setCmmodity} setsiteId={setsiteId} setcustomerName={setcustomerName} setproductId={setproductId} setcustomerId={setcustomerId} baseObj={baseObj} setbaseObj={setbaseObj} ancillaryData={ancillaryData} setancds={setancds} />:<></>}
+                        {baseObjLoaded?<GeneralInformationTab setshippingLine={setshippingLine} setshippingLineId={setshippingLineId}  salesPersonList={salesPersonList} setpolId={setpolId} setpodId={setpodId} setPol={setPol} setFpd={setFpd} customerAddressList={customerAddressList} setCommodityCategory={setCommodityCategory} setCmmodity={setCmmodity} setsiteId={setsiteId} setcustomerName={setcustomerName} setproductId={setproductId} setcustomerId={setcustomerId} baseObj={baseObj} setbaseObj={setbaseObj} ancillaryData={ancillaryData} setancds={setancds} />:<></>}
                       </div>
                       : value === 1 ?
                         <div>

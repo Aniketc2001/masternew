@@ -121,6 +121,7 @@ function TopBarNav(props) {
     setpopoverFlag(false);
   };
 
+
   const logoff = () => {
     props.setUserInfo(null);
     navigate("/");
@@ -168,7 +169,7 @@ function TopBarNav(props) {
     return(
       <span style={{marginLeft:'20px',paddingLeft:'10px',paddingRight:'10px',
         fontSize:'8pt',backgroundColor:bclr, borderRadius:'10px',color:fclr}}>
-        {process.env.REACT_APP_ENVIRONMENT}</span>
+        {process.env.REACT_APP_ENVIRONMENT} @ {props.dbEnvironment}</span>
     );
   }
 
@@ -221,9 +222,15 @@ function TopBarNav(props) {
             <ApplicationMenuPopover
               objref={objref}
               id={"accountAvatar"}
+              userInfo={props.userInfo}
               popoverFlag={appmenupopoverFlag}
               setpopoverFlag={setappmenupopoverFlag}
               hidePopoverfn={hideappmenuPopover}
+              handleDrawerOpen={props.handleDrawerOpen}
+              setOpen={props.setOpen}
+              open={props.open}
+              setreloadMenu={props.setreloadMenu}
+              reloadMenu={props.reloadMenu}
             />
           </IconButton>
         </ClickAwayListener>

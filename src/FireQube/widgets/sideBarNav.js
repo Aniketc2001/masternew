@@ -87,7 +87,7 @@ return (
     </DrawerHeader>
     <Divider />
     <div style={{overflow: 'none',height: '100'}} > 
-      <MultiLevelList open={open} />
+      <MultiLevelList open={props.open} reloadMenu={props.reloadMenu} />
     </div>
     <Divider />
     </div>

@@ -25,6 +25,8 @@ export const resolveControlGrant = (grantsObj,controlName) => {
 }
 
 export const getFormattedDate = (dt) => {
+    if(dt===null)return(null);
+
     const date = dt;
 
     const day = String(date.getDate()).padStart(2, '0');

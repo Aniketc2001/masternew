@@ -5,6 +5,7 @@ import SelectBoxDropdown from "./SelectBoxDropdown";
 import { SelectBox } from "devextreme-react";
 import MultivalSelectbox from "./MultivalSelectbox";
 import VvpcsSBRender from "./VvpcsSBRender";
+import { getFormattedDate } from "../../../shared/scripts/common";
 
 
 export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, baseObj, setbaseObj, ancillaryData, parentvvpcId, lineServiceContractList }) {
@@ -26,6 +27,11 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
 
       try{
         setPortTerminalName(selectedVvpc[0].PortTerminalName);
+        selectedVvpc[0].Eta = getFormattedDate(new Date(selectedVvpc[0].Eta));
+        selectedVvpc[0].Etd = getFormattedDate(new Date(selectedVvpc[0].Etd));
+        selectedVvpc[0].CutOffDate = getFormattedDate(new Date(selectedVvpc[0].CutOffDate));
+        selectedVvpc[0].EtaDestination = getFormattedDate(new Date(selectedVvpc[0].EtaDestination));
+
         setEta(selectedVvpc[0].Eta);
         setEtd(selectedVvpc[0].Etd);
         setCutOffDate(selectedVvpc[0].CutOffDate);
@@ -34,7 +40,9 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
 
         console.log(PortTerminalName);
       }
-      catch(ex){}
+      catch(ex){
+        console.log('vvpcid useeffect',ex);
+      }
     }
   }, [vvpcId])
 
