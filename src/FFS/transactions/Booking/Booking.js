@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Box, Paper, Snackbar, Stack, useMediaQuery, useTheme, MenuItem } from '@mui/material'
+import { Alert, Box, Paper, Snackbar, Stack, useMediaQuery, useTheme, MenuItem, TextField } from '@mui/material'
 import axios from 'axios';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -11,9 +11,15 @@ import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { alert, confirm } from 'devextreme/ui/dialog';
 import { getAssignedGrants, resolveControlGrant } from '../../../shared/scripts/common';
 import { getFormattedDate } from '../../../shared/scripts/common';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContentText from '@mui/material/DialogContentText';
 
 export default function Booking(props) {
   const m = new URLSearchParams(useLocation().search).get('m');
+  const clr = new URLSearchParams(useLocation().search).get('clr');
   const { id } = useParams();
   const navigate = useNavigate();
   const [ancillaryData, setancillaryData] = useState(null);
@@ -47,6 +53,8 @@ export default function Booking(props) {
   const [podId,setpodId] = useState(null);
   const [grantsObj, setGrantsObj] = useState(null);
   const [baseObjLoaded,setbaseObjLoaded] = useState(false);
+  const [openRejectDialog,setopenRejectDialog] = React.useState(false);
+  const [rejectReason,setrejectReason] = React.useState("");
   
   const hdr = {
     'mId': m
@@ -103,6 +111,48 @@ export default function Booking(props) {
     getAssignedGrants(hdr, setGrantsObj);
     // eslint-disable-next-line
   }, []);
+
+  const rejectBooking = () => {
+    const vl = confirm('Confirm Booking Cancellation?','Confirmation Alert');
+    vl.then((dialogResult) => {
+        if(dialogResult){
+          setopenRejectDialog(true);
+        }
+      });
+  }
+
+
+  const hideRejectDialog = () => {
+    setopenRejectDialog(false);
+  }
+
+  const rejectAction = () => {
+    console.log('Cancel booking reason...',rejectReason);
+    hideRejectDialog();
+    
+    const newbaseObj = manageCheckBoxFlags();
+    newbaseObj.CancellationRemarks = rejectReason;
+    console.log('during booking cancellation...new base obj...',newbaseObj,"baseObj...",baseObj);
+    
+    axios({
+      method: 'put',
+      url: 'Booking/cancelbooking',
+      data: newbaseObj,
+      headers: {
+        "mId": m
+      }
+    }).then((response) => {
+        alert('Booking reference number <b>' + baseObj.BookingReference + "</b> has been marked as <b>Cancelled</b>!",'Booking Cancellation');
+        navigate(-1);
+    }).catch((error) => {
+        if(error.response)
+            alert("Error occured while cancelling booking data..<br>" + error.response.data,"Cancel Booking Error");
+    })
+  }
+
+  const onRejectValChange = (e) => {
+    setrejectReason(e.target.value);
+  }
 
   const handleCloseNotificationBar = () => {
     setOpenNotificationBar(false);
@@ -179,17 +229,15 @@ export default function Booking(props) {
         headers: hdr
       }).then((response) => {
         let x = response.data;
-        console.log('cust details',x,customerId);
+        console.log('cust details',x,customerId,"bookingid- ",BookingId);
         setcustomerDetails(x);
-        if(baseObj.CreditNumberOfDays === null){
-          //baseObj.CreditNumberOfDays = x.CreditNumberOfDays;
-          setbaseObj(prevItem => ({ ...prevItem, CreditNumberOfDays: x.CreditNumberOfDays }));
+
+        if(BookingId==="0"){
+          if(baseObj.CreditNumberOfDays === null || baseObj.CreditNumberOfDays === ""){
+            setbaseObj(prevItem => ({ ...prevItem, "CreditNumberOfDays": x.CreditNumberOfDays }));
+          }
+          setbaseObj(prevItem => ({ ...prevItem, CreditBasisId: x.CreditBasisId, CreditBasisName: x.CreditBasisName}));
         }
-        
-        setbaseObj(prevItem => ({ ...prevItem, CreditBasisId: x.CreditBasisId, CreditBasisName: x.CreditBasisName}));
-        // baseObj.CreditBasisId = x.CreditBasisId;
-        // baseObj.CreditBasisName =  x.CreditBasisName;
-        // baseObj.CustomerName = x.CustomerName;
       }).catch((error) => {
         setcustomerDetails(null);
         if (error.response) {
@@ -252,10 +300,27 @@ export default function Booking(props) {
       }).then((response) => {
         let x = response.data;
         x.LineBLRequiredFlag = x.LineBLRequiredFlag === 'Y' ? true : false;
+        
+        console.log('b0');
+
+        if(clr==="d"){    //opening a copy of the existing booking
+          setBookingId("0");
+          x.BookingId = "0";
+          x.BookingReference = "";
+          x.BookingDate = getFormattedDate(new Date());
+          const updatedArray = x.BookingInventories.map(obj => {
+            return { ...obj, "BookingId": "0", "BookingInventoryId": -obj.BookingInventoryId };
+          });
+          x.BookingInventories = updatedArray;
+          x.StatusId = null;
+          x.CancellationRemarks = "";
+        }
+
         console.log('b1');
         if (BookingId === '0') {
           x.CreatedDate = '01-01-2023 10:10:10 PM';
           x.ModifiedDate = '01-01-2023 10:10:10 PM';
+          x.CreditNumberOfDays = "";
           x.BookingDate = getFormattedDate(new Date());
           x.BookingInventories = [];
         }
@@ -396,6 +461,7 @@ export default function Booking(props) {
           if(tId){
             setBookingId(tId);
             setbaseObj({...baseObj, BookingId: tId,BookingReference: x.BookingReference});
+            alert('Booking reference number generated as<br><br><b>' + x.BookingReference + "</b>",'Booking Save');
           }
 
           if(uact === "DRAFT"){
@@ -555,33 +621,30 @@ export default function Booking(props) {
                       bookingStatus === 'Draft' || bookingStatus === 'DRAFT' ?
                         <>
                           {resolveControlGrant(grantsObj,'btnReady')?<BxButton variant="primary" onClick={() => saveRecord('READY')} size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save</BxButton>:<></>}
-                          {resolveControlGrant(grantsObj,'btnCreate')?<BxButton variant="primary"  size='sm'>  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>:<></>}
                           {
                             BookingId !== '0' ?
-                            (resolveControlGrant(grantsObj,'btnCancel')?<BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>:<></>)
+                            (resolveControlGrant(grantsObj,'btnCancel')?<BxButton variant="primary" onClick={rejectBooking} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>:<></>)
                               : <></>
                           }
                         </> :
                         bookingStatus.toUpperCase() === 'READY' ?
                           <>
                             {resolveControlGrant(grantsObj,'btnReady')?<BxButton variant="primary" onClick={() => saveRecord('READY')} size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save</BxButton>:<></>}
-                            {resolveControlGrant(grantsObj,'btnCreate')?<BxButton variant="primary"  size='sm'>  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>:<></>}
-                            {resolveControlGrant(grantsObj,'btnCancel')?<BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>:<></>}
+                            {resolveControlGrant(grantsObj,'btnCancel')?<BxButton variant="primary" onClick={rejectBooking} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>:<></>}
                           </> :
                           bookingStatus.toUpperCase() === 'CONFIRMED' ?
                             <>
                             {resolveControlGrant(grantsObj,'btnReady')?<BxButton variant="primary" onClick={() => saveRecord('READY')} size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save</BxButton>:<></>}
-                            {resolveControlGrant(grantsObj,'btnCreate')?<BxButton variant="primary"  size='sm'>  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>:<></>}
-                            {resolveControlGrant(grantsObj,'btnCancel')?<BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>:<></>}                            </> :
+                            {resolveControlGrant(grantsObj,'btnCancel')?<BxButton variant="primary" onClick={rejectBooking} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>:<></>}                            </> :
                             bookingStatus.toUpperCase() === 'FINALIZED' ?
                               <>
                             {resolveControlGrant(grantsObj,'btnReady')?<BxButton variant="primary" onClick={() => saveRecord('READY')} size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save</BxButton>:<></>}
-                            {resolveControlGrant(grantsObj,'btnCreate')?<BxButton variant="primary"  size='sm'>  <i className="bi-arrow-right-square" style={{ marginRight: 10 }} ></i>Save as New</BxButton>:<></>}
-                            {resolveControlGrant(grantsObj,'btnCancel')?<BxButton variant="primary" onClick={() => saveRecord('CANCELLED')} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>:<></>}
+                            {resolveControlGrant(grantsObj,'btnCancel')?<BxButton variant="primary" onClick={rejectBooking} size='sm'>  <i className="bi bi-card-checklist" style={{ marginRight: 10 }} ></i>Cancel Booking</BxButton>:<></>}
                               </>
                               :
                               bookingStatus.toUpperCase() === 'CANCELLED' ?
                                 <>
+                                {resolveControlGrant(grantsObj,'btnReady')?<BxButton variant="primary" onClick={() => saveRecord('READY')} size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save</BxButton>:<></>}
                                 </>
                                 :
                                 <></>
@@ -592,6 +655,46 @@ export default function Booking(props) {
                     </BxButton>
                   </Stack>
                 </Box>
+                <Dialog open={openRejectDialog} onClose={hideRejectDialog} fullWidth={true} maxWidth={'sm'}>
+                  <DialogTitle>Cancel Booking</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      Specify reason for cancelling this booking:<br/><br/><br/>
+                    </DialogContentText>
+                    <TextField
+                      onChange={(evt) => onRejectValChange(evt)}
+                      autoFocus
+                      margin="dense"
+                      name="rejectReason"
+                      id="rejectReason"
+                      value={rejectReason}
+                      label="Specify cancellation reasons"
+                      fullWidth
+                      variant="standard"
+                      autoComplete='off'
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                      <BxButton
+                        type="primary"
+                        size="sm"
+                        onClick={rejectAction}
+                        style={{ textTransform: "none" }}
+                      >
+                        <i className={'bi-terminal-x'} style={{ fontSize: '10pt', marginRight: '10px'}} />
+                        Cancel Booking
+                      </BxButton>          
+                      <BxButton
+                        type="primary"
+                        size="sm"
+                        onClick={hideRejectDialog}
+                        style={{ textTransform: "none" }}
+                      >
+                        <i className={'bi-x-square-fill'} style={{ fontSize: '10pt', marginRight: '10px'}} />
+                        Close
+                      </BxButton>          
+                  </DialogActions>
+                </Dialog>                     
               </Paper>
             </Box>
           </Box>

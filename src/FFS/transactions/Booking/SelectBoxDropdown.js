@@ -40,11 +40,12 @@ export default function SelectBoxDropdown({ dataSource, setpropName,setpropId,ba
                 setpropId(e.value);
         }
         catch(ex){
-            //console.log('ex2',ex);
+            console.log('ex2',ex,e);
         }
         
         let valueExpr = e.component.option("name");
         if(typeof e.value !== 'undefined'){
+            console.log('setting value of ',valueExpr,e.value);
             setbaseObj(prevItem => ({ ...prevItem, [valueExpr]: e.value }));
         //    baseObj[valueExpr] = e.value;
         }

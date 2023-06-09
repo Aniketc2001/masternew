@@ -105,7 +105,7 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-        <Box sx={{ display: "flex", p:0, m:0, minHeight:'100vh' }} className="AppBackgroundCanvas" >
+        <Box sx={{ display: "flex", p:0, m:0, minHeight:'100vh',minWidth:'99vh',overflow:'hidden' }} className="AppBackgroundCanvas" >
         <CssBaseline />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
     <BrowserRouter>
@@ -124,111 +124,111 @@ function App() {
          <SideBarNav open={open} setOpen={setOpen} reloadMenu={reloadMenu} /></>:<></>} 
 
     {/* <Navbar setToken={setToken} /> */}
-    <Box component="main" sx={{ flexGrow: 1, p: 0, m: 0 , height: "120%", width: '80vw' }}>
+    <Box component="main" sx={{ flexGrow: 1, p: 0, m: 0 , height: "120%", width: '80vw', overflow: 'none' }}>
       <DrawerHeader />
       <Container fluid sx={{p:0,m: 0}}>
-    <Routes>
-      <Route path="/" element={<UserDashboard />} />
+      <Routes>
+        <Route path="/" element={<UserDashboard />} />
 
-      <Route path="/appList" element={<MasterListPageCx mId="App"/>} />
-      <Route path="/systemConfigList" element={<MasterListPageCx mId="System Config"/>} />
-      <Route path="/lookupSetList" element={<MasterListPageCx mId="Lookup Set"/>} />
-      <Route path="/lookupItemList" element={<MasterListPageCx mId="Lookup Item"/>} />
-      <Route path="/menuList" element={<MasterListPageCx mId="Menu"/>} />
-      <Route path="/fieldMetaDatumList" element={<MasterListPageCx mId="Field Meta Data"/>} />
-      <Route path="/statusList" element={<MasterListPageCx mId="Status"/>} />
-      <Route path="/dbConstraintList" element={<MasterListPageCx mId="DB Constraints"/>} />
-      <Route path="/accessLevelList" element={<AccessLevelList mId="Access Level & Rights"/>} />
-      <Route path="/systemUserList" element={<MasterListPageCx mId="System Users"/>} />
-      <Route path="/dataFilterList" element={<MasterListPageCx mId="Data Filters"/>} />
-      <Route path="/companyGroupList" element={<MasterListPageCx mId="Company Group"/>} />
-      <Route path="/companyList" element={<MasterListPageCx mId="Company"/>} />
-      <Route path="/branchList" element={<MasterListPageCx mId="Branch"/>} />
-      <Route path="/departmentList" element={<MasterListPageCx mId="Department"/>} />
-      <Route path="/holidayList" element={<MasterListPageCx mId="Holiday"/>} />
-      <Route path="/countryList" element={<MasterListPageCx mId="Country"/>} />
-      <Route path="/sectorList" element={<MasterListPageCx mId="Sector"/>} />
-      <Route path="/stateList" element={<MasterListPageCx mId="State"/>} />
-      <Route path="/cityList" element={<MasterListPageCx mId="City"/>} />
-      <Route path="/bankList" element={<MasterListPageCx mId="Banks"/>} />
-      <Route path="/bankAccountList" element={<MasterListPageCx mId="Bank Accounts"/>} />
-      <Route path="/currencyList" element={<MasterListPageCx mId="Currency"/>} />
-      <Route path="/exchangeRateList" element={<MasterListPageCx mId="Exchange Rate"/>} />
-      <Route path="/productList" element={<MasterListPageCx mId="Product"/>} />
-      <Route path="/commodityList" element={<MasterListPageCx mId="Commodity"/>} />
-      <Route path="/imoClassList" element={<MasterListPageCx mId="IMO Class"/>} />
-      <Route path="/imoUnNumberList" element={<MasterListPageCx mId="IMO UN Number"/>} />
-      <Route path="/containerSizeTypeList" element={<MasterListPageCx mId="Container Size Type"/>} />
-      <Route path="/vesselList" element={<MasterListPageCx mId="Vessel"/>} />
-      <Route path="/vesselServiceList" element={<MasterListPageCx mId="VesselService"/>} />
-      <Route path="/vesselVoyagePortList" element={<MasterListPageCx mId="VesselVoyagePort"/>} />
-      <Route path="/portList" element={<MasterListPageCx mId="Port"/>} />
-      <Route path="/partyList" element={<MasterListPageCx mId="Party & Types" viewState={viewState} setViewState={setViewState}/>} />
-      <Route path="/partyAddressList" element={<MasterListPageCx mId="Party Address & Contacts"/>} />
-      <Route path="/partyCommunicationList" element={<MasterListPageCx mId="Party Communication"/>} />
-      <Route path="/rebatePartyList" element={<MasterListPageCx mId="Rebate Party"/>} />
-      <Route path="/partySalesMapList" element={<MasterListPageCx mId="Party Sales Map"/>} />
-      <Route path="/locationList" element={<MasterListPageCx mId="Location"/>} />
-      <Route path="/commodityCategoryList" element={<MasterListPageCx mId="Commodity Category"/>} />
-      <Route path="/crmTeamList" element={<MasterListPageCx mId="CRM Team"/>} />
-      <Route path="/lineServiceContractList" element={<MasterListPageCx mId="Line Service Contract List"/>} />
-      <Route path="/bookingList" element={<BookingList mId="Port" viewState={viewState} setViewState={setViewState} />} />
+        <Route path="/appList" element={<MasterListPageCx mId="App"/>} />
+        <Route path="/systemConfigList" element={<MasterListPageCx mId="System Config"/>} />
+        <Route path="/lookupSetList" element={<MasterListPageCx mId="Lookup Set"/>} />
+        <Route path="/lookupItemList" element={<MasterListPageCx mId="Lookup Item"/>} />
+        <Route path="/menuList" element={<MasterListPageCx mId="Menu"/>} />
+        <Route path="/fieldMetaDatumList" element={<MasterListPageCx mId="Field Meta Data"/>} />
+        <Route path="/statusList" element={<MasterListPageCx mId="Status"/>} />
+        <Route path="/dbConstraintList" element={<MasterListPageCx mId="DB Constraints"/>} />
+        <Route path="/accessLevelList" element={<AccessLevelList mId="Access Level & Rights"/>} />
+        <Route path="/systemUserList" element={<MasterListPageCx mId="System Users"/>} />
+        <Route path="/dataFilterList" element={<MasterListPageCx mId="Data Filters"/>} />
+        <Route path="/companyGroupList" element={<MasterListPageCx mId="Company Group"/>} />
+        <Route path="/companyList" element={<MasterListPageCx mId="Company"/>} />
+        <Route path="/branchList" element={<MasterListPageCx mId="Branch"/>} />
+        <Route path="/departmentList" element={<MasterListPageCx mId="Department"/>} />
+        <Route path="/holidayList" element={<MasterListPageCx mId="Holiday"/>} />
+        <Route path="/countryList" element={<MasterListPageCx mId="Country"/>} />
+        <Route path="/sectorList" element={<MasterListPageCx mId="Sector"/>} />
+        <Route path="/stateList" element={<MasterListPageCx mId="State"/>} />
+        <Route path="/cityList" element={<MasterListPageCx mId="City"/>} />
+        <Route path="/bankList" element={<MasterListPageCx mId="Banks"/>} />
+        <Route path="/bankAccountList" element={<MasterListPageCx mId="Bank Accounts"/>} />
+        <Route path="/currencyList" element={<MasterListPageCx mId="Currency"/>} />
+        <Route path="/exchangeRateList" element={<MasterListPageCx mId="Exchange Rate"/>} />
+        <Route path="/productList" element={<MasterListPageCx mId="Product"/>} />
+        <Route path="/commodityList" element={<MasterListPageCx mId="Commodity"/>} />
+        <Route path="/imoClassList" element={<MasterListPageCx mId="IMO Class"/>} />
+        <Route path="/imoUnNumberList" element={<MasterListPageCx mId="IMO UN Number"/>} />
+        <Route path="/containerSizeTypeList" element={<MasterListPageCx mId="Container Size Type"/>} />
+        <Route path="/vesselList" element={<MasterListPageCx mId="Vessel"/>} />
+        <Route path="/vesselServiceList" element={<MasterListPageCx mId="VesselService"/>} />
+        <Route path="/vesselVoyagePortList" element={<MasterListPageCx mId="VesselVoyagePort"/>} />
+        <Route path="/portList" element={<MasterListPageCx mId="Port"/>} />
+        <Route path="/partyList" element={<MasterListPageCx mId="Party & Types" viewState={viewState} setViewState={setViewState}/>} />
+        <Route path="/partyAddressList" element={<MasterListPageCx mId="Party Address & Contacts"/>} />
+        <Route path="/partyCommunicationList" element={<MasterListPageCx mId="Party Communication"/>} />
+        <Route path="/rebatePartyList" element={<MasterListPageCx mId="Rebate Party"/>} />
+        <Route path="/partySalesMapList" element={<MasterListPageCx mId="Party Sales Map"/>} />
+        <Route path="/locationList" element={<MasterListPageCx mId="Location"/>} />
+        <Route path="/commodityCategoryList" element={<MasterListPageCx mId="Commodity Category"/>} />
+        <Route path="/crmTeamList" element={<MasterListPageCx mId="CRM Team"/>} />
+        <Route path="/lineServiceContractList" element={<MasterListPageCx mId="Line Service Contract List"/>} />
+        <Route path="/bookingList" element={<BookingList mId="Port" viewState={viewState} setViewState={setViewState} />} />
 
-      <Route path="/appEdit/:id" element={<MasterEditCx mId="App"/>} />
-      <Route path="/systemConfigEdit/:id" element={<MasterEditCx mId="System Config"/>} />
-      <Route path="/lookupSetEdit/:id" element={<MasterEditCx mId="Lookup Set"/>} />
-      <Route path="/lookupItemEdit/:id" element={<MasterEditCx mId="Lookup Item"/>} />
-      <Route path="/menuEdit/:id" element={<MasterEditPageMultiLevel mId="Menu"/>} /> 
-      <Route path="/fieldMetaDatumEdit/:id" element={<MasterEditCx mId="Field Meta Data"/>} />
-      <Route path="/statusEdit/:id" element={<MasterEditCx mId="Status"/>} />
-      <Route path="/dbConstraintEdit/:id" element={<MasterEditCx mId="DB Constraints"/>} />
-      <Route path="/accessLevelEdit/:id" element={<MasterEditCx mId="Access Level & Rights"/>} />
-      <Route path="/systemUserEdit/:id" element={<MasterEditPageMultiLevel mId="System Users"/>} />
-      <Route path="/dataFilterEdit/:id" element={<MasterEditCx mId="Data Filters"/>} />
-      <Route path="/companyGroupEdit/:id" element={<MasterEditCx mId="Company Group"/>} />
-      <Route path="/companyEdit/:id" element={<MasterEditCx mId="Company"/>} />
-      <Route path="/branchEdit/:id" element={<MasterEditCx mId="Branch"/>} />
-      <Route path="/departmentEdit/:id" element={<MasterEditCx mId="Department"/>} />
-      <Route path="/holidayEdit/:id" element={<MasterEditCx mId="Holiday"/>} />
-      <Route path="/countryEdit/:id" element={<MasterEditCx mId="Country"/>} />
-      <Route path="/sectorEdit/:id" element={<MasterEditCx mId="Sector"/>} />
-      <Route path="/stateEdit/:id" element={<MasterEditCx mId="State"/>} />
-      <Route path="/cityEdit/:id" element={<MasterEditCx mId="City"/>} />
-      <Route path="/bankEdit/:id" element={<MasterEditCx mId="Banks"/>} />
-      <Route path="/bankAccountEdit/:id" element={<MasterEditCx mId="Bank Accounts"/>} />
-      <Route path="/currencyEdit/:id" element={<MasterEditCx mId="Currency"/>} />
-      <Route path="/exchangeRateEdit/:id" element={<MasterEditCx mId="Exchange Rate"/>} />
-      <Route path="/productEdit/:id" element={<MasterEditCx mId="Product"/>} />
-      <Route path="/commodityEdit/:id" element={<MasterEditCx mId="Commodity"/>} />
-      <Route path="/imoClassEdit/:id" element={<MasterEditCx mId="IMO Class"/>} />
-      <Route path="/imoUnNumberEdit/:id" element={<MasterEditCx mId="IMO UN Number"/>} />
-      <Route path="/containerSizeTypeEdit/:id" element={<MasterEditCx mId="Container Size Type"/>} />
-      <Route path="/vesselEdit/:id" element={<MasterEditCx mId="Vessel"/>} />
-      <Route path="/vesselServiceEdit/:id" element={<MasterEditPageMultiLevel mId="VesselService"/>} />
-      <Route path="/vesselVoyagePortEdit/:id" element={<MasterEditCx mId="VesselVoyagePort"/>} />
-      <Route path="/portEdit/:id" element={<MasterEditPageMultiLevel mId="Port"/>} />
-      <Route path="/partyFullEdit/:id" element={<PartyMaster />} />
-      <Route path="/partyListEdit/:id" element={<MasterEditCx mId="Party & Types"/>} />
-      <Route path="/partyAddressListEdit/:id" element={<MasterEditPageMultiLevel mId="Party Address & Contacts"/>} />
-      <Route path="/partyCommunicationListEdit/:id" element={<MasterEditCx mId="Party Communication"/>} />
-      <Route path="/rebatePartyListEdit/:id" element={<MasterEditCx mId="Rebate Party"/>} />
-      <Route path="/partySalesMapEdit/:id" element={<MasterEditCx mId="Party Sales Map"/>} />
-      <Route path="/locationEdit/:id" element={<MasterEditCx mId="Location"/>} />
-      <Route path="/commodityCategoryEdit/:id" element={<MasterEditCx mId="Commodity Category"/>} />
-      <Route path="/crmTeamEdit/:id" element={<MasterEditPageMultiLevel mId="CRM Team"/>} />
-      <Route path="/lineServiceContractEdit/:id" element={<MasterEditCx mId="Line Service Contract"/>} />
-      <Route path="/bookingEdit/:id" element={<BookingEdit mId="Port" setOpen={setOpen}/>} />
+        <Route path="/appEdit/:id" element={<MasterEditCx mId="App"/>} />
+        <Route path="/systemConfigEdit/:id" element={<MasterEditCx mId="System Config"/>} />
+        <Route path="/lookupSetEdit/:id" element={<MasterEditCx mId="Lookup Set"/>} />
+        <Route path="/lookupItemEdit/:id" element={<MasterEditCx mId="Lookup Item"/>} />
+        <Route path="/menuEdit/:id" element={<MasterEditPageMultiLevel mId="Menu"/>} /> 
+        <Route path="/fieldMetaDatumEdit/:id" element={<MasterEditCx mId="Field Meta Data"/>} />
+        <Route path="/statusEdit/:id" element={<MasterEditCx mId="Status"/>} />
+        <Route path="/dbConstraintEdit/:id" element={<MasterEditCx mId="DB Constraints"/>} />
+        <Route path="/accessLevelEdit/:id" element={<MasterEditCx mId="Access Level & Rights"/>} />
+        <Route path="/systemUserEdit/:id" element={<MasterEditPageMultiLevel mId="System Users"/>} />
+        <Route path="/dataFilterEdit/:id" element={<MasterEditCx mId="Data Filters"/>} />
+        <Route path="/companyGroupEdit/:id" element={<MasterEditCx mId="Company Group"/>} />
+        <Route path="/companyEdit/:id" element={<MasterEditCx mId="Company"/>} />
+        <Route path="/branchEdit/:id" element={<MasterEditCx mId="Branch"/>} />
+        <Route path="/departmentEdit/:id" element={<MasterEditCx mId="Department"/>} />
+        <Route path="/holidayEdit/:id" element={<MasterEditCx mId="Holiday"/>} />
+        <Route path="/countryEdit/:id" element={<MasterEditCx mId="Country"/>} />
+        <Route path="/sectorEdit/:id" element={<MasterEditCx mId="Sector"/>} />
+        <Route path="/stateEdit/:id" element={<MasterEditCx mId="State"/>} />
+        <Route path="/cityEdit/:id" element={<MasterEditCx mId="City"/>} />
+        <Route path="/bankEdit/:id" element={<MasterEditCx mId="Banks"/>} />
+        <Route path="/bankAccountEdit/:id" element={<MasterEditCx mId="Bank Accounts"/>} />
+        <Route path="/currencyEdit/:id" element={<MasterEditCx mId="Currency"/>} />
+        <Route path="/exchangeRateEdit/:id" element={<MasterEditCx mId="Exchange Rate"/>} />
+        <Route path="/productEdit/:id" element={<MasterEditCx mId="Product"/>} />
+        <Route path="/commodityEdit/:id" element={<MasterEditCx mId="Commodity"/>} />
+        <Route path="/imoClassEdit/:id" element={<MasterEditCx mId="IMO Class"/>} />
+        <Route path="/imoUnNumberEdit/:id" element={<MasterEditCx mId="IMO UN Number"/>} />
+        <Route path="/containerSizeTypeEdit/:id" element={<MasterEditCx mId="Container Size Type"/>} />
+        <Route path="/vesselEdit/:id" element={<MasterEditCx mId="Vessel"/>} />
+        <Route path="/vesselServiceEdit/:id" element={<MasterEditPageMultiLevel mId="VesselService"/>} />
+        <Route path="/vesselVoyagePortEdit/:id" element={<MasterEditCx mId="VesselVoyagePort"/>} />
+        <Route path="/portEdit/:id" element={<MasterEditPageMultiLevel mId="Port"/>} />
+        <Route path="/partyFullEdit/:id" element={<PartyMaster />} />
+        <Route path="/partyListEdit/:id" element={<MasterEditCx mId="Party & Types"/>} />
+        <Route path="/partyAddressListEdit/:id" element={<MasterEditPageMultiLevel mId="Party Address & Contacts"/>} />
+        <Route path="/partyCommunicationListEdit/:id" element={<MasterEditCx mId="Party Communication"/>} />
+        <Route path="/rebatePartyListEdit/:id" element={<MasterEditCx mId="Rebate Party"/>} />
+        <Route path="/partySalesMapEdit/:id" element={<MasterEditCx mId="Party Sales Map"/>} />
+        <Route path="/locationEdit/:id" element={<MasterEditCx mId="Location"/>} />
+        <Route path="/commodityCategoryEdit/:id" element={<MasterEditCx mId="Commodity Category"/>} />
+        <Route path="/crmTeamEdit/:id" element={<MasterEditPageMultiLevel mId="CRM Team"/>} />
+        <Route path="/lineServiceContractEdit/:id" element={<MasterEditCx mId="Line Service Contract"/>} />
+        <Route path="/bookingEdit/:id" element={<BookingEdit mId="Port" setOpen={setOpen}/>} />
 
-      <Route path="/accessLevelManage/:id" element={<AccessLevelManage />} />
+        <Route path="/accessLevelManage/:id" element={<AccessLevelManage />} />
 
-      <Route path="/emplist" element={<EmployeeList />} />
-      <Route path="/empedit/:id" element={<EmployeeEdit />} />
-      <Route path="/userlist" element={<SystemUserList />} />
-      <Route path="/useredit/:id" element={<SystemUserEdit />} />
-      <Route path="/checkerInbox" element={<CheckerInboxCx />} />
-      <Route path="/makerOutbox" element={<CheckerOutboxCx />} />
-    </Routes>
-    </Container>
+        <Route path="/emplist" element={<EmployeeList />} />
+        <Route path="/empedit/:id" element={<EmployeeEdit />} />
+        <Route path="/userlist" element={<SystemUserList />} />
+        <Route path="/useredit/:id" element={<SystemUserEdit />} />
+        <Route path="/checkerInbox" element={<CheckerInboxCx />} />
+        <Route path="/makerOutbox" element={<CheckerOutboxCx />} />
+      </Routes>
+      </Container>
     </Box>
     </BrowserRouter>
     </LocalizationProvider>

@@ -95,6 +95,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 function TopBarNav(props) {
   const [objref, setObjref] = useState(null);
+  const [objAppref, setObjAppref] = useState(null);
 
   const [popoverFlag, setpopoverFlag] = useState(false);
   const [appmenupopoverFlag, setappmenupopoverFlag] = useState(false);
@@ -130,12 +131,14 @@ function TopBarNav(props) {
 
   const showPopover = (event) => {
     setObjref(event.currentTarget);
+    console.log('account ref',objref);
     setpopoverFlag(!popoverFlag);
   };
 
   //Application menu flag setting functions
   const showApplicationMenuPopover = (event) => {
-    setObjref(event.currentTarget);
+    setObjAppref(event.currentTarget);
+    console.log('app ref',objAppref);
     setappmenupopoverFlag(!appmenupopoverFlag);
   };
 
@@ -220,7 +223,7 @@ function TopBarNav(props) {
               sx={{ fontSize: "16pt" }}
             ></i>
             <ApplicationMenuPopover
-              objref={objref}
+              objAppref={objAppref}
               id={"accountAvatar"}
               userInfo={props.userInfo}
               popoverFlag={appmenupopoverFlag}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Grid, TextField, Box, Paper } from '@mui/material'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DatePicker, DateTimePicker } from '@mui/x-date-pickers';
 import SelectBoxDropdown from "./SelectBoxDropdown";
 import { SelectBox } from "devextreme-react";
 import MultivalSelectbox from "./MultivalSelectbox";
@@ -17,11 +17,12 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
   const [CutOffDate, setCutOffDate] = useState('');
   const [EtdatDest, setEtdatDest] = useState(baseObj.DestinationETA);
 
+  console.log('Line baseObj',baseObj);
 
   useEffect(() => {
     const selectedVvpc = vesselVoyageList.filter((data) => data.VesselVoyagePortId === vvpcId);
     if(selectedVvpc){
-      //console.log(selectedVvpc);
+      console.log('vvpc pre select',selectedVvpc);
       setVvpcDetails(selectedVvpc[0]);
       console.log('vvpc',vvpcDetails);
 
@@ -35,8 +36,20 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
         setEta(selectedVvpc[0].Eta);
         setEtd(selectedVvpc[0].Etd);
         setCutOffDate(selectedVvpc[0].CutOffDate);
-        setEtdatDest(selectedVvpc[0].EtaDestination);
-        setbaseObj({...baseObj, DestinationETA: selectedVvpc[0].EtaDestination, PortTerminalId: selectedVvpc[0].PortTerminalId  });
+
+        console.log('vvpc eta',baseObj.DestinationETA);
+
+        if(!baseObj.DestinationETA){
+          console.log('vvpc setting revised eta',selectedVvpc[0].EtaDestination);
+
+          if(selectedVvpc[0].EtaDestination !== "01-Jan-1970"){
+            setEtdatDest(selectedVvpc[0].EtaDestination);
+            setbaseObj({...baseObj, "DestinationETA": selectedVvpc[0].EtaDestination});
+            baseObj.DestinationETA = selectedVvpc[0].EtaDestination;
+          }
+        }
+  
+        setbaseObj({...baseObj, "PortTerminalId": selectedVvpc[0].PortTerminalId});
 
         console.log(PortTerminalName);
       }
@@ -54,19 +67,22 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
   },[PortTerminalName])
 
   const onDateValChange = (fieldName) => (value) => {
-    setbaseObj({ ...baseObj, [fieldName]: value });
+    var dt = new Date(value);
+    const midnightDate = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 0, 0, 0);
+    console.log('revised date',midnightDate);      
+    setbaseObj({...baseObj, [fieldName]: getFormattedDate(new Date(midnightDate)) });
   }
 
   const onValChange = (e) => {
     if (e.target.type === 'checkbox')
-      setbaseObj({ ...baseObj, [e.target.name]: e.target.checked ? true : false });
+      setbaseObj({...baseObj, [e.target.name]: e.target.checked ? true : false });
     else
-      setbaseObj({ ...baseObj, [e.target.name]: e.target.value });
+      setbaseObj({...baseObj, [e.target.name]: e.target.value });
   }
 
   const handleValueChange = (e) => {
     let valueExpr = e.component.option("name");
-    setbaseObj({ ...baseObj, [valueExpr]: e.value });
+    setbaseObj({...baseObj, [valueExpr]: e.value });
   };
 
 
@@ -97,6 +113,8 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
                       value={baseObj.LineBookingDate}
                       onChange={onDateValChange('LineBookingDate')}
                       name="LineBookingDate"
+                      variant="dialog" // or variant="inline"
+                      inputFormat="DD-MMM-YYYY"
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -106,6 +124,8 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
                       value={baseObj.LineBookingValidity}
                       onChange={onDateValChange('LineBookingValidity')}
                       name="LineBookingValidity"
+                      variant="dialog" // or variant="inline"
+                      inputFormat="DD-MMM-YYYY"
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -115,6 +135,8 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
                       value={baseObj.SiCutOffDate}
                       onChange={onDateValChange('SiCutOffDate')}
                       name="SiCutOffDate"
+                      variant="dialog" // or variant="inline"
+                      inputFormat="DD-MMM-YYYY"
                     />
                   </Grid>
                   <Grid item xs={12} alignSelf='end'>
@@ -145,7 +167,7 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
                 <p style={{ fontWeight: 'bold' }}>Vessel Information</p>
                 <Grid container spacing={2}  >
                   <Grid item xs={12} alignSelf='end'>
-                    <MultivalSelectbox
+                    <SelectBoxDropdown
                       dataSource={vesselVoyageList}
                       itemRenderJsx={VvpcsSBRender}
                       baseObj={baseObj}
@@ -153,7 +175,7 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
                       setpropId={setvvpcId}
                       setpropName={setvesselVoyage}
                       value={baseObj.VesselVoyagePortId}
-                      data={{ name: "VesselVoyagePortId", label: "Vessel Voyage", displayExpr: "VesselVoyagePortName", valueExpr: "VesselVoyagePortId", searchExpr: "VesselVoyagePortName" }}
+                      data={{ name: "VesselVoyagePortId", label: "Vessel Voyage", displayExpr: "Vvpc", valueExpr: "VesselVoyagePortId", searchExpr: "Vvpc" }}
                     />
 
                   </Grid>
@@ -189,6 +211,8 @@ export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, base
                       value={baseObj.DestinationETA}
                       onChange={onDateValChange('DestinationETA')}
                       name="DestinationETA"
+                      variant="dialog" // or variant="inline"
+                      inputFormat="DD-MMM-YYYY"
                     />
                   </Grid>
                 </Grid>

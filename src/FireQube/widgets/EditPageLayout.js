@@ -287,8 +287,9 @@ export default function EditPageLayout(props) {
           }).catch((error) => {
               if(error.response){
                   console.log(error.response);
-                  setnotificationBarMessage("Error occured while saving data.." + error.response.data);
-                  setOpenNotificationBar(true);            
+                  alert(error.response.data,"Error occured while saving data");
+                  //setnotificationBarMessage("Error occured while saving data.." + error.response.data);
+                  //setOpenNotificationBar(true);            
               }
           })
         }
@@ -514,7 +515,7 @@ export default function EditPageLayout(props) {
                   name={column.TableFieldName}
                   displayExpr={displayFieldName}
                   valueExpr={valueFieldName}
-                  value={baseObj[`${column.TableFieldName}`] }
+                  value={baseObj[column.TableFieldName] }
                   searchEnabled={true}
                   searchMode='contains'
                   searchExpr={displayFieldName}

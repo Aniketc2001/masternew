@@ -18,7 +18,10 @@ export default function GeneralInformationTab({ baseObj,setshippingLine, setship
 
     const onDateValChange = (fieldName) => (value) => {
         //console.log('dt',value,getFormattedDate(new Date(value)));
-        setbaseObj({ ...baseObj, [fieldName]: getFormattedDate(new Date(value)) });
+        var dt = new Date(value);
+        const midnightDate = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 0, 0, 0);
+        console.log('revised date',midnightDate);      
+        setbaseObj({ ...baseObj, [fieldName]: getFormattedDate(new Date(midnightDate)) });
     }
 
     const onValChange = (e) => {
@@ -35,6 +38,8 @@ export default function GeneralInformationTab({ baseObj,setshippingLine, setship
         e.preventDefault();
         }
     }
+
+    //console.log(ancillaryData);
 
     return (
         <>
@@ -67,7 +72,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine, setship
                                                     data={{ name: "CustomerId", label: "Customer", displayExpr: "CustomerName", valueExpr: "CustomerId", searchExpr: "CustomerName" }}
                                                 />
                                             </Grid>
-                                            <Grid item xs={12} sx={{backgroundColor:'#efefef'}}>
+                                            <Grid item xs={12} >
                                                 <Grid container spacing={1}>
                                                     <Grid item xs={4}>
                                                         <SelectBoxDropdown
@@ -77,7 +82,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine, setship
                                                             baseObj={baseObj}
                                                             setbaseObj={setbaseObj}
                                                             value={baseObj.CreditBasisId}
-                                                            data={{ name: "creditBasisId", label: "Credit Basis", displayExpr: "LookupItemName", valueExpr: "LookupItemId", searchExpr: "LookupItemName" }}
+                                                            data={{ name: "CreditBasisId", label: "Credit Basis", displayExpr: "LookupItemName", valueExpr: "LookupItemId", searchExpr: "LookupItemName" }}
                                                         />
                                                     </Grid>
                                                     <Grid item xs={4}>
@@ -240,6 +245,8 @@ export default function GeneralInformationTab({ baseObj,setshippingLine, setship
                                                 value={baseObj.BookingDate}
                                                 onChange={onDateValChange('BookingDate')}
                                                 name="BookingDate"
+                                                variant="dialog" // or variant="inline"
+                                                inputFormat="DD-MMM-YYYY"
                                             />
                                         </Grid>
                                         <Grid item lg={4} sm={4} xs={6}>

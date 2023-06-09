@@ -206,10 +206,8 @@ export default function PartyMaster() {
           navigate(-1);
         }).catch((error) => {
           if (error.response) {
-            if (error.response.status === 417) {
-              setnotificationBarMessage("Error occured while approving data.." + error.response.data);
-              setOpenNotificationBar(true);
-            }
+            console.log(error.response);
+            alert(error.response.data,"Error occured while approving party");
           }
         })
       }
@@ -228,10 +226,8 @@ export default function PartyMaster() {
           navigate(-1);
         }).catch((error) => {
           if (error.response) {
-            if (error.response.status === 417) {
-              setnotificationBarMessage("Error occured while deleting data.." + error.response.data);
-              setOpenNotificationBar(true);
-            }
+            console.log(error.response);
+            alert(error.response.data,"Errors occured while deleting party");
           }
         })
       }
@@ -264,10 +260,8 @@ export default function PartyMaster() {
       navigate(-1);
     }).catch((error) => {
       if (error.response) {
-        if (error.response.status === 417) {
-          setnotificationBarMessage("Error occured while rejecting data.." + error.response.data);
-          setOpenNotificationBar(true);
-        }
+        console.log(error.response);
+        alert(error.response.data,"Error occured while rejecting party");
       }
     })
   }
@@ -404,8 +398,9 @@ export default function PartyMaster() {
         }).catch((error) => {
           if (error.response) {
             console.log(error.response);
-            setnotificationBarMessage("Error occured while saving data.." + error.response.data);
-            setOpenNotificationBar(true);
+            alert(error.response.data,"Error occured while saving data");
+            //setnotificationBarMessage("Error occured while saving data.." + error.response.data);
+            //setOpenNotificationBar(true);
           }
         })
       }

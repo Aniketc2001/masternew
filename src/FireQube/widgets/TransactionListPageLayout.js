@@ -58,9 +58,13 @@ export default function TransactionListPageLayout(props) {
   const maxToDate = new Date(2030, 11, 31);
   const [toDate, setToDate] = React.useState(new Date());
 
+  const [tmpfromDate, settmpFromDate] = React.useState(new Date());
+  const [tmptoDate, settmpToDate] = React.useState(new Date());
+
+
   const [dateMsg, setDateMsg] = useState(null);
   const [datebtn, setDateBtn] = useState("TODAY");
-
+  const [selectedRow, setSelectedRow] = useState(null);
   
   const [checkerInfo,setCheckerInfo] = useState({
     CheckedBy: '',
@@ -91,7 +95,7 @@ export default function TransactionListPageLayout(props) {
   };
 
   useEffect(() => {
-    console.log("viewstate",props.viewState);
+//    console.log("viewstate",props.viewState);
     setdisplayDataGrid(false);
     getRecords();
     if(props.APIName === props.viewState.listPageName)
@@ -113,7 +117,7 @@ export default function TransactionListPageLayout(props) {
      // fltr = 
     }
     catch(ex){}
-    console.log('currpage',currpage,'pagesize',displayPageSize);
+//    console.log('currpage',currpage,'pagesize',displayPageSize);
     props.setViewState({...props.viewState, dataSource: gridDataSource, pageSize: displayPageSize, pageNumber: currpage, listPageName: props.APIName, datebtn: datebtn, filter: fltr });
   }
 
@@ -124,7 +128,7 @@ export default function TransactionListPageLayout(props) {
     var todt = getFormattedDate(sevenDaysAgo);
 
     setDateBtn('LAST7DAYS');
-    props.setViewState({...props.viewState, fromDate: todt, toDate: frdt, datebtn: 'LAST7DAYS' });
+    props.setViewState({...props.viewState, "fromDate": todt, "toDate": frdt, "datebtn": 'LAST7DAYS' });
     props.viewState.fromDate = todt;
     props.viewState.toDate = frdt;
     props.viewState.datebtn = 'LAST7DAYS';
@@ -137,7 +141,7 @@ export default function TransactionListPageLayout(props) {
     var todt = getFormattedDate(new Date());
 
     setDateBtn('TODAY');
-    props.setViewState({...props.viewState, fromDate: todt, toDate: frdt, datebtn: 'TODAY' });
+    props.setViewState({...props.viewState, "fromDate": todt, "toDate": frdt, "datebtn": 'TODAY' });
     props.viewState.fromDate = todt;
     props.viewState.toDate = frdt;
     props.viewState.datebtn = 'TODAY';
@@ -152,7 +156,7 @@ export default function TransactionListPageLayout(props) {
     var todt = getFormattedDate(thirtyDaysAgo);
 
     setDateBtn('LAST30DAYS');
-    props.setViewState({...props.viewState, fromDate: todt, toDate: frdt, datebtn: 'LAST30DAYS' });
+    props.setViewState({...props.viewState, "fromDate": todt, "toDate": frdt, "datebtn": 'LAST30DAYS' });
     props.viewState.fromDate = todt;
     props.viewState.toDate = frdt;
     props.viewState.datebtn = 'LAST30DAYS';
@@ -162,30 +166,40 @@ export default function TransactionListPageLayout(props) {
 
   const handleCustomDatesClick = (event) => {
     console.log('event',event);
+    settmpFromDate(fromDate);
+    settmpToDate(toDate);
     setAnchorElDates(event.currentTarget);
     setOpenDatesPopover(true);
   }
 
+  const handleCustomPopupClose = () => {
+    setOpenDatesPopover(false);
+  }
+
   const handleCustomDatesClose = () => {
     // Check if both from date and to date are selected
-    if (!fromDate || !toDate) {
+    if (!tmpfromDate || !tmptoDate) {
       alert('Please specify the date range!');
       return;
     }
 
     // Check if to date is greater than from date
-    if (toDate < fromDate) {
+    if (tmptoDate < tmpfromDate) {
       alert("'To date' should be greater than 'From date'");
       return;
     }
-    if (fromDate > maxToDate) {
+    if (tmpfromDate > maxToDate) {
       alert("'From date' should be less than 'To date'");
       return;
     }
 
-    props.setViewState({...props.viewState, fromDate: getFormattedDate(fromDate), toDate: getFormattedDate(toDate), datebtn: 'CUSTOM' });
-    props.viewState.fromDate = getFormattedDate(fromDate);
-    props.viewState.toDate = getFormattedDate(toDate);
+    props.setViewState({...props.viewState, fromDate: getFormattedDate(tmpfromDate), toDate: getFormattedDate(tmptoDate), datebtn: 'CUSTOM' });
+    
+    setFromDate(tmpfromDate);
+    setToDate(tmptoDate);
+    
+    props.viewState.fromDate = getFormattedDate(tmpfromDate);
+    props.viewState.toDate = getFormattedDate(tmptoDate);
     props.viewState.datebtn = 'CUSTOM';
 
     setDateBtn('CUSTOM');
@@ -196,11 +210,11 @@ export default function TransactionListPageLayout(props) {
 
   const handleFromDateChange = (e) => {
     const selectedFromDate = e.value;
-    setFromDate(selectedFromDate);
+    settmpFromDate(selectedFromDate);
   };
 
   const handleToDateChange = (e) => {
-    setToDate(e.value);
+    settmpToDate(e.value);
     console.log(e.value);
   }
 
@@ -396,6 +410,22 @@ export default function TransactionListPageLayout(props) {
     setTimeout(hidePopover,6000);
   }
 
+  const copyButtonClick = () => {
+    try{
+      if(selectedRow[props.KeyFieldName]===null){
+        alert('Please select a record to copy!','Create Copy');
+        return false;
+      }
+    }
+    catch(ex){
+      alert('Please select a record to highlight the row and then click on the <b>Create Copy</b> button!','Create Copy');
+      return false;
+    }
+
+    var ky = selectedRow[props.KeyFieldName];
+
+    navigate(`/${props.EditPageName}/${ky}?m=${m}&clr=d`);
+  }
   const createButtonClick = () => {
     updateViewState();
     navigate(`/${props.EditPageName}/0?m=${m}`);
@@ -433,7 +463,7 @@ export default function TransactionListPageLayout(props) {
 
 
   const handleGridCellClick = (e) => {
-    console.log(e);
+//    console.log(e);
     switch(e.column.name){
       case "CHECKER": //Checker status
         if(e.data.CheckerStatus !== "D")
@@ -458,6 +488,11 @@ export default function TransactionListPageLayout(props) {
     //e.rowElement.style.backgroundColor = 'red';
   }
 
+  const handleRowClick = (e) => {
+    const clickedRow = e.data;
+    setSelectedRow(clickedRow);
+    console.log('selected row id',clickedRow[props.KeyFieldName]);
+  }
 
   return (
       true
@@ -482,10 +517,10 @@ export default function TransactionListPageLayout(props) {
               variant="primary"
               size="sm"
               style={{ textTransform: "none" }}
-              onClick={getRecords}
+              onClick={copyButtonClick}
             >
               <i className={'bi-arrow-repeat'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
-              Refresh Data
+              Create Copy
             </BxButton>
           </Grid>                  
           <Grid item xm={1}>
@@ -539,7 +574,7 @@ export default function TransactionListPageLayout(props) {
                       id='dates-popover'
                       open={openDatesPopover}
                       anchorEl={anchorElDates}
-                      onClose={handleCustomDatesClose}
+                      onClose={handleCustomPopupClose}
                       anchorOrigin={{
                         vertical: 'bottom',
                         horizontal: 'left',
@@ -547,8 +582,8 @@ export default function TransactionListPageLayout(props) {
                     >
                       <Paper elevation={0} sx={{ width: "430px", height: "80px", p: 2, backgroundColor:'lightgoldenrodyellow' }}>
                         <Grid container gap={3} alignItems="baseline">
-                          <DateBox width={120} value={fromDate} onValueChanged={handleFromDateChange} stylingMode="underlined" label='From Date' labelMode='floating' displayFormat="dd-MMM-yyyy" />
-                          <DateBox width={120} max={maxToDate} value={toDate} onValueChanged={handleToDateChange} stylingMode="underlined" label='To Date' labelMode='floating' displayFormat="dd-MMM-yyyy" />
+                          <DateBox width={120} value={tmpfromDate} onValueChanged={handleFromDateChange} stylingMode="underlined" label='From Date' labelMode='floating' displayFormat="dd-MMM-yyyy" />
+                          <DateBox width={120} max={maxToDate} value={tmptoDate} onValueChanged={handleToDateChange} stylingMode="underlined" label='To Date' labelMode='floating' displayFormat="dd-MMM-yyyy" />
                           <BxButton
                             variant="primary"
                             size="sm"
@@ -561,29 +596,31 @@ export default function TransactionListPageLayout(props) {
                       </Paper>
                     </Popover>
                   <ToggleButtonGroup
+                  value={displayPageSize}
+                  exclusive
                 size="small"
                 aria-label="text alignment"
                 sx={{ marginTop:0, height:'30px',  backgroundColor:'whitesmoke'}}
                 >
-                <ToggleButton value="left" aria-label="left aligned" onClick={()=> setdisplayPageSize(10)} hint="Pagesize: 12">
+                <ToggleButton value="10" aria-label="left aligned" onClick={()=> setdisplayPageSize(10)} hint="Pagesize: 12">
                     10
                 </ToggleButton>
-                <ToggleButton value="center" aria-label="centered" onClick={()=> setdisplayPageSize(20)}>
+                <ToggleButton value="20" aria-label="centered" onClick={()=> setdisplayPageSize(20)}>
                     20
                 </ToggleButton>
-                <ToggleButton value="right" aria-label="right aligned" onClick={()=> setdisplayPageSize(50)}>
+                <ToggleButton value="50" aria-label="right aligned" onClick={()=> setdisplayPageSize(50)}>
                     50
                 </ToggleButton>
-                <ToggleButton value="justify" aria-label="justified" onClick={()=> setdisplayPageSize(100)}>
+                <ToggleButton value="100" aria-label="justified" onClick={()=> setdisplayPageSize(100)}>
                     100
                 </ToggleButton>
-                <ToggleButton  value="justify" aria-label="justified" onClick={()=> setdisplayFilterRow(!displayFilterRow)} title="Enable Column Filters">
+                <ToggleButton  value="filter" aria-label="justified" onClick={()=> setdisplayFilterRow(!displayFilterRow)} title="Enable Column Filters">
                     <i className={'bi-binoculars-fill'} style={{ color:'darkslategray', fontSize: '12pt'}} />
                 </ToggleButton>
-                <ToggleButton value="justify" aria-label="justified" onClick={()=> setdisplayFilterPanel(!displayFilterPanel)} title="Enable Query Filters">
+                <ToggleButton value="funnel" aria-label="justified" onClick={()=> setdisplayFilterPanel(!displayFilterPanel)} title="Enable Query Filters">
                     <i className={'bi-funnel-fill'} style={{ color:'darkslategray', fontSize: '12pt'}} />
                 </ToggleButton>                
-                <ToggleButton value="justify" aria-label="justified" onClick={()=> setdisplayGroupPanel(!displayGroupPanel)} title="Display Column Grouping">
+                <ToggleButton value="group" aria-label="justified" onClick={()=> setdisplayGroupPanel(!displayGroupPanel)} title="Display Column Grouping">
                     <i className={'bi-bar-chart-steps'} style={{ color:'darkslategray', fontSize: '12pt'}} />
                 </ToggleButton>
             </ToggleButtonGroup>
@@ -610,6 +647,7 @@ export default function TransactionListPageLayout(props) {
               onCellClick={handleGridCellClick}
               onRowPrepared={handleCheckBoxVisibility}
               onRowDblClick={editIconClick}
+              onRowClick={handleRowClick}
               height={520}
             >
               <Paging enabled={true} pageSize={displayPageSize} />
@@ -634,6 +672,7 @@ export default function TransactionListPageLayout(props) {
                     key={column.FunctionPointName}
                   />
               ))}
+              
 
             </DataGrid>
             <Snackbar

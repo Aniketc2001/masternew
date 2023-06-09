@@ -9,8 +9,6 @@ import Typography from '@mui/material/Typography';
 
 
 
-
-
 import DataGrid, {
     Column, Button, Editing, Grouping, SearchPanel, GroupPanel, Popup, Paging, Lookup,
     Form, FilterRow, HeaderFilter, Export, ColumnChooser, Font, Selection, FilterPanel
@@ -180,10 +178,9 @@ export default function ListPageLayout(props) {
     }).then((response) => {
       getRecords();
     }).catch((error) => {
-      if(error.response) {
-        if(error.response.status === 417) {
-          console.log("Error occured while deleting record..");
-        }
+      console.log('delete record',error);
+      if(error.response.data) {
+        alert(error.response.data,"Error occured while deleting record");
       }
     })
   }
@@ -251,11 +248,9 @@ export default function ListPageLayout(props) {
                 setnotificationBarMessage('Action on selected record(s) successful!');
                 setOpenNotificationBar(true);
               }).catch((error) => {
+                console.log('delete records err',error);
                 if(error.response) {
-                  if(error.response.status === 417) {
-                    setnotificationBarMessage('Error occured while deleting the record(s)! <br/>' + error.message);
-                    setOpenNotificationBar(true);
-                  }
+                  alert(error.response.data,"Error occured while deleting record");
                 }
               });                
             }
@@ -286,10 +281,7 @@ export default function ListPageLayout(props) {
                   setOpenNotificationBar(true);
                 }).catch((error) => {
                   if(error.response) {
-                    if(error.response.status === 417) {
-                      setnotificationBarMessage('Error occured while setting the active flag for the record(s)! <br/>' + error.message);
-                      setOpenNotificationBar(true);
-                    }
+                    alert(error.response.data,"Error occured while marking records as active");
                   }
                 });
             }
@@ -321,10 +313,7 @@ export default function ListPageLayout(props) {
               setOpenNotificationBar(true);
             }).catch((error) => {
               if(error.response) {
-                if(error.response.status === 417) {
-                  setnotificationBarMessage('Error occured while setting the inactive flag for the record(s)! <br/>' + error.message);
-                  setOpenNotificationBar(true);
-                }
+                alert(error.response.data,"Error occured while marking records as inactive");
               }
             });
          

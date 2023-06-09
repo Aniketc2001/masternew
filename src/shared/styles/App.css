@@ -43,3 +43,11 @@
 }
 
 
+.AppBackgroundCanvas{
+  overflow:'hidden';
+  scrollbar-width: none;
+}
+
+.AppSwitcher  {
+  background-color: rgba(13, 8, 1, 0.263);
+}

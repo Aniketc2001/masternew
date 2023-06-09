@@ -4,13 +4,13 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { Paper } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { rgbToHex, useTheme } from '@mui/material/styles';
 import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useState,useEffect } from 'react';
 import {  Link, useNavigate } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
 import modules from '../jsondata/modules';
-
+import '../../shared/styles/App.css';
 
 function ApplicationMenuPopover(props) {
     const navigate = useNavigate();
@@ -58,30 +58,32 @@ function ApplicationMenuPopover(props) {
     <div>
       <Popper
         open={props.popoverFlag}
-        anchorEl={props.objref}
+        anchorEl={props.objAppref}
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "right",
         }}
-        anchorPosition={{left:300,top:150}}
-        anchorReference="anchorPosition"
-        transitionDuration={50}
-        transformorigin={{
-          vertical: 'top',
-          horizontal: 'left',
+        sx={{
+          height: 350,
+          width: 500,
+          marginRight:5 
         }}
       >
         <Paper
-          elevation={15}
+          elevation={6}
           sx={{
             height: 250,
             width: 450,
             paddingTop: 2,
             paddingLeft: 2,
             paddingRight: 2,
-            backgroundColor: 'wheat',
-            marginRight:10
+            marginRight:30,
+            marginTop:0.5,
+            border:'1px solid #0F6CBD',
+            backgroundColor:'wheat'
           }}
+
+
         >
         <Box sx={{ p: 0 }}>
             <b>Application Modules</b>
