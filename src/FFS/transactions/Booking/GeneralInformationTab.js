@@ -69,7 +69,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine, setship
                                                     listType="customers"
                                                     fieldName="partyname"
                                                     autoFocus
-                                                    data={{ name: "CustomerId", label: "Customer", displayExpr: "CustomerName", valueExpr: "CustomerId", searchExpr: "CustomerName" }}
+                                                    data={{ name: "CustomerId", label: "Booking Party", displayExpr: "CustomerName", valueExpr: "CustomerId", searchExpr: "CustomerName" }}
                                                 />
                                             </Grid>
                                             <Grid item xs={12} >
@@ -120,7 +120,7 @@ export default function GeneralInformationTab({ baseObj,setshippingLine, setship
                                                     setbaseObj={setbaseObj}
                                                     itemRenderJsx={CustomerAddressSBRender}
                                                     value={baseObj.CustomerSiteId}
-                                                    data={{ name: "CustomerSiteId", label: "Customer Location", displayExpr: "CustomerSiteName", valueExpr: "CustomerSiteId", searchExpr: "CustomerSiteName" }}
+                                                    data={{ name: "CustomerSiteId", label: "Booking Party Location", displayExpr: "CustomerSiteName", valueExpr: "CustomerSiteId", searchExpr: "CustomerSiteName" }}
                                                 />
                                             </Grid>
                                             <Grid item xs={12}>

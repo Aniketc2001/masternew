@@ -22,6 +22,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContentText from '@mui/material/DialogContentText';
 import PartyContact from './PartyContact';
+import { getAssignedGrants, resolveControlGrant } from '../../../shared/scripts/common';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -76,7 +77,7 @@ export default function PartyMaster() {
   const [loadcustomerAddressFlag,setloadcustomerAddressFlag] = useState(false);
   const [PartyId, setPartyId] = useState(id);
   const [reloadPage,setreloadPage] = useState(0);
-
+  const [grantsObj, setGrantsObj] = useState(null);
 
   const hdr = {
     'mId': m
@@ -121,6 +122,7 @@ export default function PartyMaster() {
   }
 
   useEffect(() => {
+    getAssignedGrants(hdr, setGrantsObj);
     getinitialVal();
     getancillaryData();
     //console.log("anc1",ancillaryData);
@@ -432,8 +434,9 @@ export default function PartyMaster() {
         }).catch((error) => {
           if (error.response) {
             console.log(error.response);
-            setnotificationBarMessage("Error occured while saving data.." + error.response.data);
-            setOpenNotificationBar(true);
+            alert(error.response.data,"Error occured while saving data");
+            // setnotificationBarMessage("Error occured while saving data.." + error.response.data);
+            // setOpenNotificationBar(true);
           }
         })
       }
@@ -458,7 +461,7 @@ export default function PartyMaster() {
         <CssBaseline>
           <Box marginTop={0} >
             <Paper elevation={3} sx={{ paddingTop: 3, paddingLeft: 4, paddingBottom: 3, paddingRight: 4, fontFamily: 'Poppins' }}>
-              <h2 style={{ paddingBottom: 0, marginBottom: 0 }}>Party</h2>
+              <h2 style={{ paddingBottom: 0 }}>Party</h2>
               <span>Manage details of parties and associated types</span>
               <Grid container spacing={2} sx={{ paddingTop: 2 }}>
                 <Grid item xs={12}>
@@ -604,12 +607,22 @@ export default function PartyMaster() {
                           <Grid item sx={{ marginLeft: 2 }}>
                             <Stack spacing={0}>
                               <FormControl sx={{ p: 0 }} >
+                                {resolveControlGrant(grantsObj,'chkBookingParty')?
                                 <FormControlLabel
-                                  control={<Checkbox checked={baseObj.IsCustomer === "Y"} />}
+                                  control={<Checkbox checked={baseObj.IsCustomer === "Y"}  />}
                                   onChange={(evt) => onValChange(evt)}
                                   name="IsCustomer"
-                                  label="Customer"
+                                  label="Booking Party"
                                 />
+                                :
+                                <FormControlLabel
+                                  control={<Checkbox checked={baseObj.IsCustomer === "Y"}  />}
+                                  name="IsCustomer"
+                                  label="Booking Party"
+                                  disabled
+                                />
+                              }
+
                               </FormControl>
                               <FormControl sx={{ p: 0 }} >
                                 <FormControlLabel

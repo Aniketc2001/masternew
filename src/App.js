@@ -21,6 +21,7 @@ import BookingEdit from './FFS/transactions/Booking/Booking';
 import SystemUserList from './FireQube/masters/SystemUserList'
 import DepartmentEdit from './FireQube/masters/DepartmentEdit';
 import PartyMaster from './FFS/masters/PartyMaster/PartyMaster';
+import PartySalesMapEdit from './FFS/masters/PartyMaster/PartySalesMapEdit';
 import EmployeeEdit from './FireQube/masters/EmployeeEdit';
 import SystemUserEdit from './FireQube/masters/SystemUserEdit'
 import Login from './FireQube/auth/Login';
@@ -212,7 +213,7 @@ function App() {
         <Route path="/partyAddressListEdit/:id" element={<MasterEditPageMultiLevel mId="Party Address & Contacts"/>} />
         <Route path="/partyCommunicationListEdit/:id" element={<MasterEditCx mId="Party Communication"/>} />
         <Route path="/rebatePartyListEdit/:id" element={<MasterEditCx mId="Rebate Party"/>} />
-        <Route path="/partySalesMapEdit/:id" element={<MasterEditCx mId="Party Sales Map"/>} />
+        <Route path="/partySalesMapEdit/:id" element={<PartySalesMapEdit mId="Party Sales Map"/>} />
         <Route path="/locationEdit/:id" element={<MasterEditCx mId="Location"/>} />
         <Route path="/commodityCategoryEdit/:id" element={<MasterEditCx mId="Commodity Category"/>} />
         <Route path="/crmTeamEdit/:id" element={<MasterEditPageMultiLevel mId="CRM Team"/>} />

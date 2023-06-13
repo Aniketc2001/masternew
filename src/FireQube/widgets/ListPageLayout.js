@@ -6,7 +6,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
-
+import { getAssignedGrants, resolveControlGrant} from  '../../shared/scripts/common';
 
 
 import DataGrid, {
@@ -37,7 +37,7 @@ export default function ListPageLayout(props) {
   const m = new URLSearchParams(useLocation().search).get('m');
   const [gridDataSource, setgridDataSource] = useState([]);
   const navigate = useNavigate();
-
+  const [grantsObj, setGrantsObj] = useState(null);
   const [displayDataGrid, setdisplayDataGrid] = useState(true);
 
   const [displayPageSize, setdisplayPageSize] = useState(10);
@@ -82,6 +82,7 @@ export default function ListPageLayout(props) {
 
   useEffect(() => {
     //console.log('useeffect...');
+    getAssignedGrants(hdr, setGrantsObj);
     setdisplayDataGrid(false);
     getRecords();
   }, [props.APIName]);
@@ -443,7 +444,7 @@ export default function ListPageLayout(props) {
 
         <Grid container spacing={1} >
           <Grid item xm={1} >
-            <BxButton
+          {resolveControlGrant(grantsObj,'btnNew')?<BxButton
               variant="primary"
               size="sm"
               style={{ textTransform: "none"}}
@@ -451,10 +452,10 @@ export default function ListPageLayout(props) {
             >
               <i className={'bi-save'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
               Create New
-            </BxButton>
+            </BxButton>:<></>}
           </Grid>
           <Grid item xm={1}>
-            <BxButton
+          {resolveControlGrant(grantsObj,'btnDelete')?<BxButton
               variant="primary"
               size="sm"
               style={{ textTransform: "none" }}
@@ -462,10 +463,10 @@ export default function ListPageLayout(props) {
             >
               <i className={'bi-x-circle'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
               Delete Records
-            </BxButton>
+            </BxButton>:<></>}
           </Grid>                  
           <Grid item xm={1}>
-            <BxButton
+          {resolveControlGrant(grantsObj,'btnSetActive')?<BxButton
               variant="primary"
               size="sm"
               style={{ textTransform: "none" }}
@@ -473,10 +474,10 @@ export default function ListPageLayout(props) {
             >
               <i className={'bi-calendar2-x'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
               Active
-            </BxButton>
+            </BxButton>:<></>}
           </Grid>
           <Grid item xm={1}>
-            <BxButton
+          {resolveControlGrant(grantsObj,'btnSetInactive')?<BxButton
               variant="secondary"
               size="sm"
               style={{ textTransform: "none" }}
@@ -485,7 +486,7 @@ export default function ListPageLayout(props) {
             >
               <i className={'bi-card-checklist'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
               Inactive
-            </BxButton>
+            </BxButton>:<></>}
           </Grid>
           <Grid item xm={1}>
             <BxButton
