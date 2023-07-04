@@ -299,11 +299,20 @@ export default function PartyMaster() {
     if (baseObj.PartyName === null || baseObj.PartyName === "") {
       msg = msg + "Invalid Party Name!" + "<br/>";
     }
+    
+    console.log('validation iscustomer',baseObj.IsCustomer);
 
-    if (baseObj.CreditBasisId === null ) {
-      msg = msg + "Invalid Credit Basis!" + "<br/>";
+    if(baseObj.IsCustomer==="Y"){
+      if (baseObj.CreditNumberOfDays === null || baseObj.CreditNumberOfDays === "" ) {
+        msg = msg + "Invalid credit number of days!" + "<br/>";
+      }
+
+      if (baseObj.CreditBasisId === null ) {
+        msg = msg + "Invalid credit basis!" + "<br/>";
+      }
     }
 
+    console.log('msg ', msg,msg !== "")
     if(msg !== ""){
       alert(msg,"Party Validation Errors");
       return false;
@@ -411,15 +420,25 @@ export default function PartyMaster() {
 
   const saveRecord = () => {
 
-    console.log("baseobj", baseObj);
+    console.log("baseobj", baseObj, baseObj.PartySalesMaps.length);
     if (!validateForm() || !validatePartyType()) {
       return (false);
     }
+    var vl;
 
-    const vl = confirm('Confirm updation?', 'Confirmation Alert');
+    if(baseObj.PartySalesMaps.length === 0)
+      vl = confirm('<b>Sales person mapping not configured for this party.</b><br/><br/>Continue with the updation of party details?', 'Confirmation Alert');
+    else
+      vl = confirm('Confirm updation?', 'Confirmation Alert');
+
     vl.then((dialogResult) => {
       if (dialogResult) {
         let x = baseObj;
+        
+        if(x.CreditNumberOfDays === ""){
+          x.CreditNumberOfDays="0";
+        }
+
         x.DraftFlag = "F";
         console.log("x", x);
         axios({
@@ -435,8 +454,6 @@ export default function PartyMaster() {
           if (error.response) {
             console.log(error.response);
             alert(error.response.data,"Error occured while saving data");
-            // setnotificationBarMessage("Error occured while saving data.." + error.response.data);
-            // setOpenNotificationBar(true);
           }
         })
       }

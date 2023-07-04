@@ -144,7 +144,7 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
     const validateGSTStateCode = () => {
         try{
             var gst = tmpgstval;
-            if(gst === "") return true;
+            if(gst === "" || gst===null) return true;
 
             var cid = tmpcityid;
             if(cid==="")
@@ -158,7 +158,7 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                 statecode = selectedCity.GstStateCode;
             }
 
-            if(gst.substr(0,2) !== statecode){
+            if(gst.substring(0,2) !== statecode){
                 errmsg = "GST initials does not match with the selected city's state GST Code! [" + statecode + "]";
                 return false;
             }
@@ -172,7 +172,8 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
 
     const handleSavingData = (e) => {
         if(!validateGSTStateCode()){
-            alert(errmsg,"Party Address Validation");
+            if(errmsg !== "")
+                alert(errmsg,"Party Address Validation");
             e.cancel = true;
         }
     }
@@ -310,7 +311,6 @@ export default function PartyAddressEdit({ baseObj, ancillaryData, PartyAddresse
                     <FormItem visible={true} />
                 </Column>
                 <Column dataField="PinCode" visible={true} caption="Pin Code" >
-                    <RequiredRule />
                     <FormItem visible={true} />
                 </Column>
                 <Column dataField="CityName" caption="CityName" visible={false}>

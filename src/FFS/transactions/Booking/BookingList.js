@@ -1,10 +1,11 @@
 import * as React from 'react';
 import '../../../shared/styles/dx-styles.css';
-import { useNavigate,useLocation, useParams   } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import PropTypes  from 'prop-types';
+import PropTypes from 'prop-types';
 import TransactionListPageLayout from '../../../FireQube/widgets/TransactionListPageLayout';
+import BookingPreviewCx from './BookingPreviewCx';
 
 /* ListPageLayout Component Props 
     - ColumnVisibilityJSON (columnDisplayMap)
@@ -17,78 +18,99 @@ import TransactionListPageLayout from '../../../FireQube/widgets/TransactionList
     - ColumnNamesJSON (Columns) */
 
 export default function BookingList(props) {
-    const m = new URLSearchParams(useLocation().search).get('m');
-    const [menuDetails, setmenuDetails] = useState(null); 
-    const [columnNamesJSON, setcolumnNamesJSON] = useState(null);
-   
+  const m = new URLSearchParams(useLocation().search).get('m');
+  const [menuDetails, setmenuDetails] = useState(null);
+  const [columnNamesJSON, setcolumnNamesJSON] = useState(null);
 
-    const hdr = {
-        'mId': m
-    };
 
-    useEffect(() => {
-        getDetails();
-        getColumnDetails();
-    }, [props.mId]);
-      
+  const hdr = {
+    'mId': m
+  };
 
-    const getDetails = () => {
-      axios({
-          method: 'get',
-          url: "menu/getMenuInfo",
-          headers: hdr
-        }).then((response) => {
-          //console.log('menu obj MasterListPage...');
-          setmenuDetails(response.data);
-          //console.log(response.data);
-        }).catch((error) => {
-          console.log('MasterListPage err...',error);
-          if(error.response) {
-            console.log("Error occured while fetching data. Error message - " + error.message);
-          }
-      })
+  useEffect(() => {
+    getDetails();
+    getColumnDetails();
+  }, [props.mId]);
+
+
+  const getDetails = () => {
+    axios({
+      method: 'get',
+      url: "menu/getMenuInfo",
+      headers: hdr
+    }).then((response) => {
+      //console.log('menu obj MasterListPage...');
+      setmenuDetails(response.data);
+      //console.log(response.data);
+    }).catch((error) => {
+      console.log('MasterListPage err...', error);
+      if (error.response) {
+        console.log("Error occured while fetching data. Error message - " + error.message);
+      }
+    })
+  }
+
+  const getColumnDetails = () => {
+    axios({
+      method: 'get',
+      url: "menu/assignedGrants",
+      headers: hdr
+    }).then((response) => {
+      //console.log('column details obj...',response.data);
+      //response.data.grants_columns.sort((a, b) => a.FunctionPointId - b.FunctionPointId);
+      setcolumnNamesJSON(response.data.grants_columns);
+      //console.log('grant columns',response.data.grants_columns);
+    }).catch((error) => {
+      console.log('err', error);
+      if (error.response) {
+        console.log("Error occured while fetching data. Error message - " + error.message);
+      }
+    })
+  }
+
+  const showPreview = (baseObj) => {
+    console.log('data', baseObj);
+    if (baseObj) {
+      return (
+        <>
+          <BookingPreviewCx mId={m} baseObj={baseObj} />
+        </>
+      )
+    } else {
+      return (
+        <>
+          <p>Please select a record.</p>
+        </>
+      )
     }
-
-    const getColumnDetails = () => {
-        axios({
-            method: 'get',
-            url: "menu/assignedGrants", 
-            headers: hdr
-          }).then((response) => {
-            //console.log('column details obj...',response.data);
-            //response.data.grants_columns.sort((a, b) => a.FunctionPointId - b.FunctionPointId);
-            setcolumnNamesJSON(response.data.grants_columns);
-            //console.log('grant columns',response.data.grants_columns);
-          }).catch((error) => {
-            console.log('err',error);
-            if(error.response) {
-              console.log("Error occured while fetching data. Error message - " + error.message);
-            }
-        })
-    }
+  }
 
 
-    return(
-        menuDetails && columnNamesJSON  ? 
-        <TransactionListPageLayout 
-            APIName={menuDetails.ApiName}
-            EditPageName={menuDetails.EditUrl}
-            ListPageName={menuDetails.MenuUrl}
-            ListPageTitle={menuDetails.MenuName}
-            SubTitle={menuDetails.SubTitle}
-            TableName={menuDetails.MenuName}
-            KeyFieldName={menuDetails.KeyField}
-            columnNamesJSON={columnNamesJSON}
-            DeleteStatusColumnVisibility={false}
-            CheckerStatusColumnVisibility={false}
-            viewState={props.viewState}   
-            setViewState={props.setViewState}
+  return (
+    menuDetails && columnNamesJSON ?
+      <>
+        <TransactionListPageLayout
+          APIName={menuDetails.ApiName}
+          EditPageName={menuDetails.EditUrl}
+          ListPageName={menuDetails.MenuUrl}
+          ListPageTitle={menuDetails.MenuName}
+          SubTitle={menuDetails.SubTitle}
+          TableName={menuDetails.MenuName}
+          KeyFieldName={menuDetails.KeyField}
+          columnNamesJSON={columnNamesJSON}
+          DeleteStatusColumnVisibility={false}
+          CheckerStatusColumnVisibility={false}
+          viewState={props.viewState}
+          setViewState={props.setViewState}
+          showPreview={showPreview}
+          setOpen={props.setOpen}
         />
-        :
-        <></>
-    );
+      </>
+      :
+      <></>
+  );
 };
 
 BookingList.propTypes = {
-    mId : PropTypes.string.isRequired
+  mId: PropTypes.string.isRequired
 }

@@ -15,6 +15,10 @@ import CheckerOutboxCx from './FireQube/masters/CheckerOutboxCx';
 import MenuEdit from './FireQube/masters/MenuEdit';
 import MasterEditPageMultiLevel from './FireQube/masters/MasterEditPageMultiLevel';
 
+import SystemUserEditCx from './FireQube/masters/User Master/SystemUserEdit';
+import DataAccessLevelManage from './FireQube/masters/Access Level/DataAccessLevelManage';
+import DataFilter from './FireQube/masters/DataFilter';
+
 import BookingList from './FFS/transactions/Booking/BookingList';
 import BookingEdit from './FFS/transactions/Booking/Booking';
 
@@ -173,7 +177,8 @@ function App() {
         <Route path="/commodityCategoryList" element={<MasterListPageCx mId="Commodity Category"/>} />
         <Route path="/crmTeamList" element={<MasterListPageCx mId="CRM Team"/>} />
         <Route path="/lineServiceContractList" element={<MasterListPageCx mId="Line Service Contract List"/>} />
-        <Route path="/bookingList" element={<BookingList mId="Port" viewState={viewState} setViewState={setViewState} />} />
+        <Route path="/bookingList" element={<BookingList mId="Port" viewState={viewState} setViewState={setViewState} setOpen={setOpen} />} />
+        <Route path="/addressWiseSalesTeam" element={<MasterListPageCx mId="AddressWise SalesTeam"/>} />
 
         <Route path="/appEdit/:id" element={<MasterEditCx mId="App"/>} />
         <Route path="/systemConfigEdit/:id" element={<MasterEditCx mId="System Config"/>} />
@@ -184,8 +189,9 @@ function App() {
         <Route path="/statusEdit/:id" element={<MasterEditCx mId="Status"/>} />
         <Route path="/dbConstraintEdit/:id" element={<MasterEditCx mId="DB Constraints"/>} />
         <Route path="/accessLevelEdit/:id" element={<MasterEditCx mId="Access Level & Rights"/>} />
-        <Route path="/systemUserEdit/:id" element={<MasterEditPageMultiLevel mId="System Users"/>} />
-        <Route path="/dataFilterEdit/:id" element={<MasterEditCx mId="Data Filters"/>} />
+        {/* <Route path="/systemUserEdit/:id" element={<MasterEditPageMultiLevel mId="System Users"/>} /> */}
+        <Route path="/systemUserEdit/:id" element={<SystemUserEditCx mId="System Users"/>} />
+        <Route path="/dataFilterEdit/:id" element={<DataFilter mId="Data Filters"/>} />
         <Route path="/companyGroupEdit/:id" element={<MasterEditCx mId="Company Group"/>} />
         <Route path="/companyEdit/:id" element={<MasterEditCx mId="Company"/>} />
         <Route path="/branchEdit/:id" element={<MasterEditCx mId="Branch"/>} />
@@ -221,6 +227,7 @@ function App() {
         <Route path="/bookingEdit/:id" element={<BookingEdit mId="Port" setOpen={setOpen}/>} />
 
         <Route path="/accessLevelManage/:id" element={<AccessLevelManage />} />
+        <Route path="/accessLevelDataManage/:id" element={<DataAccessLevelManage />} />
 
         <Route path="/emplist" element={<EmployeeList />} />
         <Route path="/empedit/:id" element={<EmployeeEdit />} />

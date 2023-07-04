@@ -39,11 +39,11 @@ function ApplicationMenuPopover(props) {
       
       if(props.userInfo)
        return props.userInfo.SystemUserApps.map((moduleRec) => (
-        <ListItemButton key={moduleRec.AppId} onClick={() => handleAppSelect(moduleRec.AppId)} disabled={currAppId === moduleRec.AppId?true:false} >
-          <ListItemIcon sx={{fontSize:'20pt',color:'black'}}>
-            <i className={moduleRec.AppIcon} style={{color:'darkred'}} />
+        <ListItemButton key={moduleRec.AppId} sx={{fontWeight:'bold'}} onClick={() => handleAppSelect(moduleRec.AppId)} disabled={currAppId === moduleRec.AppId?true:false} >
+          <ListItemIcon sx={{fontSize:'40pt',color:'black'}}>
+            <i className={moduleRec.AppIcon} style={{color:'#222242'}} />
           </ListItemIcon>
-          <ListItemText sx={{paddingLeft:3}} primary={moduleRec.AppName}
+          <ListItemText sx={{paddingLeft:3, fontWeight:'bold'}} primary={moduleRec.AppName}
              secondary={moduleRec.AppDescription} />
         </ListItemButton>
         ));
@@ -80,7 +80,7 @@ function ApplicationMenuPopover(props) {
             marginRight:30,
             marginTop:0.5,
             border:'1px solid #0F6CBD',
-            backgroundColor:'wheat'
+            backgroundColor:'#FFF0F5'
           }}
 
 
@@ -94,7 +94,6 @@ function ApplicationMenuPopover(props) {
               p: 0,
               "& .MuiListItemIcon-root": {
                 minWidth: 32,
-                color: theme.palette.grey[500],
               },
             }}
           >

@@ -78,7 +78,9 @@ export default function AccessLevelList(props) {
             KeyFieldName={menuDetails.KeyField}
             columnNamesJSON={columnNamesJSON}
             CustomField={true}
+            CustomField2={true}
             CustomURL="accessLevelManage"
+            CustomURL2="accessLevelDataManage"
         />
         :
         <></>
