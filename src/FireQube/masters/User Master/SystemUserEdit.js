@@ -27,6 +27,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContentText from '@mui/material/DialogContentText';
+import { getFormattedDate } from "../../../shared/scripts/common";
+
 
 export default function SystemUserEdit() {
   const navigate = useNavigate();
@@ -77,6 +79,14 @@ export default function SystemUserEdit() {
     }
     if (baseObj.SpecialClassificationId == 0 || baseObj.SpecialClassificationId == null) {
       errors.push("Special Classification");
+    }
+    if(baseObj.SystemUserApps.length <= 0){
+      errors.push("Selected Apps and Access Levels");
+    } else{
+      const temp = baseObj.SystemUserApps.filter((data) => data.DefaultAppFlag === 'Y');
+      if(temp.length <= 0){
+        errors.push("No default/primary app specified"); 
+      }
     }
 
     if (changePass || id === "0") {
@@ -167,6 +177,15 @@ export default function SystemUserEdit() {
           x.Active = x.Active === "Y" ? true : false;
           x.IsLocked = x.IsLocked === "Y" ? true : false;
           x.IsLoggedIn = x.IsLoggedIn === "Y" ? true : false;
+
+          if(x.LastLoginDate !== '' ||x.LastLoginDate !== null)
+            x.LastLoginDate = getFormattedDate(new Date(x.LastLoginDate));
+
+          if(x.LastPasswordChangedDate !== '' ||x.LastPasswordChangedDate !== null)
+            x.LastPasswordChangedDate = getFormattedDate(new Date(x.LastPasswordChangedDate));
+          
+          if(x.LockedDate !== '' ||x.LockedDate !== null)
+            x.LockedDate = getFormattedDate(new Date(x.LockedDate));  
 
           if (id === "0") {
             x.SystemUserApps = [];
@@ -587,6 +606,7 @@ export default function SystemUserEdit() {
                   <Grid container>
                     <Grid item marginTop={2} marginRight={5}>
                       <UserAvatar baseObj={baseObj} setBaseObj={setBaseObj} />
+                      <p style={{textAlign:'center',fontSize:'8pt'}}>Click here to upload image</p>
                     </Grid>
                   </Grid>
                 </Grid>

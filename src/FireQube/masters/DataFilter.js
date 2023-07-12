@@ -2,15 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Checkbox, FormControl, FormControlLabel, Grid, Paper, TextField, Stack, Snackbar, Alert, Divider } from '@mui/material';
 import { Box } from '@mui/material';
 import { DataGrid, Column, Lookup, Paging, SearchPanel, Editing, Form, Button, FormItem } from 'devextreme-react/data-grid';
-import { SelectBox } from 'devextreme-react';
-import { ProductionQuantityLimitsSharp } from '@mui/icons-material';
+import { SelectBox, TextBox } from 'devextreme-react';
 import axios from 'axios';
-import { matchPath, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import BxButton from "react-bootstrap/button"
 import { alert, confirm } from 'devextreme/ui/dialog';
-import SelectBoxDropdown from  '../../FFS/transactions/Booking/SelectBoxDropdown'
+import SelectBoxDropdown from '../../FFS/transactions/Booking/SelectBoxDropdown';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -26,7 +25,6 @@ export default function DataFilter() {
     const { id } = useParams();
     const [baseObj, setBaseObj] = useState(null);
     const [moduleId, setModuleId] = useState(null);
-    const [fieldData, setFieldData] = useState({ FilterCode: '', FilterName: '', Description: '' })
     const navigate = useNavigate();
     const [notificationBarMessage, setnotificationBarMessage] = useState(''); //Notification Message
     const [openNotificationBar, setOpenNotificationBar] = useState(false); //Notification Bar Flag
@@ -144,7 +142,9 @@ export default function DataFilter() {
                     ctr = ctr - 1;
                     data.FilterClause = "";
                 });
+
                 console.log("getDictionary2", x);
+                console.log("xxx", x.DataFilterConditions);
                 x.CreatedDate = '2023-06-27T09:30:00';
                 x.ModifiedDate = '2023-06-27T09:30:00';
                 setBaseObj({ ...baseObj, DataFilterConditions: x.DataFilterConditions });
@@ -234,8 +234,9 @@ export default function DataFilter() {
             setBaseObj({ ...baseObj });
         };
 
+
         const itemRender = (data) => {
-            const helpText = data.OperatorHelpText.replace('/\n/g', '\u200B\n'); // Replace newlines with zero-width space + newline
+            const helpText = data.OperatorHelpText.replace(/\n/g, '\u200B\n');
 
             return (
                 <div>
@@ -245,11 +246,14 @@ export default function DataFilter() {
             );
         };
 
+
+
         return (
             <SelectBox
                 dataSource={props.dataSource}
                 displayExpr="Operator"
                 valueExpr="ConditionOperatorId"
+                disabled={props.data.SystemFlag === 'Y'}
                 value={props.value}
                 onValueChanged={handleChange}
                 itemRender={itemRender}
@@ -332,6 +336,15 @@ export default function DataFilter() {
         );
     }
 
+    const renderSystemFlagStatus = (cellData) => {
+        // console.log("celldata",cellData);
+        return (
+            <div>
+                {cellData.data.SystemFlag === "Y" ? <i class="bi bi-exclamation-circle-fill"></i> : <></>}
+            </div>
+        );
+    }
+
     const markConditionRecordDelete = (e) => {
         dataGrid.current.instance.deleteRow(e.row.rowIndex);
     };
@@ -350,6 +363,27 @@ export default function DataFilter() {
         baseObj.DataFilterConditions = updatedData;
         setRefresh(!refresh);
     }
+
+    const handleFilterClauseEdit = (props, baseObj) => {
+        const handleInputChange = (e) => {
+            if (props.data.SystemFlag === 'Y') {
+                return;
+            }
+
+            const newFilterClause = e.value;
+            props.setValue(newFilterClause);
+        };
+
+
+        return (
+            <TextBox
+                value={props.data.FilterClause}
+                onValueChanged={handleInputChange}
+                disabled={props.data.SystemFlag === 'Y'}
+            />
+        );
+    };
+
 
     return (
         <>
@@ -381,7 +415,6 @@ export default function DataFilter() {
                                             value={baseObj.FilterCode}
                                             onChange={(evt) => onValChange(evt)}
                                             fullWidth
-
                                         />
                                     </Grid>
                                     <Grid item xs={2}>
@@ -444,7 +477,7 @@ export default function DataFilter() {
                                                 size="sm"
                                                 onClick={getDictionary}
                                                 style={{ alignSelf: 'flex-end', marginTop: 10, marginLeft: 10 }}
-                                           
+
                                             >
                                                 <i className="bi bi-box-arrow-right" style={{ color: 'white', marginRight: 10 }}></i>Get Dictionary
                                             </BxButton>
@@ -491,14 +524,17 @@ export default function DataFilter() {
                             <Editing mode="batch" newRowPosition="last" allowUpdating={true} allowDeleting={true}>
                                 <Form colCount={1} colSpan={2}></Form>
                             </Editing>
+                            <Column caption="" cellRender={renderSystemFlagStatus} width={35} visible={true}>
+                                <FormItem visible={false} />
+                            </Column>
                             <Column caption="" cellRender={renderDeleteStatus} width={35} visible={true}>
                                 <FormItem visible={false} />
                             </Column>
 
-                            <Column dataField="FieldName" width={250} caption="Datafield name">
-                                {/* <Lookup dataSource={[]} displayExpr="DataFieldName" valueExpr="DataFieldNameId" /> */}
+                            <Column dataField="FieldName" width={250} caption="Column Name">
+
                             </Column>
-                            <Column dataField="ConditionOperatorId" caption="Condition" width={500} editCellRender={(props) => (
+                            <Column dataField="ConditionOperatorId" caption="Comparison Operator" width={500} editCellRender={(props) => (
                                 <Multivalrender
                                     dataSource={ancillaryData.anc_conditionOperators}
                                     data={props.data}
@@ -508,7 +544,14 @@ export default function DataFilter() {
                             )}>
                                 <Lookup dataSource={ancillaryData.anc_conditionOperators} displayExpr="Operator" valueExpr="ConditionOperatorId" />
                             </Column>
-                            <Column dataField="FilterClause" caption="Datafield value" width={200}></Column>
+                            <Column
+                                dataField="FilterClause"
+                                caption="Value"
+                                width={200}
+                                editCellRender={(props) => (
+                                    handleFilterClauseEdit(props, baseObj)
+                                )}
+                            ></Column>
                             {id === '0' ?
                                 <Column type="buttons" width={100} >
                                     <Button name="FWdelete" text="Delete1" hint="Delete Record" onClick={markConditionRecordDelete} >

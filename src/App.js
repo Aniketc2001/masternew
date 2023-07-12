@@ -44,6 +44,10 @@ import SideBarNav from './FireQube/widgets/sideBarNav';
 import { Container } from 'react-bootstrap';
 import { styled  } from '@mui/material/styles';
 import { getFormattedDate } from './shared/scripts/common';
+import VesselVoyagePort from './FFS/masters/VesselVoyagePort';
+import BuyPendencyList from './FFS/transactions/Booking/BuyPendencyList';
+import SellPendencyList from './FFS/transactions/Booking/SellPendencyList';
+import BookingCommercials from './FFS/transactions/Booking/BookingCommercials';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -178,6 +182,9 @@ function App() {
         <Route path="/crmTeamList" element={<MasterListPageCx mId="CRM Team"/>} />
         <Route path="/lineServiceContractList" element={<MasterListPageCx mId="Line Service Contract List"/>} />
         <Route path="/bookingList" element={<BookingList mId="Port" viewState={viewState} setViewState={setViewState} setOpen={setOpen} />} />
+        <Route path="/bookingBuyCommercialList" element={<BuyPendencyList mId="Port" viewState={viewState} setViewState={setViewState} setOpen={setOpen} />} />
+        <Route path="/bookingSellCommercialList" element={<SellPendencyList mId="Port" viewState={viewState} setViewState={setViewState} setOpen={setOpen} />} />
+
         <Route path="/addressWiseSalesTeam" element={<MasterListPageCx mId="AddressWise SalesTeam"/>} />
 
         <Route path="/appEdit/:id" element={<MasterEditCx mId="App"/>} />
@@ -212,7 +219,7 @@ function App() {
         <Route path="/containerSizeTypeEdit/:id" element={<MasterEditCx mId="Container Size Type"/>} />
         <Route path="/vesselEdit/:id" element={<MasterEditCx mId="Vessel"/>} />
         <Route path="/vesselServiceEdit/:id" element={<MasterEditPageMultiLevel mId="VesselService"/>} />
-        <Route path="/vesselVoyagePortEdit/:id" element={<MasterEditCx mId="VesselVoyagePort"/>} />
+        <Route path="/vesselVoyagePortEdit/:id" element={<VesselVoyagePort mId="VesselVoyagePort"/>} />
         <Route path="/portEdit/:id" element={<MasterEditPageMultiLevel mId="Port"/>} />
         <Route path="/partyFullEdit/:id" element={<PartyMaster />} />
         <Route path="/partyListEdit/:id" element={<MasterEditCx mId="Party & Types"/>} />
@@ -225,6 +232,8 @@ function App() {
         <Route path="/crmTeamEdit/:id" element={<MasterEditPageMultiLevel mId="CRM Team"/>} />
         <Route path="/lineServiceContractEdit/:id" element={<MasterEditCx mId="Line Service Contract"/>} />
         <Route path="/bookingEdit/:id" element={<BookingEdit mId="Port" setOpen={setOpen}/>} />
+        <Route path="/bookingBuyCommercialEdit/:id" element={<BookingCommercials mId="Buy" setOpen={setOpen}/>} />
+        <Route path="/bookingSellCommercialEdit/:id" element={<BookingCommercials mId="Sell" setOpen={setOpen}/>} />
 
         <Route path="/accessLevelManage/:id" element={<AccessLevelManage />} />
         <Route path="/accessLevelDataManage/:id" element={<DataAccessLevelManage />} />

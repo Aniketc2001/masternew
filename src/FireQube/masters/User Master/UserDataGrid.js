@@ -13,73 +13,54 @@ import {
 import { useState, useRef } from "react";
 import { RequiredRule } from "devextreme-react/form";
 
-export default function UserDataGrid({ baseObj, ancillaryData }) {
+export default function UserDataGrid({ baseObj, ancillaryData ,setBaseObj}) {
   const dataGrid = useRef();
   const popupRef = useRef();
-  let defaultApp = false;
+  const defaultAppDatasource = [
+    {
+      value:'Y',
+      text:'Primary'
+    },
+    {
+      value:'N',
+      text:'Secondary'
+    }
+  ]
 
-  const renderActiveStatus = (e) => {
-    return (
-      <CheckBox
-        value={e.data.DefaultAppFlag === "Y" ? true : false}
-        readOnly
-      />
-    );
-  };
+  const handlePostSaved = (e) => {
+    console.log('Post Saved e',e);
+    var appId;
+    var DefaultAppFlag;
+    const updatedData = e.changes.map((change) => change.data);
+    if(updatedData[0] !== undefined ){
+      appId= updatedData[0].AppId;
+      DefaultAppFlag = updatedData[0].DefaultAppFlag;
+    }
 
-
-
-  const CustomEditCell = (props) => {
-    const { value, onValueChange } = props;
-    console.log('custom edit value...',value);
-    const isChecked = value === "Y"; // Convert the string value to a boolean for the checkbox
-
-    const handleValueChange = (newValue) => {
-      props.value = newValue.value === true ? "Y" : "N";
-      props.data.DefaultAppFlag = props.value;
-      if (props.data.DefaultAppFlag === 'Y' && baseObj.SystemUserApps.length > 0) {
-        baseObj.SystemUserApps.map(data => {
-          if (data.SystemUserAppId === props.data.SystemUserAppId) {
-            data.DefaultAppFlag = 'Y';
-          } else {
-            data.DefaultAppFlag = 'N';
-          }
-          return data;
-        });
-        const filterDefaultApp = baseObj.SystemUserApps.filter((data) => {
-          return data.DefaultAppFlag === "Y";
-        });
-        // If we set newly inserted app as defaultApp
-        if (filterDefaultApp.length === 0) {
-          defaultApp = true;
-        }
-      } else if (props.data.DefaultAppFlag === 'N' && baseObj.SystemUserApps.length > 0) {
-        baseObj.SystemUserApps.map(data => {
-          if (data.SystemUserAppId === props.data.SystemUserAppId) {
-            data.DefaultAppFlag = 'N';
-          }
-          return data;
-        });
-      } else if (props.data.DefaultAppFlag === 'Y') {
-        defaultApp = true;
+    const tempBaseObj = baseObj.SystemUserApps.map(data=>{
+      if(data.AppId === appId && DefaultAppFlag === 'Y'){
+        data.DefaultAppFlag = 'Y';
+      } 
+      else{
+        data.DefaultAppFlag = 'N';
       }
-    };
+      return data;
+    });
+    setBaseObj({...baseObj,SystemUserApps:tempBaseObj});
+  }
 
-    return (
-      <CheckBox
-        value={isChecked}
-        onValueChanged={handleValueChange}
-      />
-    );
-  };
 
   const handleSavingChanges = (e) => {
-    try {
+
+    var appId;
+      try {
     const updatedData = e.changes.map((change) => change.data);
     let duplicateEntries = [];
     if(updatedData[0] !== undefined ){
        duplicateEntries = updatedData.filter((data) => {
         console.log('upd',updatedData);
+        appId = data.AppId;
+        console.log('appId',appId);
         return baseObj.SystemUserApps.some((app) => app.AppId === data.AppId);
       });
     }
@@ -94,11 +75,9 @@ export default function UserDataGrid({ baseObj, ancillaryData }) {
         "Duplicate App Error"
       );
     }
-    if (defaultApp) {
-      updatedData[0].DefaultAppFlag = 'Y';
-    }
+      
     console.log('sym', baseObj.SystemUserApps);
-    defaultApp = false;
+
     } catch (error) {
       console.log("error", error);
     }
@@ -121,6 +100,7 @@ export default function UserDataGrid({ baseObj, ancillaryData }) {
     rowData.AccessLevelId = null;
     rowData.AppId = value;
   }
+
 
 
   return (
@@ -155,6 +135,7 @@ export default function UserDataGrid({ baseObj, ancillaryData }) {
           e.data.DefaultAppFlag = "N";
         }}
         onSaving={handleSavingChanges}
+        onSaved={handlePostSaved}
         onEditorPreparing={onEditorPreparing}
       >
         <Paging enabled={true} pageSize={7} />
@@ -191,13 +172,9 @@ export default function UserDataGrid({ baseObj, ancillaryData }) {
           />
           <RequiredRule />
         </Column>
-        <Column
-          dataField="DefaultAppFlag"
-          caption="Default App"
-          visible={true}
-          cellRender={renderActiveStatus}
-          editCellRender={CustomEditCell}
-        ></Column>
+        <Column dataField="DefaultAppFlag" caption="Default App" width={125}>
+            <Lookup dataSource={defaultAppDatasource} valueExpr="value" displayExpr="text" />
+          </Column>
       </DataGrid>
     </div>
   );
