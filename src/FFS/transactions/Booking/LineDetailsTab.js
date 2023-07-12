@@ -7,7 +7,6 @@ import MultivalSelectbox from "./MultivalSelectbox";
 import VvpcsSBRender from "./VvpcsSBRender";
 import { getFormattedDate } from "../../../shared/scripts/common";
 
-
 export default function LineDetailsTab({ setvesselVoyage, vesselVoyageList, baseObj, setbaseObj, ancillaryData, parentvvpcId, lineServiceContractList }) {
   const [vvpcId, setvvpcId] = useState(baseObj.VesselVoyagePortId);
   const [vvpcDetails, setVvpcDetails] = useState();
