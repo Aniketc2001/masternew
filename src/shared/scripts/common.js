@@ -15,6 +15,7 @@ export const getAssignedGrants = (hdr,setGrantsObj) => {
 
 export const resolveControlGrant = (grantsObj,controlName) => {
     try{
+        //console.log('grants obj',grantsObj);
         const filteredData = grantsObj.grants_controls.filter(row => row.FunctionPointName === controlName);
         //console.log('resolveControls ',filteredData,"length",filteredData.length > 0);
         return (filteredData.length > 0);

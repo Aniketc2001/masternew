@@ -131,6 +131,13 @@ body
     font-size: 7.5pt;
 }
 
+.ms-datagrid .dx-header-row  {
+    color: #222222;
+    font-weight: bold;
+    background-color: lightskyblue;
+}
+
+
 .ms-datagrid .dx-datagrid .dx-row > td , .ms-datagrid  .dx-datagrid-rowsview .dx-texteditor-input{
     /* padding: 1px; */
     padding:1px 4px 1px 4px;

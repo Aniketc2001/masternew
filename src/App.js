@@ -184,6 +184,10 @@ function App() {
         <Route path="/bookingList" element={<BookingList mId="Port" viewState={viewState} setViewState={setViewState} setOpen={setOpen} />} />
         <Route path="/bookingBuyCommercialList" element={<BuyPendencyList mId="Port" viewState={viewState} setViewState={setViewState} setOpen={setOpen} />} />
         <Route path="/bookingSellCommercialList" element={<SellPendencyList mId="Port" viewState={viewState} setViewState={setViewState} setOpen={setOpen} />} />
+        <Route path="/chargeList" element={<MasterListPageCx mId="Charge List"/>} />
+        <Route path="/applicableChargeList" element={<MasterListPageCx mId="Applicable Charge List"/>} />
+        <Route path="/rateList" element={<MasterListPageCx mId="Rate List"/>} />
+
 
         <Route path="/addressWiseSalesTeam" element={<MasterListPageCx mId="AddressWise SalesTeam"/>} />
 

@@ -37,9 +37,9 @@ export default function MasterListPageCx(props) {
             url: "menu/getMenuInfo",
             headers: hdr
           }).then((response) => {
-            //console.log('menu obj MasterListPage...');
+            console.log('menu obj MasterListPage...');
             setmenuDetails(response.data);
-            //console.log(response.data);
+            console.log(response.data);
           }).catch((error) => {
             console.log('MasterListPage err...',error);
             if(error.response) {
