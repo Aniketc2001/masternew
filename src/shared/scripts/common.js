@@ -1,10 +1,11 @@
 import axios from 'axios';
 
 export const getAssignedGrants = (hdr,setGrantsObj) => {
+    var m = hdr.mId.replace(' ','+');
     axios({
         method: 'get',
         url: "menu/assignedGrants", 
-        headers: hdr
+        headers: {mId: m}
         }).then((response) => {
         // console.log('get assigned granss...',response.data);
         setGrantsObj(response.data);
