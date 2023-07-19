@@ -432,10 +432,22 @@ export default function Booking(props) {
     // if(!validate(uact)){
     //   return(false);
     // }
+
     const newbaseObj = manageCheckBoxFlags();
     console.log('newObj', newbaseObj);
     console.log('mId', module);
     console.log('uact',uact);
+
+    if(newbaseObj.CreditNumberOfDays === ""){
+      newbaseObj.CreditNumberOfDays = "0";
+    }
+    if(newbaseObj.GrossWeight === ""){
+      newbaseObj.GrossWeight = "0";
+    }
+    if(newbaseObj.Volume === ""){
+      newbaseObj.Volume = "0";
+    }
+
     
     //setBookingStatus(uact);
     const vl = confirm('Confirm updation?', 'Confirmation Alert');
@@ -471,7 +483,10 @@ export default function Booking(props) {
 
           navigate(-1);
         }).catch((error) => {
-          if (error.response) {
+          if (error.response.status === 400) {
+            alert(error.response.statusText,'Booking Validation Error(s)');
+          }
+          else{
             console.log(error.response);
             var msg = "";
             msg = error.response.data;
@@ -644,7 +659,6 @@ export default function Booking(props) {
                               :
                               bookingStatus.toUpperCase() === 'CANCELLED' ?
                                 <>
-                                {resolveControlGrant(grantsObj,'btnReady')?<BxButton variant="primary" onClick={() => saveRecord('READY')} size='sm'>  <i className="bi bi-save" style={{ marginRight: 10 }} ></i>Save</BxButton>:<></>}
                                 </>
                                 :
                                 <></>
