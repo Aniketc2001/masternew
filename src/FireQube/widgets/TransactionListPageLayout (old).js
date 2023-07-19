@@ -6,7 +6,8 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
-import { getAssignedGrants, resolveControlGrant} from  '../../shared/scripts/common';
+import { getFormattedDate } from '../../shared/scripts/common';
+import { DateBox } from 'devextreme-react';
 
 
 import DataGrid, {
@@ -20,7 +21,6 @@ import { useNavigate,useLocation, useParams } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 
-
 /* ListPageLayout Component Props 
     - ColumnVisibilityJSON (columnDisplayMap)
     - API Name (APIName)
@@ -33,11 +33,11 @@ import axios from 'axios';
 
 
 
-export default function ListPageLayout(props) {
+export default function TransactionListPageLayout(props) {
   const m = new URLSearchParams(useLocation().search).get('m');
   const [gridDataSource, setgridDataSource] = useState([]);
   const navigate = useNavigate();
-  const [grantsObj, setGrantsObj] = useState(null);
+
   const [displayDataGrid, setdisplayDataGrid] = useState(true);
 
   const [displayPageSize, setdisplayPageSize] = useState(10);
@@ -51,6 +51,20 @@ export default function ListPageLayout(props) {
   const [anchorElement, setAnchorElement] = React.useState(null);     //Anchor point for Popover
   const [openPopover, setOpenPopover] = React.useState(false);     //Display status for Popover
 
+  const [anchorElDates, setAnchorElDates] = React.useState(null);     //Anchor point for Popover
+  const [openDatesPopover, setOpenDatesPopover] = React.useState(false);     //Display status for Popover
+
+  const [fromDate, setFromDate] = React.useState(new Date());
+  const maxToDate = new Date(2030, 11, 31);
+  const [toDate, setToDate] = React.useState(new Date());
+
+  const [tmpfromDate, settmpFromDate] = React.useState(new Date());
+  const [tmptoDate, settmpToDate] = React.useState(new Date());
+
+
+  const [dateMsg, setDateMsg] = useState(null);
+  const [datebtn, setDateBtn] = useState("TODAY");
+  const [selectedRow, setSelectedRow] = useState(null);
   
   const [checkerInfo,setCheckerInfo] = useState({
     CheckedBy: '',
@@ -81,44 +95,165 @@ export default function ListPageLayout(props) {
   };
 
   useEffect(() => {
-    //console.log('useeffect...');
-    getAssignedGrants(hdr, setGrantsObj);
+//    console.log("viewstate",props.viewState);
     setdisplayDataGrid(false);
     getRecords();
-    console.log("props",props);
-  }, [props.APIName]);
+    if(props.APIName === props.viewState.listPageName)
+      renderViewState();
+  }, [datebtn]);
   
-  const clearViewState = () => {
-    props.setViewState(null);
-  }
 
   const renderViewState = () => {
     setdisplayPageSize(props.viewState.pageSize);
-    console.log('currpage get',props.viewState.pageNumber);
     dataGrid.current.instance.pageIndex(props.viewState.pageNumber);
     setdisplayDataGrid(true);
-    try{
-      //dataGrid.current.instance.filter(props.viewState.filter);
-    }
-    catch(ex){}
-
   }
 
+  const updateViewState = () => {
+    var currpage = "";
+    var fltr = "";
+    try{
+      currpage =dataGrid.current.instance.pageIndex();
+     // fltr = 
+    }
+    catch(ex){}
+//    console.log('currpage',currpage,'pagesize',displayPageSize);
+    props.setViewState({...props.viewState, dataSource: gridDataSource, pageSize: displayPageSize, pageNumber: currpage, listPageName: props.APIName, datebtn: datebtn, filter: fltr });
+  }
+
+  const handle7DaysClick = () => {
+    var frdt =  getFormattedDate(new Date());
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // Subtract 6 days to get the start date
+    var todt = getFormattedDate(sevenDaysAgo);
+
+    setDateBtn('LAST7DAYS');
+    props.setViewState({...props.viewState, "fromDate": todt, "toDate": frdt, "datebtn": 'LAST7DAYS' });
+    props.viewState.fromDate = todt;
+    props.viewState.toDate = frdt;
+    props.viewState.datebtn = 'LAST7DAYS';
+
+    getRecords();
+  }
+
+  const handleTodayClick = () => {
+    var frdt =  getFormattedDate(new Date());
+    var todt = getFormattedDate(new Date());
+
+    setDateBtn('TODAY');
+    props.setViewState({...props.viewState, "fromDate": todt, "toDate": frdt, "datebtn": 'TODAY' });
+    props.viewState.fromDate = todt;
+    props.viewState.toDate = frdt;
+    props.viewState.datebtn = 'TODAY';
+
+    getRecords();
+  }
+
+  const handle30DaysClick = () => {
+    var frdt =  getFormattedDate(new Date());
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29); // Subtract 29 days to get the start date
+    var todt = getFormattedDate(thirtyDaysAgo);
+
+    setDateBtn('LAST30DAYS');
+    props.setViewState({...props.viewState, "fromDate": todt, "toDate": frdt, "datebtn": 'LAST30DAYS' });
+    props.viewState.fromDate = todt;
+    props.viewState.toDate = frdt;
+    props.viewState.datebtn = 'LAST30DAYS';
+
+    getRecords();
+  }
+
+  const handleCustomDatesClick = (event) => {
+    console.log('event',event);
+    settmpFromDate(fromDate);
+    settmpToDate(toDate);
+    setAnchorElDates(event.currentTarget);
+    setOpenDatesPopover(true);
+  }
+
+  const handleCustomPopupClose = () => {
+    setOpenDatesPopover(false);
+  }
+
+  const handleCustomDatesClose = () => {
+    // Check if both from date and to date are selected
+    if (!tmpfromDate || !tmptoDate) {
+      alert('Please specify the date range!');
+      return;
+    }
+
+    // Check if to date is greater than from date
+    if (tmptoDate < tmpfromDate) {
+      alert("'To date' should be greater than 'From date'");
+      return;
+    }
+    if (tmpfromDate > maxToDate) {
+      alert("'From date' should be less than 'To date'");
+      return;
+    }
+
+    props.setViewState({...props.viewState, fromDate: getFormattedDate(tmpfromDate), toDate: getFormattedDate(tmptoDate), datebtn: 'CUSTOM' });
+    
+    setFromDate(tmpfromDate);
+    setToDate(tmptoDate);
+    
+    props.viewState.fromDate = getFormattedDate(tmpfromDate);
+    props.viewState.toDate = getFormattedDate(tmptoDate);
+    props.viewState.datebtn = 'CUSTOM';
+
+    setDateBtn('CUSTOM');
+    getRecords();
+
+    setOpenDatesPopover(false);
+  };
+
+  const handleFromDateChange = (e) => {
+    const selectedFromDate = e.value;
+    settmpFromDate(selectedFromDate);
+  };
+
+  const handleToDateChange = (e) => {
+    settmpToDate(e.value);
+    console.log(e.value);
+  }
 
   const getRecords =  () => {
       //console.log('inside getrecords');
+      var frdt = props.viewState.fromDate;
+      var todt = props.viewState.toDate;
+      var dbtn = props.viewState.datebtn;
+      var msg = "";
+      
+      if(frdt !== todt)
+        msg = "Displaying list of transactions between " + frdt + " and " + todt;
+      else
+        msg = "Displaying list of transactions for " + frdt ;
+
+      if(dbtn === "TODAY")
+        msg = "Displaying list of transactions for Today...";
+      else if(dbtn === "LAST7DAYS")
+        msg = "Displaying list of transactions for last 7 days...";
+      else if(dbtn === "LAST30DAYS")
+        msg = "Displaying list of transactions for last 30 days...";
+      
+      //console.log('msg',msg);
+      setDateMsg(msg);
+
       axios({
         method: 'get',
         url: props.APIName, 
-        headers: hdr
+        headers: {mId: m, frdt: frdt, todt: todt}
       }).then((response) => {
         //console.log('listpage getrecords...');
         setgridDataSource(response.data);
-        //console.log(response.data);
+        //console.log('getrecords',response.data);
         setdisplayDataGrid(true);
+        renderViewState();
+        updateViewState();
       }).catch((error) => {
-        console.log('list err');
-        console.log(error);
+        //console.log('list err');
+        //console.log(error);
         if(error.response) {
           console.log("Error occured while fetching data. Error message - " + error.message);
         }
@@ -164,33 +299,12 @@ export default function ListPageLayout(props) {
     );
   }
   
-  const renderCustomButton2 = (cellData) => {
-    return (
-        <i className={'bi-funnel-fill'} style={{color:'green', fontSize: '9pt', cursor:'pointer'}} title='Manage additional details' />
-    );
-  }
-
   const renderActiveStatus = (cellData) => {
     return (
       <div>
             {cellData.data.Active=="N" ? <i className={'bi-flag-fill'} style={{color:'red', fontSize: '10pt', marginRight: '5px', cursor:'pointer'}} title='Inactive' />: <i className={'bi-flag-fill'} style={{color:'lightgreen', fontSize: '10pt', marginRight: '5px', cursor:'pointer'}} title='Active' />}
       </div>
     );
-  }
-  
-  const deleteRecord = (id) => {
-    axios({
-      method: 'delete',
-      url: props.APIName + "/" + id,
-      headers: {"mId": m}
-    }).then((response) => {
-      getRecords();
-    }).catch((error) => {
-      console.log('delete record',error);
-      if(error.response.data) {
-        alert(error.response.data,"Error occured while deleting record");
-      }
-    })
   }
 
   const validateSelection = (fg) => {
@@ -256,9 +370,11 @@ export default function ListPageLayout(props) {
                 setnotificationBarMessage('Action on selected record(s) successful!');
                 setOpenNotificationBar(true);
               }).catch((error) => {
-                console.log('delete records err',error);
                 if(error.response) {
-                  alert(error.response.data,"Error occured while deleting record");
+                  if(error.response.status === 417) {
+                    setnotificationBarMessage('Error occured while deleting the record(s)! <br/>' + error.message);
+                    setOpenNotificationBar(true);
+                  }
                 }
               });                
             }
@@ -268,70 +384,6 @@ export default function ListPageLayout(props) {
         setnotificationBarMessage('No records selected!');
         setOpenNotificationBar(true);
       }
-  };
-
-  const activeButtonClick = () => {
-    if(!validateSelection('act'))
-      return;
-    
-    var ids = getSelectedRowIDs();
-      if(ids){
-        const vl = confirm('Mark records as active?','Confirmation Alert');
-        vl.then((dialogResult) => {
-            if(dialogResult){
-                axios({
-                  method: 'put',
-                  url: props.APIName + "/" + ids,
-                  headers: {"mId": m, "actstate": 'Y'}
-                }).then((response) => {
-                  getRecords();
-                  setnotificationBarMessage('Records marked as active!');
-                  setOpenNotificationBar(true);
-                }).catch((error) => {
-                  if(error.response) {
-                    alert(error.response.data,"Error occured while marking records as active");
-                  }
-                });
-            }
-        });
-      }
-      else{
-        setnotificationBarMessage('No records selected!');
-        setOpenNotificationBar(true);
-      }
-  };
-
- 
-  const inactiveButtonClick = () => {
-    if(!validateSelection('inact'))
-      return;
-
-    var ids = getSelectedRowIDs();
-    if(ids){
-      const vl = confirm('Mark records as inactive?','Confirmation Alert');
-      vl.then((dialogResult) => {
-          if(dialogResult){
-            axios({
-              method: 'put',
-              url: props.APIName + "/" + ids,
-              headers: {"mId": m, "actstate": 'N'}
-            }).then((response) => {
-              getRecords();
-              setnotificationBarMessage('Records marked as inactive!');
-              setOpenNotificationBar(true);
-            }).catch((error) => {
-              if(error.response) {
-                alert(error.response.data,"Error occured while marking records as inactive");
-              }
-            });
-         
-          }
-      });
-    }
-    else{
-      setnotificationBarMessage('No records selected!');
-      setOpenNotificationBar(true);
-    }
   };
 
   const hidePopover = () => {
@@ -358,38 +410,35 @@ export default function ListPageLayout(props) {
     setTimeout(hidePopover,6000);
   }
 
-  const updateViewState = () => {
-    var currpage = "";
-    var gridfilter = "";
+  const copyButtonClick = () => {
     try{
-      currpage = dataGrid.current.instance.pageIndex();
-      console.log('currpage set',currpage);
-      //gridfilter = dataGrid.current.instance.getCombinedFilter();
+      if(selectedRow[props.KeyFieldName]===null){
+        alert('Please select a record to copy!','Create Copy');
+        return false;
+      }
     }
-    catch(ex){}
-    console.log('currpage',currpage,gridfilter);
-    props.setViewState({...props.viewState, pageNumber: currpage, listPageName: props.APIName, pageSize: displayPageSize, filter: gridfilter });
+    catch(ex){
+      alert('Please select a record to highlight the row and then click on the <b>Create Copy</b> button!','Create Copy');
+      return false;
+    }
+
+    var ky = selectedRow[props.KeyFieldName];
+
+    navigate(`/${props.EditPageName}/${ky}?m=${m}&clr=d`);
   }
-
-
   const createButtonClick = () => {
-    //updateViewState();
+    updateViewState();
     navigate(`/${props.EditPageName}/0?m=${m}`);
   }
 
   const editIconClick = (e) => {
-    //updateViewState();
+    updateViewState();
     navigate(`/${props.EditPageName}/${e.key}?m=${m}`);
   };
   
   const customIconClick = (e) => {
     console.log('custom click');
     navigate(`/${props.CustomURL}/${e.key}?m=${m}`);
-  };
-
-  const customIcon2Click = (e) => {
-    console.log('custom click');
-    navigate(`/${props.CustomURL2}/${e.key}?m=${m}`);
   };
 
   const deleteIconClick = (e) => {
@@ -414,25 +463,22 @@ export default function ListPageLayout(props) {
 
 
   const handleGridCellClick = (e) => {
-    switch(e.columnIndex){
-      case 2: //Checker status
+//    console.log(e);
+    switch(e.column.name){
+      case "CHECKER": //Checker status
         if(e.data.CheckerStatus !== "D")
           checkerStatusIconClick(e.row);
         break;
-      case 3: // Active Status
+      case "ACTIVE": // Active Status
         //checkerStatusIconClick(e.row);
         break;
-      case 4: //Edit Button
+      case "EDIT": //Edit Button
         editIconClick(e.row);
         break;
-      case 5:
+      case "CUSTOM":
         if(props.CustomField)
           customIconClick(e.row);
         break;
-      case 6:
-        if(props.CustomField2)
-          customIcon2Click(e.row);
-        break;  
 
     }
     
@@ -442,25 +488,21 @@ export default function ListPageLayout(props) {
     //e.rowElement.style.backgroundColor = 'red';
   }
 
-  const customizePager = (pagerOptions) => {
-    return (
-      <div>
-        <span>Total Records: {gridDataSource.length}</span>
-        {pagerOptions}
-      </div>
-    );
-  };
+  const handleRowClick = (e) => {
+    const clickedRow = e.data;
+    setSelectedRow(clickedRow);
+    console.log('selected row id',clickedRow[props.KeyFieldName]);
+  }
 
   return (
       true
       ?
       <Box   sx={{ p: 2,  paddingTop: 2, minHeight:'90vh', minWidth:'90vh',  backgroundColor: 'white', fontFamily:'Poppins' }}>
         <h2 className='PageTitle'>{props.ListPageTitle}</h2>
-        <p className='PageSubTitle'>{props.SubTitle}  <span style={{color:'grey',fontSize:'8pt',paddingLeft:'20px'}}>Displaying a total list of {gridDataSource.length} record(s)</span></p> 
-
+        <p className='PageSubTitle'>{props.SubTitle} <span style={{paddingLeft:'20px',color:'blue'}}>{dateMsg} [Total records: {gridDataSource.length}]</span></p>
         <Grid container spacing={1} >
           <Grid item xm={1} >
-          {resolveControlGrant(grantsObj,'btnNew')?<BxButton
+            <BxButton
               variant="primary"
               size="sm"
               style={{ textTransform: "none"}}
@@ -468,42 +510,19 @@ export default function ListPageLayout(props) {
             >
               <i className={'bi-save'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
               Create New
-            </BxButton>:<></>}
+            </BxButton>
           </Grid>
           <Grid item xm={1}>
-          {resolveControlGrant(grantsObj,'btnDelete')?<BxButton
+            <BxButton
               variant="primary"
               size="sm"
               style={{ textTransform: "none" }}
-              onClick={deleteButtonClick}
+              onClick={copyButtonClick}
             >
-              <i className={'bi-x-circle'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
-              Delete Records
-            </BxButton>:<></>}
+              <i className={'bi-arrow-repeat'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
+              Create Copy
+            </BxButton>
           </Grid>                  
-          <Grid item xm={1}>
-          {resolveControlGrant(grantsObj,'btnSetActive')?<BxButton
-              variant="primary"
-              size="sm"
-              style={{ textTransform: "none" }}
-              onClick={activeButtonClick}
-            >
-              <i className={'bi-calendar2-x'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
-              Active
-            </BxButton>:<></>}
-          </Grid>
-          <Grid item xm={1}>
-          {resolveControlGrant(grantsObj,'btnSetInactive')?<BxButton
-              variant="secondary"
-              size="sm"
-              style={{ textTransform: "none" }}
-              color="success"
-              onClick={inactiveButtonClick}
-            >
-              <i className={'bi-card-checklist'} style={{color:'white', fontSize: '10pt', marginRight: '10px'}} />
-              Inactive
-            </BxButton>:<></>}
-          </Grid>
           <Grid item xm={1}>
             <BxButton
               variant="primary"
@@ -514,34 +533,98 @@ export default function ListPageLayout(props) {
               Advanced Search
             </BxButton>
           </Grid>   
-          <Grid item xm={4}>
-            <ToggleButtonGroup
+          <Grid item xm={9}>
+                  <BxButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleTodayClick}
+                  style={{ textTransform: "none",fontSize: '8pt',marginRight:'5px',marginLeft:'15px' }}
+                  >
+                    <i className={'bi-thermometer'} style={{ fontSize: '10pt', marginRight: '2px'}} />
+                    Today
+                  </BxButton>
+                  <BxButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={handle7DaysClick}
+                  style={{ textTransform: "none",fontSize: '8pt',marginRight:'5px' }}
+                  >
+                    <i className={'bi-thermometer-half'} style={{ fontSize: '10pt', marginRight: '2px'}} />
+                    Last 7 days
+                  </BxButton>
+                  <BxButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={handle30DaysClick}
+                  style={{ textTransform: "none",fontSize: '8pt',marginRight:'5px' }}
+                  >
+                    <i className={'bi-thermometer-high'} style={{ fontSize: '10pt', marginRight: '2px'}} />
+                    Last 30 days
+                  </BxButton>
+                  <BxButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleCustomDatesClick}
+                  style={{ textTransform: "none",fontSize: '8pt',marginRight:'20px' }}
+                  >
+                    <i className={'bi-thermometer-snow'} style={{ fontSize: '10pt', marginRight: '2px'}} />
+                    Custom
+                  </BxButton>
+                    <Popover
+                      id='dates-popover'
+                      open={openDatesPopover}
+                      anchorEl={anchorElDates}
+                      onClose={handleCustomPopupClose}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                      }}
+                    >
+                      <Paper elevation={0} sx={{ width: "430px", height: "80px", p: 2, backgroundColor:'lightgoldenrodyellow' }}>
+                        <Grid container gap={3} alignItems="baseline">
+                          <DateBox width={120} value={tmpfromDate} onValueChanged={handleFromDateChange} stylingMode="underlined" label='From Date' labelMode='floating' displayFormat="dd-MMM-yyyy" />
+                          <DateBox width={120} max={maxToDate} value={tmptoDate} onValueChanged={handleToDateChange} stylingMode="underlined" label='To Date' labelMode='floating' displayFormat="dd-MMM-yyyy" />
+                          <BxButton
+                            variant="primary"
+                            size="sm"
+                            style={{ textTransform: "none", fontSize: '9pt', marginRight: '20px', marginTop: '5px', height: "29px" }} 
+                            onClick={handleCustomDatesClose}
+                          ><i className={'bi-thermometer-snow'} style={{ fontSize: '10pt', marginRight: '2px' }} />
+                            Set Dates
+                          </BxButton>
+                        </Grid>
+                      </Paper>
+                    </Popover>
+                  <ToggleButtonGroup
+                  value={displayPageSize}
+                  exclusive
                 size="small"
                 aria-label="text alignment"
                 sx={{ marginTop:0, height:'30px',  backgroundColor:'whitesmoke'}}
                 >
-                <ToggleButton value="left" aria-label="left aligned" onClick={()=> setdisplayPageSize(10)} hint="Pagesize: 12">
+                <ToggleButton value="10" aria-label="left aligned" onClick={()=> setdisplayPageSize(10)} hint="Pagesize: 12">
                     10
                 </ToggleButton>
-                <ToggleButton value="center" aria-label="centered" onClick={()=> setdisplayPageSize(20)}>
+                <ToggleButton value="20" aria-label="centered" onClick={()=> setdisplayPageSize(20)}>
                     20
                 </ToggleButton>
-                <ToggleButton value="right" aria-label="right aligned" onClick={()=> setdisplayPageSize(50)}>
+                <ToggleButton value="50" aria-label="right aligned" onClick={()=> setdisplayPageSize(50)}>
                     50
                 </ToggleButton>
-                <ToggleButton value="justify" aria-label="justified" onClick={()=> setdisplayPageSize(100)}>
+                <ToggleButton value="100" aria-label="justified" onClick={()=> setdisplayPageSize(100)}>
                     100
                 </ToggleButton>
-                <ToggleButton  value="justify" aria-label="justified" onClick={()=> setdisplayFilterRow(!displayFilterRow)} title="Enable Column Filters">
+                <ToggleButton  value="filter" aria-label="justified" onClick={()=> setdisplayFilterRow(!displayFilterRow)} title="Enable Column Filters">
                     <i className={'bi-binoculars-fill'} style={{ color:'darkslategray', fontSize: '12pt'}} />
                 </ToggleButton>
-                <ToggleButton value="justify" aria-label="justified" onClick={()=> setdisplayFilterPanel(!displayFilterPanel)} title="Enable Query Filters">
+                <ToggleButton value="funnel" aria-label="justified" onClick={()=> setdisplayFilterPanel(!displayFilterPanel)} title="Enable Query Filters">
                     <i className={'bi-funnel-fill'} style={{ color:'darkslategray', fontSize: '12pt'}} />
                 </ToggleButton>                
-                <ToggleButton value="justify" aria-label="justified" onClick={()=> setdisplayGroupPanel(!displayGroupPanel)} title="Display Column Grouping">
+                <ToggleButton value="group" aria-label="justified" onClick={()=> setdisplayGroupPanel(!displayGroupPanel)} title="Display Column Grouping">
                     <i className={'bi-bar-chart-steps'} style={{ color:'darkslategray', fontSize: '12pt'}} />
                 </ToggleButton>
-                </ToggleButtonGroup>
+            </ToggleButtonGroup>
+
           </Grid>   
         </Grid>
         {props.columnNamesJSON && gridDataSource && props.KeyFieldName && displayDataGrid?
@@ -564,9 +647,9 @@ export default function ListPageLayout(props) {
               onCellClick={handleGridCellClick}
               onRowPrepared={handleCheckBoxVisibility}
               onRowDblClick={editIconClick}
-              height={500}
+              onRowClick={handleRowClick}
+              height={520}
             >
-              <Selection mode="multiple"  />
               <Paging enabled={true} pageSize={displayPageSize} />
               <SearchPanel visible={true} />
               <GroupPanel visible={displayGroupPanel} />
@@ -576,21 +659,20 @@ export default function ListPageLayout(props) {
               <ColumnChooser enabled={true} />
 
               <Export enabled={true}   />
-              <Column caption="" cellRender={renderMarkForDeleteStatus} width={25} />
-              <Column caption="" cellRender={renderCheckerStatus} width={25} onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}   />
-              <Column caption="" cellRender={renderActiveStatus} width={25} />
-              <Column caption="" cellRender={renderEditButton}  width={29} onClick={editIconClick}  />
-              <Column caption="" cellRender={renderCustomButton} visible={props.CustomField===true} onClick={editIconClick} width={28} />
-              <Column caption="" cellRender={renderCustomButton2} visible={props.CustomField2===true} onClick={editIconClick} width={28} />
+              <Column name="DELETE" key="1" caption="" cellRender={renderMarkForDeleteStatus} width={25} visible={props.DeleteStatusColumnVisibility} />
+              <Column name="CHECKER" key="2" caption="" cellRender={renderCheckerStatus} width={25} visible={props.CheckerStatusColumnVisibility} onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}   />
+              <Column name="ACTIVE" key="3" caption="" cellRender={renderActiveStatus} width={25} />
+              <Column name="EDIT" key="4" caption="" cellRender={renderEditButton}  width={29} onClick={editIconClick}  />
+              <Column name="CUSTOM" key="5" caption="" cellRender={renderCustomButton} visible={props.CustomField===true} onClick={editIconClick} width={28} />
 
               {props.columnNamesJSON.map(column => (
                   <Column
                     dataField={column.FunctionPointName}
                     caption={column.ColumnCaption}
-                    dataType={column.ColumnCaption.toLowerCase().includes('date') ? 'datetime' : undefined}
-                    format={column.ColumnCaption.toLowerCase().includes('date') ? 'dd-MMM-yyyy' : undefined}
+                    key={column.FunctionPointName}
                   />
               ))}
+              
 
             </DataGrid>
             <Snackbar
@@ -622,32 +704,7 @@ export default function ListPageLayout(props) {
                         Checker Information
                     </Alert>
                     <br/>
-                    <Typography variant="button" display="block" gutterBottom>
-                        Requester Details:
-                    </Typography>
-                    <Typography variant="caption" display="block" gutterBottom>
-                        {checkerInfo.RequestDate}
-                    </Typography>                    
-                    <Typography variant="overline" sx={{fontWeight:'bold',fontSize:14}} display="block" gutterBottom>
-                        {checkerInfo.RequestByName}
-                    </Typography>
-                   
-                    <br/>
-                    <Typography variant="button" display="block" gutterBottom>
-                        Checker Details:
-                    </Typography>
-
-                    <Typography variant="caption" display="block" gutterBottom>
-                        {checkerInfo.CheckedDate}
-                    </Typography>
-                    <Typography variant="overline" sx={{fontWeight:'bold',fontSize:14}} display="block" gutterBottom>
-                        {checkerInfo.CheckedBy}
-                    </Typography>                    
-                    <Typography variant="body2" display="block" gutterBottom>
-                        {checkerInfo.CheckerRemarks}
-                    </Typography>
-
-                  
+                    
                 </Paper>
             </Popover>
         </Box>

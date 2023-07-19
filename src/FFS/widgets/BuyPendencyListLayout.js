@@ -34,7 +34,7 @@ import { AspectRatio, AspectRatioOutlined, CastConnected, CastConnectedOutlined,
 
 
 
-export default function TransactionListPageLayout(props) {
+export default function BuyPendencyListLayout(props) {
   const m = new URLSearchParams(useLocation().search).get('m');
   const [gridDataSource, setgridDataSource] = useState([]);
   const navigate = useNavigate();
@@ -509,38 +509,6 @@ export default function TransactionListPageLayout(props) {
         <h2 className='PageTitle'>{props.ListPageTitle}</h2>
         <p className='PageSubTitle'>{props.SubTitle} <span style={{ paddingLeft: '20px', color: 'blue' }}>{dateMsg} [Total records: {gridDataSource.length}]</span></p>
         <Grid container spacing={1} >
-          <Grid item xm={1} >
-            <BxButton
-              variant="primary"
-              size="sm"
-              style={{ textTransform: "none" }}
-              onClick={createButtonClick}
-            >
-              <i className={'bi-save'} style={{ color: 'white', fontSize: '10pt', marginRight: '10px' }} />
-              Create New
-            </BxButton>
-          </Grid>
-          <Grid item xm={1}>
-            <BxButton
-              variant="primary"
-              size="sm"
-              style={{ textTransform: "none" }}
-              onClick={copyButtonClick}
-            >
-              <i className={'bi-arrow-repeat'} style={{ color: 'white', fontSize: '10pt', marginRight: '10px' }} />
-              Create Copy
-            </BxButton>
-          </Grid>
-          <Grid item xm={1}>
-            <BxButton
-              variant="primary"
-              size="sm"
-              style={{ textTransform: "none" }}
-            >
-              <i className={'bi-card-checklist'} style={{ fontSize: '10pt', marginRight: '10px' }} />
-              Advanced Search
-            </BxButton>
-          </Grid>
           <Grid item xm={9}>
             <BxButton
               variant="secondary"

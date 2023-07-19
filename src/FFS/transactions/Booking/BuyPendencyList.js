@@ -4,7 +4,7 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import TransactionListPageLayout from '../../../FireQube/widgets/TransactionListPageLayout';
+import BuyPendencyListLayout from '../../widgets/BuyPendencyListLayout';
 import BookingPreviewCx from './BookingPreviewCx';
 
 /* ListPageLayout Component Props 
@@ -17,7 +17,7 @@ import BookingPreviewCx from './BookingPreviewCx';
     - KeyFieldName (KeyFieldName)
     - ColumnNamesJSON (Columns) */
 
-export default function BookingList(props) {
+export default function BuyPendencyList(props) {
   const m = new URLSearchParams(useLocation().search).get('m');
   const [menuDetails, setmenuDetails] = useState(null);
   const [columnNamesJSON, setcolumnNamesJSON] = useState(null);
@@ -89,7 +89,7 @@ export default function BookingList(props) {
   return (
     menuDetails && columnNamesJSON ?
       <>
-        <TransactionListPageLayout
+        <BuyPendencyListLayout
           APIName={menuDetails.ApiName}
           EditPageName={menuDetails.EditUrl}
           ListPageName={menuDetails.MenuUrl}
@@ -111,6 +111,6 @@ export default function BookingList(props) {
   );
 };
 
-BookingList.propTypes = {
+BuyPendencyList.propTypes = {
   mId: PropTypes.string.isRequired
 }

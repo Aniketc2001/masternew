@@ -17,7 +17,11 @@ import PropTypes  from 'prop-types';
     - ColumnNamesJSON (Columns) */
 
 export default function MasterListPageCx(props) {
-    const m = new URLSearchParams(useLocation().search).get('m');
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    var m = decodeURIComponent(queryParams.get('m'));
+
+  //const m = new URLSearchParams(useLocation().search).get('m');
     const [menuDetails, setmenuDetails] = useState(null); 
     const [columnNamesJSON, setcolumnNamesJSON] = useState(null);
    
@@ -32,14 +36,20 @@ export default function MasterListPageCx(props) {
     }, [props.mId]);
       
     const getDetails = () => {
+        console.log('menu id - {' + m + '}');
+        m = m.replace(' ','+');
+        console.log('revised menu id - {' + m + '}');
+
         axios({
             method: 'get',
             url: "menu/getMenuInfo",
-            headers: hdr
+            headers: {
+              'mId': m
+            }
           }).then((response) => {
-            //console.log('menu obj MasterListPage...');
+            console.log('menu obj MasterListPage...');
             setmenuDetails(response.data);
-            //console.log(response.data);
+            console.log(response.data);
           }).catch((error) => {
             console.log('MasterListPage err...',error);
             if(error.response) {
@@ -49,10 +59,16 @@ export default function MasterListPageCx(props) {
     }
 
     const getColumnDetails = () => {
+        console.log('2.menu id - {' + m + '}');
+        m = m.replace(' ','+');
+        console.log('2.revised menu id - {' + m + '}');
+
         axios({
             method: 'get',
             url: "menu/assignedGrants", 
-            headers: hdr
+            headers: {
+              'mId': m
+            }
           }).then((response) => {
             //console.log('column details obj...',response.data);
             //response.data.grants_columns.sort((a, b) => a.FunctionPointId - b.FunctionPointId);

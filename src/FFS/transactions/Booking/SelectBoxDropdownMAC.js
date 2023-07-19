@@ -1,4 +1,5 @@
-import { Typography } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 import { SelectBox } from 'devextreme-react';
 import React , {useEffect, useRef,useState} from 'react'
 import axios from 'axios';
@@ -6,6 +7,9 @@ import axios from 'axios';
 export default function SelectBoxDropdown({ dataSource, setpropName,setpropId,baseObj, value, initialText, initialId, ancobjectName, setbaseObj, data, dynamic,apiName,listType,fieldName, ancchild,setancds }) {
     const [selectboxDatasource, setselectboxDatasource] = useState(dataSource)
     const selectboxRef = useRef(null);
+
+    const [options, setOptions] = useState(dataSource);
+    const [selectedItemId, setSelectedItemId] = useState('');
 
 
     useEffect(()=>{
@@ -91,36 +95,90 @@ export default function SelectBoxDropdown({ dataSource, setpropName,setpropId,ba
           );
     }
 
+    const handleInputChange = (event) => {
+        console.log('input',event);
+        if (event.target.value.length === 3) {
+          // Perform API call to populate the JSON array
+            axios({
+                method: 'get',
+                url: apiName + '/' + listType + '/' + fieldName + '/' + event.target.value,
+            }).then((response) => {
+                console.log('getting data...',response.data.anc_results);
+                setselectboxDatasource(response.data.anc_results);
+                setOptions(response.data.anc_results);
+                ancobjectName = response.data.anc_results;
+                setancds(ancchild,response.data.anc_results);
+            });            
+        }
+      };
+    
+    const handleItemSelected = (event, value) => {
+        //console.log('item selected',event,value);
+        if (value) {
+          setSelectedItemId(value.id);
+          try{
+            setpropName(value[data.displayExpr]);
+          }
+          catch(ex){}
+
+          try{
+            setpropId(value[data.valueExpr]);
+          }
+          catch(ex){}
+            
+        } else {
+          setSelectedItemId('');
+        }
+      };
+
 
     return (
         <>
          {dynamic ?
-                <SelectBox dataSource={selectboxDatasource}
+                <Autocomplete
                     fullWidth
-                    name={data.name}
-                    displayExpr={data.displayExpr}
-                    valueExpr={data.valueExpr}
-                    label={data.label}
-                    searchExpr={data.searchExpr}
-                    value={value}
-                    searchEnabled={true}
-                    searchMode='contains'
-                    searchTimeout={200}
-                    minSearchLength={3}
-                    showDataBeforeSearch={true}
-                    showClearButton={true}
-                    labelMode='floating'
-                    showSelectionControls={false}
-                    height='45px'
-                    ref={selectboxRef}
-                    onKeyDown={handleKeyDown}
-                    //onValueChanged={handleValueChange}
-                    onValueChanged={handleValueChange}
-                    dropDownButtonRender={dynaButton}
-                    //className='select-dyna-box-text'
-                    placeholder='Type atleast 3 chars to search...'
-                    stylingMode="underlined"
+                    options={options}
+                    autoHighlight
+                    getOptionLabel={(option) => option[data.displayExpr]}
+                    getOptionSelected={(option, value) => option.id === value[data.valueExpr]}
+                    renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        value={initialText}
+                        label={data.label}
+                        onChange={handleInputChange}
+                        variant="standard"
+                    />
+                    )}
+                    onChange={handleItemSelected}
                 />
+
+                // <SelectBox dataSource={selectboxDatasource}
+                //     fullWidth
+                //     name={data.name}
+                //     displayExpr={data.displayExpr}
+                //     valueExpr={data.valueExpr}
+                //     label={data.label}
+                //     searchExpr={data.searchExpr}
+                //     value={value}
+                //     searchEnabled={true}
+                //     searchMode='contains'
+                //     searchTimeout={200}
+                //     minSearchLength={3}
+                //     showDataBeforeSearch={true}
+                //     showClearButton={true}
+                //     labelMode='floating'
+                //     showSelectionControls={false}
+                //     height='45px'
+                //     ref={selectboxRef}
+                //     onKeyDown={handleKeyDown}
+                //     //onValueChanged={handleValueChange}
+                //     onValueChanged={handleValueChange}
+                //     dropDownButtonRender={dynaButton}
+                //     //className='select-dyna-box-text'
+                //     placeholder='Type atleast 3 chars to search...'
+                //     stylingMode="underlined"
+                // />
                 :
                 <SelectBox dataSource={dataSource}
                     fullWidth

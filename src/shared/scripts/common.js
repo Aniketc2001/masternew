@@ -1,10 +1,11 @@
 import axios from 'axios';
 
 export const getAssignedGrants = (hdr,setGrantsObj) => {
+    var m = hdr.mId.replace(' ','+');
     axios({
         method: 'get',
         url: "menu/assignedGrants", 
-        headers: hdr
+        headers: {mId: m}
         }).then((response) => {
         // console.log('get assigned granss...',response.data);
         setGrantsObj(response.data);
@@ -15,8 +16,9 @@ export const getAssignedGrants = (hdr,setGrantsObj) => {
 
 export const resolveControlGrant = (grantsObj,controlName) => {
     try{
+        //console.log('grants obj',grantsObj);
         const filteredData = grantsObj.grants_controls.filter(row => row.FunctionPointName === controlName);
-        console.log('resolveControls ',filteredData,"length",filteredData.length > 0);
+        //console.log('resolveControls ',filteredData,"length",filteredData.length > 0);
         return (filteredData.length > 0);
     }
     catch(ex){
